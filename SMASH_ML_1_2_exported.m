@@ -509,7 +509,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function CalculateButtonPushed(app, event)
             app.WritetoExcelButton.Enable = 'on';
             app.pix_size = app.PixelSizeumpixelEditField.Value;
+
+            % Change output folder to current folder
+            app.DataOutputFolderEditField.Value = pwd;
             app.output_path = app.DataOutputFolderEditField.Value;
+
             pix_area = app.pix_size^2;
             label = bwlabel(app.bw_obj,4);
             app.num_obj = max(max(label));
@@ -590,6 +594,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CalculateButton_CNF
         function CalculateButton_CNFPushed(app, event)
+            % Change output folder to current folder
+            app.DataOutputFolderEditField_2.Value = pwd;
+            app.output_path = app.DataOutputFolderEditField_2.Value;
+
             app.Prompt.Text = '';
             app.CalculateButton_CNF.Enable = 'off';
             app.DoneButton_CNF.Enable = 'off';
@@ -657,6 +665,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: CNFExcelWrite
         function CNFExcelWriteButtonPushed(app, event)
             cd(app.DataOutputFolderEditField_2.Value)
+            
             header{1,1} = 'Border (um)';
             header{1,2} = 'Minimum Nuclear Size (um^2)';
             header{1,3} = 'Nuclear Filter (arb)';
@@ -724,6 +733,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CalculateFT
         function CalculateFTButtonPushed(app, event)
+            % Change output folder to current folder
+            app.DataOutputFiberType.Value = pwd;
+            app.output_path = app.DataOutputFiberType.Value;
+
             app.CalculateFT.Enable = 'off';
             app.PixelSizeFiberType.Enable = 'off';
             app.FiberTypeColorDropDown.Enable = 'off';
@@ -805,6 +818,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: WritetoExcelFT
         function WritetoExcelFTButtonPushed(app, event)
             cd(app.DataOutputFiberType.Value)
+            
             pix_area = app.pix_size^2;
             header{1,1} = 'Average Fiber Size';
             header{1,2} = 'Average Fiber Intensity';
@@ -889,6 +903,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CalculateNonfiber
         function CalculateNonfiberButtonPushed(app, event)
+            % Change output folder to current folder
+            app.NonfiberOutput.Value = pwd;
+            app.output_path = app.NonfiberOutput.Value;
+            
             img_org = app.orig_img;
             app.CalculateNonfiber.Enable = 'off';
             app.DoneNonfiber.Enable = 'off';
