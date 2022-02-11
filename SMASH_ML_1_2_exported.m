@@ -196,8 +196,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             cd(PathName)
             app.orig_img = imread(FileName);
             imshow(app.orig_img,'Parent',app.UIAxes)
-
-            % TEST TEST TEST TEST 
             
             if exist(MaskName,'file')
                 app.InitialSegmentationButton.Enable = 'on';
