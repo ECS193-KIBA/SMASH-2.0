@@ -3,116 +3,116 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
-        SelectFileButton                matlab.ui.control.Button
-        FilenameLabel                   matlab.ui.control.Label
-        UIAxes                          matlab.ui.control.UIAxes
-        SegmentationParameters          matlab.ui.container.Panel
-        PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
-        PixelSizeField                  matlab.ui.control.NumericEditField
-        SegmentButton                   matlab.ui.control.Button
-        FiberOutlineColorDropDownLabel  matlab.ui.control.Label
-        FiberOutlineColorDropDown       matlab.ui.control.DropDown
-        AcceptSegmentationButton        matlab.ui.control.Button
-        SegmentationThresholdSliderLabel  matlab.ui.control.Label
-        SegmentationThresholdSlider     matlab.ui.control.Slider
-        DetectValueButton               matlab.ui.control.Button
-        Prompt                          matlab.ui.control.Label
-        Image                           matlab.ui.control.Image
-        SMASHLabel                      matlab.ui.control.Label
-        Image2                          matlab.ui.control.Image
-        DrawLineControls                matlab.ui.container.Panel
-        DrawLineButton                  matlab.ui.control.Button
-        DoneDrawingButton               matlab.ui.control.Button
-        FinishSegmentingButton          matlab.ui.control.Button
-        SortingAxesPanel                matlab.ui.container.Panel
-        UIAxesL                         matlab.ui.control.UIAxes
-        YesButton                       matlab.ui.control.Button
-        NoButton                        matlab.ui.control.Button
-        MarkasfiberLabel                matlab.ui.control.Label
-        UIAxesR                         matlab.ui.control.UIAxes
-        ManualFilterControls            matlab.ui.container.Panel
-        RemoveObjectsButton             matlab.ui.control.Button
-        FinishManualFilteringButton     matlab.ui.control.Button
-        PropertiesPanel                 matlab.ui.container.Panel
-        FeretAxes                       matlab.ui.control.UIAxes
-        FiberSizeAxes                   matlab.ui.control.UIAxes
-        PropertiesControlPanel          matlab.ui.container.Panel
-        WritetoExcelButton              matlab.ui.control.Button
-        DoneButton                      matlab.ui.control.Button
-        DataOutputFolderEditFieldLabel  matlab.ui.control.Label
-        DataOutputFolderEditField       matlab.ui.control.EditField
-        PixelSizeumpixelEditFieldLabel_2  matlab.ui.control.Label
-        PixelSizeumpixelEditField       matlab.ui.control.NumericEditField
-        CalculateButton                 matlab.ui.control.Button
-        FiberPredictionControlPanel     matlab.ui.container.Panel
-        FilterButton                    matlab.ui.control.Button
-        ManualSortingButton             matlab.ui.control.Button
-        SortingThresholdHigherrequiresmoremanualsortingLabel  matlab.ui.control.Label
-        SortingThresholdSlider          matlab.ui.control.Slider
-        CNFControlPanel                 matlab.ui.container.Panel
-        PixelSizeumpixelLabel           matlab.ui.control.Label
-        PixelSizeumpixelEditField_2     matlab.ui.control.NumericEditField
-        NucleiColorDropDownLabel        matlab.ui.control.Label
-        NucleiColorDropDown             matlab.ui.control.DropDown
-        CalculateButton_CNF             matlab.ui.control.Button
-        CNFExcelWrite                   matlab.ui.control.Button
-        DoneButton_CNF                  matlab.ui.control.Button
-        DistancefromborderEditFieldLabel  matlab.ui.control.Label
-        DistancefromborderEditField     matlab.ui.control.NumericEditField
-        MinimumNucleusSizeum2EditFieldLabel  matlab.ui.control.Label
-        MinimumNucleusSizeum2EditField  matlab.ui.control.NumericEditField
-        DataOutputFolderEditField_2Label  matlab.ui.control.Label
-        DataOutputFolderEditField_2     matlab.ui.control.EditField
-        FiberTypingControlPanel         matlab.ui.container.Panel
-        PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
-        PixelSizeFiberType              matlab.ui.control.NumericEditField
-        DataOutputFolderEditField_3Label  matlab.ui.control.Label
-        DataOutputFiberType             matlab.ui.control.EditField
-        FiberTypeColorDropDownLabel     matlab.ui.control.Label
-        FiberTypeColorDropDown          matlab.ui.control.DropDown
-        CalculateFT                     matlab.ui.control.Button
-        WritetoExcelFT                  matlab.ui.control.Button
-        DoneFT                          matlab.ui.control.Button
-        FiberTypingPanel                matlab.ui.container.Panel
-        ThresholdEditFieldLabel         matlab.ui.control.Label
-        ThresholdEditField              matlab.ui.control.NumericEditField
-        AdjustButton                    matlab.ui.control.Button
-        AcceptButton                    matlab.ui.control.Button
-        FTAxesL                         matlab.ui.control.UIAxes
-        FTAxesR                         matlab.ui.control.UIAxes
-        FThistL                         matlab.ui.control.UIAxes
-        FThistR                         matlab.ui.control.UIAxes
-        CNFPanel                        matlab.ui.container.Panel
-        CNFAxes                         matlab.ui.control.UIAxes
-        ThresholdEditField_2Label       matlab.ui.control.Label
-        ThresholdCNF                    matlab.ui.control.NumericEditField
-        AdjustCNF                       matlab.ui.control.Button
-        AcceptCNF                       matlab.ui.control.Button
-        NonfiberPanel                   matlab.ui.container.Panel
-        NonfiberAxes                    matlab.ui.control.UIAxes
-        ThresholdEditField_2Label_2     matlab.ui.control.Label
-        NonfiberThreshold               matlab.ui.control.NumericEditField
-        NonfiberAdjust                  matlab.ui.control.Button
-        NonfiberAccept                  matlab.ui.control.Button
-        NonfiberControlPanel            matlab.ui.container.Panel
-        ObjectColorDropDownLabel        matlab.ui.control.Label
-        NonfiberObjectColor             matlab.ui.control.DropDown
-        DataOutputFolderEditField_3Label_2  matlab.ui.control.Label
-        NonfiberOutput                  matlab.ui.control.EditField
-        CalculateNonfiber               matlab.ui.control.Button
-        WritetoExcelNonfiber            matlab.ui.control.Button
-        DoneNonfiber                    matlab.ui.control.Button
-        PixelSizeumpixelLabel_2         matlab.ui.control.Label
-        PixelSizeNonfiber               matlab.ui.control.NumericEditField
         Toolbar                         matlab.ui.container.Panel
-        InitialSegmentationButton       matlab.ui.control.Button
-        ManualSegmentationButton        matlab.ui.control.Button
-        FiberPredictionButton           matlab.ui.control.Button
-        ManualFiberFilterButton         matlab.ui.control.Button
-        FiberPropertiesButton           matlab.ui.control.Button
-        CentralNucleiButton             matlab.ui.control.Button
-        FiberTypingButton               matlab.ui.control.Button
         NonfiberObjectsButton           matlab.ui.control.Button
+        FiberTypingButton               matlab.ui.control.Button
+        CentralNucleiButton             matlab.ui.control.Button
+        FiberPropertiesButton           matlab.ui.control.Button
+        ManualFiberFilterButton         matlab.ui.control.Button
+        FiberPredictionButton           matlab.ui.control.Button
+        ManualSegmentationButton        matlab.ui.control.Button
+        InitialSegmentationButton       matlab.ui.control.Button
+        NonfiberControlPanel            matlab.ui.container.Panel
+        PixelSizeNonfiber               matlab.ui.control.NumericEditField
+        PixelSizeumpixelLabel_2         matlab.ui.control.Label
+        DoneNonfiber                    matlab.ui.control.Button
+        WritetoExcelNonfiber            matlab.ui.control.Button
+        CalculateNonfiber               matlab.ui.control.Button
+        NonfiberOutput                  matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label_2  matlab.ui.control.Label
+        NonfiberObjectColor             matlab.ui.control.DropDown
+        ObjectColorDropDownLabel        matlab.ui.control.Label
+        NonfiberPanel                   matlab.ui.container.Panel
+        NonfiberAccept                  matlab.ui.control.Button
+        NonfiberAdjust                  matlab.ui.control.Button
+        NonfiberThreshold               matlab.ui.control.NumericEditField
+        ThresholdEditField_2Label_2     matlab.ui.control.Label
+        NonfiberAxes                    matlab.ui.control.UIAxes
+        CNFPanel                        matlab.ui.container.Panel
+        AcceptCNF                       matlab.ui.control.Button
+        AdjustCNF                       matlab.ui.control.Button
+        ThresholdCNF                    matlab.ui.control.NumericEditField
+        ThresholdEditField_2Label       matlab.ui.control.Label
+        CNFAxes                         matlab.ui.control.UIAxes
+        FiberTypingPanel                matlab.ui.container.Panel
+        AcceptButton                    matlab.ui.control.Button
+        AdjustButton                    matlab.ui.control.Button
+        ThresholdEditField              matlab.ui.control.NumericEditField
+        ThresholdEditFieldLabel         matlab.ui.control.Label
+        FThistR                         matlab.ui.control.UIAxes
+        FThistL                         matlab.ui.control.UIAxes
+        FTAxesR                         matlab.ui.control.UIAxes
+        FTAxesL                         matlab.ui.control.UIAxes
+        FiberTypingControlPanel         matlab.ui.container.Panel
+        DoneFT                          matlab.ui.control.Button
+        WritetoExcelFT                  matlab.ui.control.Button
+        CalculateFT                     matlab.ui.control.Button
+        FiberTypeColorDropDown          matlab.ui.control.DropDown
+        FiberTypeColorDropDownLabel     matlab.ui.control.Label
+        DataOutputFiberType             matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label  matlab.ui.control.Label
+        PixelSizeFiberType              matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
+        CNFControlPanel                 matlab.ui.container.Panel
+        DataOutputFolderEditField_2     matlab.ui.control.EditField
+        DataOutputFolderEditField_2Label  matlab.ui.control.Label
+        MinimumNucleusSizeum2EditField  matlab.ui.control.NumericEditField
+        MinimumNucleusSizeum2EditFieldLabel  matlab.ui.control.Label
+        DistancefromborderEditField     matlab.ui.control.NumericEditField
+        DistancefromborderEditFieldLabel  matlab.ui.control.Label
+        DoneButton_CNF                  matlab.ui.control.Button
+        CNFExcelWrite                   matlab.ui.control.Button
+        CalculateButton_CNF             matlab.ui.control.Button
+        NucleiColorDropDown             matlab.ui.control.DropDown
+        NucleiColorDropDownLabel        matlab.ui.control.Label
+        PixelSizeumpixelEditField_2     matlab.ui.control.NumericEditField
+        PixelSizeumpixelLabel           matlab.ui.control.Label
+        FiberPredictionControlPanel     matlab.ui.container.Panel
+        SortingThresholdSlider          matlab.ui.control.Slider
+        SortingThresholdHigherrequiresmoremanualsortingLabel  matlab.ui.control.Label
+        ManualSortingButton             matlab.ui.control.Button
+        FilterButton                    matlab.ui.control.Button
+        PropertiesControlPanel          matlab.ui.container.Panel
+        CalculateButton                 matlab.ui.control.Button
+        PixelSizeumpixelEditField       matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditFieldLabel_2  matlab.ui.control.Label
+        DataOutputFolderEditField       matlab.ui.control.EditField
+        DataOutputFolderEditFieldLabel  matlab.ui.control.Label
+        DoneButton                      matlab.ui.control.Button
+        WritetoExcelButton              matlab.ui.control.Button
+        PropertiesPanel                 matlab.ui.container.Panel
+        FiberSizeAxes                   matlab.ui.control.UIAxes
+        FeretAxes                       matlab.ui.control.UIAxes
+        ManualFilterControls            matlab.ui.container.Panel
+        FinishManualFilteringButton     matlab.ui.control.Button
+        RemoveObjectsButton             matlab.ui.control.Button
+        SortingAxesPanel                matlab.ui.container.Panel
+        MarkasfiberLabel                matlab.ui.control.Label
+        NoButton                        matlab.ui.control.Button
+        YesButton                       matlab.ui.control.Button
+        UIAxesR                         matlab.ui.control.UIAxes
+        UIAxesL                         matlab.ui.control.UIAxes
+        DrawLineControls                matlab.ui.container.Panel
+        FinishSegmentingButton          matlab.ui.control.Button
+        DoneDrawingButton               matlab.ui.control.Button
+        DrawLineButton                  matlab.ui.control.Button
+        Image2                          matlab.ui.control.Image
+        SMASHLabel                      matlab.ui.control.Label
+        Image                           matlab.ui.control.Image
+        Prompt                          matlab.ui.control.Label
+        SegmentationParameters          matlab.ui.container.Panel
+        DetectValueButton               matlab.ui.control.Button
+        SegmentationThresholdSlider     matlab.ui.control.Slider
+        SegmentationThresholdSliderLabel  matlab.ui.control.Label
+        AcceptSegmentationButton        matlab.ui.control.Button
+        FiberOutlineColorDropDown       matlab.ui.control.DropDown
+        FiberOutlineColorDropDownLabel  matlab.ui.control.Label
+        SegmentButton                   matlab.ui.control.Button
+        PixelSizeField                  matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
+        FilenameLabel                   matlab.ui.control.Label
+        SelectFileButton                matlab.ui.control.Button
+        UIAxes                          matlab.ui.control.UIAxes
     end
 
     
@@ -1180,6 +1180,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIFigure.Position = [100 100 1199 779];
             app.UIFigure.Name = 'MATLAB App';
 
+            % Create UIAxes
+            app.UIAxes = uiaxes(app.UIFigure);
+            xlabel(app.UIAxes, 'X')
+            ylabel(app.UIAxes, 'Y')
+            app.UIAxes.XColor = 'none';
+            app.UIAxes.YColor = 'none';
+            app.UIAxes.GridColor = 'none';
+            app.UIAxes.MinorGridColor = 'none';
+            app.UIAxes.Position = [266 9 909 698];
+
             % Create SelectFileButton
             app.SelectFileButton = uibutton(app.UIFigure, 'push');
             app.SelectFileButton.ButtonPushedFcn = createCallbackFcn(app, @SelectFileButtonPushed, true);
@@ -1190,17 +1200,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FilenameLabel = uilabel(app.UIFigure);
             app.FilenameLabel.Position = [156 676 130 22];
             app.FilenameLabel.Text = 'Filename';
-
-            % Create UIAxes
-            app.UIAxes = uiaxes(app.UIFigure);
-            title(app.UIAxes, '')
-            xlabel(app.UIAxes, 'X')
-            ylabel(app.UIAxes, 'Y')
-            app.UIAxes.GridColor = 'none';
-            app.UIAxes.MinorGridColor = 'none';
-            app.UIAxes.XColor = 'none';
-            app.UIAxes.YColor = 'none';
-            app.UIAxes.Position = [266 9 909 698];
 
             % Create SegmentationParameters
             app.SegmentationParameters = uipanel(app.UIFigure);
@@ -1319,13 +1318,21 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create UIAxesL
             app.UIAxesL = uiaxes(app.SortingAxesPanel);
-            title(app.UIAxesL, '')
             xlabel(app.UIAxesL, 'X')
             ylabel(app.UIAxesL, 'Y')
             app.UIAxesL.PlotBoxAspectRatio = [1 1.04306220095694 1];
             app.UIAxesL.XColor = 'none';
             app.UIAxesL.YColor = 'none';
             app.UIAxesL.Position = [12 188 412 438];
+
+            % Create UIAxesR
+            app.UIAxesR = uiaxes(app.SortingAxesPanel);
+            xlabel(app.UIAxesR, 'X')
+            ylabel(app.UIAxesR, 'Y')
+            app.UIAxesR.PlotBoxAspectRatio = [1 1.12082262210797 1];
+            app.UIAxesR.XColor = 'none';
+            app.UIAxesR.YColor = 'none';
+            app.UIAxesR.Position = [467 188 412 438];
 
             % Create YesButton
             app.YesButton = uibutton(app.SortingAxesPanel, 'push');
@@ -1344,16 +1351,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.MarkasfiberLabel.HorizontalAlignment = 'center';
             app.MarkasfiberLabel.Position = [188 143 290 22];
             app.MarkasfiberLabel.Text = 'Mark as fiber?';
-
-            % Create UIAxesR
-            app.UIAxesR = uiaxes(app.SortingAxesPanel);
-            title(app.UIAxesR, '')
-            xlabel(app.UIAxesR, 'X')
-            ylabel(app.UIAxesR, 'Y')
-            app.UIAxesR.PlotBoxAspectRatio = [1 1.12082262210797 1];
-            app.UIAxesR.XColor = 'none';
-            app.UIAxesR.YColor = 'none';
-            app.UIAxesR.Position = [467 188 412 438];
 
             % Create ManualFilterControls
             app.ManualFilterControls = uipanel(app.UIFigure);
@@ -1381,16 +1378,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Create FeretAxes
             app.FeretAxes = uiaxes(app.PropertiesPanel);
             title(app.FeretAxes, 'Minimum Feret Diameter (um)')
-            xlabel(app.FeretAxes, '')
-            ylabel(app.FeretAxes, '')
             app.FeretAxes.PlotBoxAspectRatio = [3.2695652173913 1 1];
             app.FeretAxes.Position = [53 365 799 285];
 
             % Create FiberSizeAxes
             app.FiberSizeAxes = uiaxes(app.PropertiesPanel);
             title(app.FiberSizeAxes, 'Fiber Area (um^2)')
-            xlabel(app.FiberSizeAxes, '')
-            ylabel(app.FiberSizeAxes, '')
             app.FiberSizeAxes.PlotBoxAspectRatio = [3.29824561403509 1 1];
             app.FiberSizeAxes.Position = [53 67 799 285];
 
@@ -1608,6 +1601,30 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingPanel.Visible = 'off';
             app.FiberTypingPanel.Position = [285 24 882 679];
 
+            % Create FTAxesL
+            app.FTAxesL = uiaxes(app.FiberTypingPanel);
+            app.FTAxesL.PlotBoxAspectRatio = [1.06832298136646 1 1];
+            app.FTAxesL.XColor = 'none';
+            app.FTAxesL.YColor = 'none';
+            app.FTAxesL.Position = [22 318 414 332];
+
+            % Create FTAxesR
+            app.FTAxesR = uiaxes(app.FiberTypingPanel);
+            app.FTAxesR.PlotBoxAspectRatio = [1.06832298136646 1 1];
+            app.FTAxesR.XColor = 'none';
+            app.FTAxesR.YColor = 'none';
+            app.FTAxesR.Position = [450 318 416 335];
+
+            % Create FThistL
+            app.FThistL = uiaxes(app.FiberTypingPanel);
+            app.FThistL.PlotBoxAspectRatio = [1.83030303030303 1 1];
+            app.FThistL.Position = [22 112 402 207];
+
+            % Create FThistR
+            app.FThistR = uiaxes(app.FiberTypingPanel);
+            app.FThistR.PlotBoxAspectRatio = [1.91358024691358 1 1];
+            app.FThistR.Position = [450 115 402 204];
+
             % Create ThresholdEditFieldLabel
             app.ThresholdEditFieldLabel = uilabel(app.FiberTypingPanel);
             app.ThresholdEditFieldLabel.HorizontalAlignment = 'right';
@@ -1634,42 +1651,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AcceptButton.Position = [467 70 100 22];
             app.AcceptButton.Text = 'Accept';
 
-            % Create FTAxesL
-            app.FTAxesL = uiaxes(app.FiberTypingPanel);
-            title(app.FTAxesL, '')
-            xlabel(app.FTAxesL, '')
-            ylabel(app.FTAxesL, '')
-            app.FTAxesL.PlotBoxAspectRatio = [1.06832298136646 1 1];
-            app.FTAxesL.XColor = 'none';
-            app.FTAxesL.YColor = 'none';
-            app.FTAxesL.Position = [22 318 414 332];
-
-            % Create FTAxesR
-            app.FTAxesR = uiaxes(app.FiberTypingPanel);
-            title(app.FTAxesR, '')
-            xlabel(app.FTAxesR, '')
-            ylabel(app.FTAxesR, '')
-            app.FTAxesR.PlotBoxAspectRatio = [1.06832298136646 1 1];
-            app.FTAxesR.XColor = 'none';
-            app.FTAxesR.YColor = 'none';
-            app.FTAxesR.Position = [450 318 416 335];
-
-            % Create FThistL
-            app.FThistL = uiaxes(app.FiberTypingPanel);
-            title(app.FThistL, '')
-            xlabel(app.FThistL, '')
-            ylabel(app.FThistL, '')
-            app.FThistL.PlotBoxAspectRatio = [1.83030303030303 1 1];
-            app.FThistL.Position = [22 112 402 207];
-
-            % Create FThistR
-            app.FThistR = uiaxes(app.FiberTypingPanel);
-            title(app.FThistR, '')
-            xlabel(app.FThistR, '')
-            ylabel(app.FThistR, '')
-            app.FThistR.PlotBoxAspectRatio = [1.91358024691358 1 1];
-            app.FThistR.Position = [450 115 402 204];
-
             % Create CNFPanel
             app.CNFPanel = uipanel(app.UIFigure);
             app.CNFPanel.Visible = 'off';
@@ -1677,9 +1658,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create CNFAxes
             app.CNFAxes = uiaxes(app.CNFPanel);
-            title(app.CNFAxes, '')
-            xlabel(app.CNFAxes, '')
-            ylabel(app.CNFAxes, '')
             app.CNFAxes.PlotBoxAspectRatio = [1.34971644612476 1 1];
             app.CNFAxes.XColor = 'none';
             app.CNFAxes.YColor = 'none';
@@ -1714,7 +1692,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create NonfiberAxes
             app.NonfiberAxes = uiaxes(app.NonfiberPanel);
-            title(app.NonfiberAxes, '')
             xlabel(app.NonfiberAxes, 'X')
             ylabel(app.NonfiberAxes, 'Y')
             app.NonfiberAxes.PlotBoxAspectRatio = [1.35976789168279 1 1];
