@@ -173,7 +173,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: SelectFileButton
         function SelectFileButtonPushed(app, event)
             [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';},'File Selector - dont select mask');
-            drawnow;
+            
+            drawnow limitrate;
             figure(app.UIFigure)
             if FilterIndex
                 C = strsplit(FileName,'.');
@@ -299,7 +300,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FilterButton.Enable = 'off';
             app.SortingThresholdSlider.Enable = 'off';
             app.Prompt.Text = 'Filtering, please wait.';
-            drawnow
+            
+            drawnow limitrate
             app.pix_size = app.PixelSizeField.Value;
             pix_area = app.pix_size^2;
             label = bwlabel(app.bw_obj,4);
