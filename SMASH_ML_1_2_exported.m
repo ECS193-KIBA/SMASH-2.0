@@ -158,20 +158,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Apply defaults
             app.PixelSizeField.Value = app.default{2,2};
             app.PixelSizeumpixelEditField.Value = app.default{2,2};
-            app.DataOutputFolderEditField.Value = app.default{16,2};
             %app.SegmentationThresholdSlider.Value = app.default{7,2};
             app.FiberOutlineColorDropDown.Value = num2str(app.default{3,2});
             app.NucleiColorDropDown.Value = num2str(app.default{4,2});
             app.PixelSizeumpixelEditField_2.Value = app.default{2,2};
             app.DistancefromborderEditField.Value = app.default{14,2};
             app.MinimumNucleusSizeum2EditField.Value = app.default{15,2};
-            app.DataOutputFolderEditField_2.Value = app.default{18,2};
             app.PixelSizeFiberType.Value = app.default{2,2};
             app.FiberTypeColorDropDown.Value = num2str(app.default{5,2});
-            app.DataOutputFiberType.Value = app.default{17,2};
             app.PixelSizeNonfiber.Value = app.default{2,2};
             app.NonfiberObjectColor.Value = num2str(app.default{6,2});
-            app.NonfiberOutput.Value = app.default{19,2};
         end
 
         % Button pushed function: SelectFileButton
@@ -194,6 +190,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Files{3} = PathName;
             app.Files{4} = FileNameS;
             cd(PathName)
+    
+            % Change output directory to where image is located
+            app.DataOutputFolderEditField.Value = pwd;
+            app.DataOutputFolderEditField_2.Value = pwd;
+            app.DataOutputFiberType.Value = pwd;
+            app.NonfiberOutput.Value = pwd;
+            
             app.orig_img = imread(FileName);
             imshow(app.orig_img,'Parent',app.UIAxes)
             
