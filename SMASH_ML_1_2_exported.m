@@ -172,7 +172,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: SelectFileButton
         function SelectFileButtonPushed(app, event)
-            [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';},'File Selector - dont select mask');
+            [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi'},'File Selector - dont select mask');
             drawnow;
             figure(app.UIFigure)
             if FilterIndex
@@ -196,10 +196,28 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DataOutputFolderEditField_2.Value = pwd;
             app.DataOutputFiberType.Value = pwd;
             app.NonfiberOutput.Value = pwd;
-            
-            app.orig_img = imread(FileName);
-            imshow(app.orig_img,'Parent',app.UIAxes)
-            
+
+            if strcmp(ExtName, 'czi')
+                BioformatsData = bfopen(FileName);
+                % Couldn't figure out how to show multiple layers
+                % for Layer = 1:length(BioformatsData{1,1})
+                % Hardcode Layer for now
+                    Layer = 1;
+                    disp(Layer)
+                    disp(['Displaying Layer ', Layer])
+                    ColorMap = BioformatsData{1, 3}{Layer, 1};
+                    if isempty(ColorMap)
+                      colormap(app.UIAxes, gray);
+                    else
+                      colormap(app.UIAxes, ColorMap);
+                    end
+                    imshow(BioformatsData{1, 1}{Layer, 1},'Parent',app.UIAxes);
+                % end
+            else
+                app.orig_img = imread(FileName);
+                imshow(app.orig_img,'Parent',app.UIAxes)
+            end
+
             if exist(MaskName,'file')
                 app.InitialSegmentationButton.Enable = 'on';
                 app.FiberPredictionButton.Enable = 'on';
