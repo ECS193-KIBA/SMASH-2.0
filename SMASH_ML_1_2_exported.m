@@ -197,26 +197,33 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DataOutputFiberType.Value = pwd;
             app.NonfiberOutput.Value = pwd;
 
-            if strcmp(ExtName, 'czi')
+            isMultilayerImage = strcmp(ExtName, 'czi');
+            if isMultilayerImage
                 BioformatsData = bfopen(FileName);
-                % Couldn't figure out how to show multiple layers
-                % for Layer = 1:length(BioformatsData{1,1})
-                % Hardcode Layer for now
-                    Layer = 1;
-                    disp(Layer)
-                    disp(['Displaying Layer ', Layer])
-                    ColorMap = BioformatsData{1, 3}{Layer, 1};
-                    if isempty(ColorMap)
-                      colormap(app.UIAxes, gray);
-                    else
-                      colormap(app.UIAxes, ColorMap);
-                    end
-                    imshow(BioformatsData{1, 1}{Layer, 1},'Parent',app.UIAxes);
-                % end
+                PixelDataForAllLayers = BioformatsData{1,1};
+                ColorMapDataForAllLayers = BioformatsData{1, 3};
+
+                NumLayers = length(PixelDataForAllLayers);
+
+                LayerOnePixelData = PixelDataForAllLayers{1,1};
+                LayerSize = size(LayerOnePixelData);
+                RGBSize = [LayerSize 3];
+
+                TotalRGB = zeros(RGBSize, 'uint8');
+                for Layer = 1:NumLayers
+                    PixelsGrayscale = PixelDataForAllLayers{Layer, 1};
+                    ColorMap = ColorMapDataForAllLayers{1, Layer};
+                    PixelsRGBAsDouble = ind2rgb(PixelsGrayscale, ColorMap);
+                    PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
+
+                    TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
+                end
+                app.orig_img = TotalRGB;
             else
                 app.orig_img = imread(FileName);
-                imshow(app.orig_img,'Parent',app.UIAxes)
             end
+
+            imshow(app.orig_img,'Parent',app.UIAxes)
 
             if exist(MaskName,'file')
                 app.InitialSegmentationButton.Enable = 'on';
