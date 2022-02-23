@@ -467,6 +467,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 yp = pos(2);
                 delete(phand)
                 if ~app.done
+                    % If finish removing objects button is pressed, xp is 0
+                    % Continue without calling label on position
+                    if xp == 0
+                        continue
+                    end
                     regS = label(yp,xp);
                     if regS == 0
                         continue
