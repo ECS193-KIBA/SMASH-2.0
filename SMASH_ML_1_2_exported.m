@@ -146,6 +146,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         segmodel
     end
     
+    methods (Access = private)
+
+        function results = CreateFolderIfDirectoryIsNonexistent(app, pathDirectory)
+            if exist(pathDirectory,'dir') == 0
+                mkdir(pathDirectory)
+            end
+        end
+    end
+
 
     % Callbacks that handle component events
     methods (Access = private)
@@ -173,6 +182,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: SelectFileButton
         function SelectFileButtonPushed(app, event)
             [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';},'File Selector - dont select mask');
+            
             drawnow;
             figure(app.UIFigure)
             if FilterIndex
@@ -299,6 +309,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FilterButton.Enable = 'off';
             app.SortingThresholdSlider.Enable = 'off';
             app.Prompt.Text = 'Filtering, please wait.';
+            
             drawnow
             app.pix_size = app.PixelSizeField.Value;
             pix_area = app.pix_size^2;
@@ -577,7 +588,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             
             out = [header; sums; data];
             
+            % Create folder if directory does not exist for excel input
+            CreateFolderIfDirectoryIsNonexistent(app, app.DataOutputFolderEditField.Value)
             cd(app.DataOutputFolderEditField.Value)
+
             writecell(out,[app.Files{4} '_Properties.xlsx'],'Range','A5')
             app.Prompt.Text = 'Write to Excel done';
             app.props = 0;
@@ -659,7 +673,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CNFExcelWrite
         function CNFExcelWriteButtonPushed(app, event)
+            % Create folder if directory does not exist for excel input
+            CreateFolderIfDirectoryIsNonexistent(app, app.DataOutputFolderEditField_2.Value)
             cd(app.DataOutputFolderEditField_2.Value)
+
             header{1,1} = 'Border (um)';
             header{1,2} = 'Minimum Nuclear Size (um^2)';
             header{1,3} = 'Nuclear Filter (arb)';
@@ -807,7 +824,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: WritetoExcelFT
         function WritetoExcelFTButtonPushed(app, event)
+            % Create folder if directory does not exist for excel input
+            CreateFolderIfDirectoryIsNonexistent(app, app.DataOutputFiberType.Value)
             cd(app.DataOutputFiberType.Value)
+
             pix_area = app.pix_size^2;
             header{1,1} = 'Average Fiber Size';
             header{1,2} = 'Average Fiber Intensity';
@@ -953,6 +973,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: WritetoExcelNonfiber
         function WritetoExcelNonfiberButtonPushed(app, event)
+            % Create folder if directory does not exist for excel input
+            CreateFolderIfDirectoryIsNonexistent(app, app.NonfiberOutput.Value)
             cd(app.NonfiberOutput.Value)
             
             header{1,1} = 'Threshold';
