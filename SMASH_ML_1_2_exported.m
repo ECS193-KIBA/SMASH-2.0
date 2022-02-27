@@ -120,6 +120,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         default
         Files
         orig_img
+        orig_img_multispectral
         bw_obj
         model
         pix_size
@@ -181,7 +182,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: SelectFileButton
         function SelectFileButtonPushed(app, event)
-            [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';},'File Selector - dont select mask');
+            [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi'},'File Selector - dont select mask');
             
             drawnow;
             figure(app.UIFigure)
@@ -207,7 +208,46 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DataOutputFiberType.Value = pwd;
             app.NonfiberOutput.Value = pwd;
             
-            app.orig_img = imread(FileName);
+            isMultilayerImage = strcmp(ExtName, 'czi');
+            if isMultilayerImage
+                BioformatsData = bfopen(FileName);
+                PixelDataForAllLayers = BioformatsData{1,1};
+                ColorMapDataForAllLayers = BioformatsData{1, 3};
+
+                NumLayers = length(PixelDataForAllLayers);
+
+                LayerOnePixelData = PixelDataForAllLayers{1,1};
+                LayerSize = size(LayerOnePixelData);
+                RGBSize = [LayerSize 3];
+
+                TotalRGB = zeros(RGBSize, 'uint8');
+                app.FiberOutlineColorDropDown.Items = {};
+                app.FiberOutlineColorDropDown.ItemsData = {};
+                TotalMultiSpectral = [];
+             
+                for Layer = 1:NumLayers
+                    PixelsGrayscale = PixelDataForAllLayers{Layer, 1};
+                    ColorMap = ColorMapDataForAllLayers{1, Layer};
+                    PixelsRGBAsDouble = ind2rgb(PixelsGrayscale, ColorMap);
+                    PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
+                    app.FiberOutlineColorDropDown.Items = cat(2, app.FiberOutlineColorDropDown.Items, {['Channel ', num2str(Layer)]});
+                    app.FiberOutlineColorDropDown.ItemsData = cat(2, app.FiberOutlineColorDropDown.ItemsData, {num2str(Layer)});
+
+                    PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
+                    TotalMultiSpectral = cat(3, TotalMultiSpectral, PixelsGrayscaleUInt8);
+
+
+
+                    TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
+                end
+                app.orig_img = TotalRGB;
+                app.orig_img_multispectral = TotalMultiSpectral;
+            else
+                ImageData = imread(FileName);
+                app.orig_img = ImageData;
+                app.orig_img_multispectral = ImageData;
+            end
+
             imshow(app.orig_img,'Parent',app.UIAxes)
             
             if exist(MaskName,'file')
@@ -245,7 +285,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                    %orig_img = imread(app.Files{1});
                    foc = app.FiberOutlineColorDropDown.Value;
                    foc = str2double(foc);
-                   lam = app.orig_img(:,:,foc);  % fiber outline color
+                   lam = app.orig_img_multispectral(:,:,foc);  % fiber outline color
                    
                    % Image Segmentation
                    lam_t = imhmin(lam,app.SegmentationThresholdSlider.Value);
