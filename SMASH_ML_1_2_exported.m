@@ -516,9 +516,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 yp = pos(2);
                 delete(phand)
                 if ~app.done
-                    % If finish removing objects button is pressed, xp is 0
-                    % Continue without calling label on position
-                    if xp == 0
+                    % Continue if clicked point is out of bounds
+                    xp_is_valid = xp > 0 & xp <= size(label,2);
+                    yp_is_valid = yp > 0 & yp <= size(label,1);
+                    if ~xp_is_valid || ~yp_is_valid
                         continue
                     end
                     regS = label(yp,xp);
