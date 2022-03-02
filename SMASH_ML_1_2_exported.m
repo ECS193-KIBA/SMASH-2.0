@@ -509,19 +509,24 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
             while ~app.done
                 app.Prompt.Text = 'Click on regions for removal';
-                phand = drawpoint(app.UIAxes,'Color','w');
-                %wait(phand)
-                pos = round(phand.Position);
-                xp = pos(1);
-                yp = pos(2);
-                delete(phand)
+                % Wait for the value of app.done
+                % to be set in FinishManualFilteringButton
+                pause(2)
+
                 if ~app.done
+                    phand = drawpoint(app.UIAxes,'Color','w');
+                    pos = round(phand.Position);
+                    xp = pos(1);
+                    yp = pos(2);
+                    delete(phand)
+                
                     % Continue if clicked point is out of bounds
                     xp_is_valid = xp > 0 & xp <= size(label,2);
                     yp_is_valid = yp > 0 & yp <= size(label,1);
                     if ~xp_is_valid || ~yp_is_valid
                         continue
                     end
+
                     regS = label(yp,xp);
                     if regS == 0
                         continue
@@ -544,6 +549,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             label = bwlabel(app.bw_obj,4);
             rgb_label = label2rgb(label,'jet','w','shuffle');
             imwrite(rgb_label,app.Files{2},'tiff');
+
             app.ManualFilterControls.Visible = 'off';
             app.InitialSegmentationButton.Enable = 'on';
             app.ManualSegmentationButton.Enable = 'on';
@@ -559,10 +565,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FinishManualFilteringButton
         function FinishManualFilteringButtonPushed(app, event)
-            app.Prompt.Text = 'Click anywhere to continue';
-            app.FinishManualFilteringButton.Enable = 'off';
             app.done = 1;
+            app.FinishManualFilteringButton.Enable = 'off';
             
+          
         end
 
         % Button pushed function: CalculateButton
