@@ -17,8 +17,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeumpixelLabel_2         matlab.ui.control.Label
         DoneNonfiber                    matlab.ui.control.Button
         WritetoExcelNonfiber            matlab.ui.control.Button
-        CalculateNonfiber               matlab.ui.control.Button
-        NonfiberOutput                  matlab.ui.control.EditField
+        CalculateNonfiberObjects        matlab.ui.control.Button
+        NonfiberObjectsDataOutputFolder  matlab.ui.control.EditField
         DataOutputFolderEditField_3Label_2  matlab.ui.control.Label
         NonfiberObjectColor             matlab.ui.control.DropDown
         ObjectColorDropDownLabel        matlab.ui.control.Label
@@ -46,15 +46,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         FiberTypingControlPanel         matlab.ui.container.Panel
         DoneFT                          matlab.ui.control.Button
         WritetoExcelFT                  matlab.ui.control.Button
-        CalculateFT                     matlab.ui.control.Button
+        CalculateFiberTyping            matlab.ui.control.Button
         FiberTypeColorDropDown          matlab.ui.control.DropDown
         FiberTypeColorDropDownLabel     matlab.ui.control.Label
-        DataOutputFiberType             matlab.ui.control.EditField
+        FiberTypingDataOutputFolder     matlab.ui.control.EditField
         DataOutputFolderEditField_3Label  matlab.ui.control.Label
         PixelSizeFiberType              matlab.ui.control.NumericEditField
         PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
         CNFControlPanel                 matlab.ui.container.Panel
-        DataOutputFolderEditField_2     matlab.ui.control.EditField
+        CentralNucleiDataOutputFolder   matlab.ui.control.EditField
         DataOutputFolderEditField_2Label  matlab.ui.control.Label
         MinimumNucleusSizeum2EditField  matlab.ui.control.NumericEditField
         MinimumNucleusSizeum2EditFieldLabel  matlab.ui.control.Label
@@ -62,7 +62,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         DistancefromborderEditFieldLabel  matlab.ui.control.Label
         DoneButton_CNF                  matlab.ui.control.Button
         CNFExcelWrite                   matlab.ui.control.Button
-        CalculateButton_CNF             matlab.ui.control.Button
+        CalculateCentralNuclei          matlab.ui.control.Button
         NucleiColorDropDown             matlab.ui.control.DropDown
         NucleiColorDropDownLabel        matlab.ui.control.Label
         PixelSizeumpixelEditField_2     matlab.ui.control.NumericEditField
@@ -73,10 +73,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         ManualSortingButton             matlab.ui.control.Button
         FilterButton                    matlab.ui.control.Button
         PropertiesControlPanel          matlab.ui.container.Panel
-        CalculateButton                 matlab.ui.control.Button
+        CalculateFiberProperties        matlab.ui.control.Button
         PixelSizeumpixelEditField       matlab.ui.control.NumericEditField
         PixelSizeumpixelEditFieldLabel_2  matlab.ui.control.Label
-        DataOutputFolderEditField       matlab.ui.control.EditField
+        FiberPropertiesDataOutputFolder  matlab.ui.control.EditField
         DataOutputFolderEditFieldLabel  matlab.ui.control.Label
         DoneButton                      matlab.ui.control.Button
         WritetoExcelButton              matlab.ui.control.Button
@@ -203,10 +203,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             cd(PathName)
     
             % Change output directory to where image is located
-            app.DataOutputFolderEditField.Value = pwd;
-            app.DataOutputFolderEditField_2.Value = pwd;
-            app.DataOutputFiberType.Value = pwd;
-            app.NonfiberOutput.Value = pwd;
+            app.FiberPropertiesDataOutputFolder.Value = pwd;
+            app.CentralNucleiDataOutputFolder.Value = pwd;
+            app.FiberTypingDataOutputFolder.Value = pwd;
+            app.NonfiberObjectsDataOutputFolder.Value = pwd;
             
             isMultilayerImage = strcmp(ExtName, 'czi');
             if isMultilayerImage
@@ -565,11 +565,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             
         end
 
-        % Button pushed function: CalculateButton
-        function CalculateButtonPushed(app, event)
+        % Button pushed function: CalculateFiberProperties
+        function CalculateFiberPropertiesPushed(app, event)
             app.WritetoExcelButton.Enable = 'on';
             app.pix_size = app.PixelSizeumpixelEditField.Value;
-            app.output_path = app.DataOutputFolderEditField.Value;
+            app.output_path = app.FiberPropertiesDataOutputFolder.Value;
             pix_area = app.pix_size^2;
             label = bwlabel(app.bw_obj,4);
             app.num_obj = max(max(label));
@@ -635,8 +635,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             out = [header; sums; data];
             
             % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.DataOutputFolderEditField.Value)
-            cd(app.DataOutputFolderEditField.Value)
+            CreateFolderIfDirectoryIsNonexistent(app, app.FiberPropertiesDataOutputFolder.Value)
+            cd(app.FiberPropertiesDataOutputFolder.Value)
 
             writecell(out,[app.Files{4} '_Properties.xlsx'],'Range','A5')
             app.Prompt.Text = 'Write to Excel done';
@@ -651,10 +651,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SortingThresholdSlider.Value = round(value,1);
         end
 
-        % Button pushed function: CalculateButton_CNF
-        function CalculateButton_CNFPushed(app, event)
+        % Button pushed function: CalculateCentralNuclei
+        function CalculateCentralNucleiPushed(app, event)
             app.Prompt.Text = '';
-            app.CalculateButton_CNF.Enable = 'off';
+            app.CalculateCentralNuclei.Enable = 'off';
             app.DoneButton_CNF.Enable = 'off';
             app.pix_size = app.PixelSizeumpixelEditField_2.Value;
             min_nuc_pix = app.MinimumNucleusSizeum2EditField.Value/(app.pix_size^2);
@@ -720,8 +720,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: CNFExcelWrite
         function CNFExcelWriteButtonPushed(app, event)
             % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.DataOutputFolderEditField_2.Value)
-            cd(app.DataOutputFolderEditField_2.Value)
+            CreateFolderIfDirectoryIsNonexistent(app, app.CentralNucleiDataOutputFolder.Value)
+            cd(app.CentralNucleiDataOutputFolder.Value)
 
             header{1,1} = 'Border (um)';
             header{1,2} = 'Minimum Nuclear Size (um^2)';
@@ -788,9 +788,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'on';
         end
 
-        % Button pushed function: CalculateFT
-        function CalculateFTButtonPushed(app, event)
-            app.CalculateFT.Enable = 'off';
+        % Button pushed function: CalculateFiberTyping
+        function CalculateFiberTypingButtonPushed(app, event)
+            app.CalculateFiberTyping.Enable = 'off';
             app.PixelSizeFiberType.Enable = 'off';
             app.FiberTypeColorDropDown.Enable = 'off';
             app.DoneFT.Enable = 'off';
@@ -862,7 +862,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ThresholdEditField.Enable = 'off';
             app.AdjustButton.Enable = 'off';
             app.AcceptButton.Enable = 'off';
-            app.CalculateFT.Enable = 'on';
+            app.CalculateFiberTyping.Enable = 'on';
             app.WritetoExcelFT.Enable = 'on';
             app.DoneFT.Enable = 'on';
             uiresume(app.UIFigure)
@@ -871,8 +871,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: WritetoExcelFT
         function WritetoExcelFTButtonPushed(app, event)
             % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.DataOutputFiberType.Value)
-            cd(app.DataOutputFiberType.Value)
+            CreateFolderIfDirectoryIsNonexistent(app, app.FiberTypingDataOutputFolder.Value)
+            cd(app.FiberTypingDataOutputFolder.Value)
 
             pix_area = app.pix_size^2;
             header{1,1} = 'Average Fiber Size';
@@ -950,16 +950,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ThresholdCNF.Enable = 'off';
             app.AdjustCNF.Enable = 'off';
             app.AcceptCNF.Enable = 'off';
-            app.CalculateButton_CNF.Enable = 'on';
+            app.CalculateCentralNuclei.Enable = 'on';
             app.CNFExcelWrite.Enable = 'on';
             app.DoneButton_CNF.Enable = 'on';
             uiresume(app.UIFigure)
         end
 
-        % Button pushed function: CalculateNonfiber
-        function CalculateNonfiberButtonPushed(app, event)
+        % Button pushed function: CalculateNonfiberObjects
+        function CalculateNonfiberObjectsButtonPushed(app, event)
             img_org = app.orig_img;
-            app.CalculateNonfiber.Enable = 'off';
+            app.CalculateNonfiberObjects.Enable = 'off';
             app.DoneNonfiber.Enable = 'off';
             app.pix_size = app.PixelSizeNonfiber.Value;
             ch_obj = img_org(:,:,str2double(app.NonfiberObjectColor.Value));
@@ -1011,7 +1011,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberThreshold.Enable = 'off';
             app.NonfiberAccept.Enable = 'off';
             app.NonfiberAdjust.Enable = 'off';
-            app.CalculateNonfiber.Enable = 'on';
+            app.CalculateNonfiberObjects.Enable = 'on';
             app.WritetoExcelNonfiber.Enable = 'on';
             app.DoneNonfiber.Enable = 'on';
             uiresume(app.UIFigure)
@@ -1020,8 +1020,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: WritetoExcelNonfiber
         function WritetoExcelNonfiberButtonPushed(app, event)
             % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.NonfiberOutput.Value)
-            cd(app.NonfiberOutput.Value)
+            CreateFolderIfDirectoryIsNonexistent(app, app.NonfiberObjectsDataOutputFolder.Value)
+            cd(app.NonfiberObjectsDataOutputFolder.Value)
             
             header{1,1} = 'Threshold';
             header{2,1} = 'Number of Objects';
@@ -1482,9 +1482,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DataOutputFolderEditFieldLabel.Position = [16 169 108 22];
             app.DataOutputFolderEditFieldLabel.Text = 'Data Output Folder';
 
-            % Create DataOutputFolderEditField
-            app.DataOutputFolderEditField = uieditfield(app.PropertiesControlPanel, 'text');
-            app.DataOutputFolderEditField.Position = [139 169 100 22];
+            % Create FiberPropertiesDataOutputFolder
+            app.FiberPropertiesDataOutputFolder = uieditfield(app.PropertiesControlPanel, 'text');
+            app.FiberPropertiesDataOutputFolder.Position = [139 169 100 22];
 
             % Create PixelSizeumpixelEditFieldLabel_2
             app.PixelSizeumpixelEditFieldLabel_2 = uilabel(app.PropertiesControlPanel);
@@ -1496,11 +1496,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeumpixelEditField = uieditfield(app.PropertiesControlPanel, 'numeric');
             app.PixelSizeumpixelEditField.Position = [139 218 100 22];
 
-            % Create CalculateButton
-            app.CalculateButton = uibutton(app.PropertiesControlPanel, 'push');
-            app.CalculateButton.ButtonPushedFcn = createCallbackFcn(app, @CalculateButtonPushed, true);
-            app.CalculateButton.Position = [81 119 100 22];
-            app.CalculateButton.Text = 'Calculate';
+            % Create CalculateFiberProperties
+            app.CalculateFiberProperties = uibutton(app.PropertiesControlPanel, 'push');
+            app.CalculateFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberPropertiesPushed, true);
+            app.CalculateFiberProperties.Position = [81 119 100 22];
+            app.CalculateFiberProperties.Text = 'Calculate';
 
             % Create FiberPredictionControlPanel
             app.FiberPredictionControlPanel = uipanel(app.UIFigure);
@@ -1562,11 +1562,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NucleiColorDropDown.Position = [125 226 100 22];
             app.NucleiColorDropDown.Value = '1';
 
-            % Create CalculateButton_CNF
-            app.CalculateButton_CNF = uibutton(app.CNFControlPanel, 'push');
-            app.CalculateButton_CNF.ButtonPushedFcn = createCallbackFcn(app, @CalculateButton_CNFPushed, true);
-            app.CalculateButton_CNF.Position = [85 66 100 22];
-            app.CalculateButton_CNF.Text = 'Calculate';
+            % Create CalculateCentralNuclei
+            app.CalculateCentralNuclei = uibutton(app.CNFControlPanel, 'push');
+            app.CalculateCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @CalculateCentralNucleiPushed, true);
+            app.CalculateCentralNuclei.Position = [85 66 100 22];
+            app.CalculateCentralNuclei.Text = 'Calculate';
 
             % Create CNFExcelWrite
             app.CNFExcelWrite = uibutton(app.CNFControlPanel, 'push');
@@ -1606,9 +1606,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DataOutputFolderEditField_2Label.Position = [16 128 108 22];
             app.DataOutputFolderEditField_2Label.Text = 'Data Output Folder';
 
-            % Create DataOutputFolderEditField_2
-            app.DataOutputFolderEditField_2 = uieditfield(app.CNFControlPanel, 'text');
-            app.DataOutputFolderEditField_2.Position = [139 128 109 22];
+            % Create CentralNucleiDataOutputFolder
+            app.CentralNucleiDataOutputFolder = uieditfield(app.CNFControlPanel, 'text');
+            app.CentralNucleiDataOutputFolder.Position = [139 128 109 22];
 
             % Create FiberTypingControlPanel
             app.FiberTypingControlPanel = uipanel(app.UIFigure);
@@ -1631,9 +1631,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DataOutputFolderEditField_3Label.Position = [19 144 108 22];
             app.DataOutputFolderEditField_3Label.Text = 'Data Output Folder';
 
-            % Create DataOutputFiberType
-            app.DataOutputFiberType = uieditfield(app.FiberTypingControlPanel, 'text');
-            app.DataOutputFiberType.Position = [142 144 100 22];
+            % Create FiberTypingDataOutputFolder
+            app.FiberTypingDataOutputFolder = uieditfield(app.FiberTypingControlPanel, 'text');
+            app.FiberTypingDataOutputFolder.Position = [142 144 100 22];
 
             % Create FiberTypeColorDropDownLabel
             app.FiberTypeColorDropDownLabel = uilabel(app.FiberTypingControlPanel);
@@ -1648,11 +1648,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypeColorDropDown.Position = [126 197 100 22];
             app.FiberTypeColorDropDown.Value = '1';
 
-            % Create CalculateFT
-            app.CalculateFT = uibutton(app.FiberTypingControlPanel, 'push');
-            app.CalculateFT.ButtonPushedFcn = createCallbackFcn(app, @CalculateFTButtonPushed, true);
-            app.CalculateFT.Position = [80 90 100 22];
-            app.CalculateFT.Text = 'Calculate';
+            % Create CalculateFiberTyping
+            app.CalculateFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
+            app.CalculateFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberTypingButtonPushed, true);
+            app.CalculateFiberTyping.Position = [80 90 100 22];
+            app.CalculateFiberTyping.Text = 'Calculate';
 
             % Create WritetoExcelFT
             app.WritetoExcelFT = uibutton(app.FiberTypingControlPanel, 'push');
@@ -1816,15 +1816,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DataOutputFolderEditField_3Label_2.Position = [5 139 108 22];
             app.DataOutputFolderEditField_3Label_2.Text = 'Data Output Folder';
 
-            % Create NonfiberOutput
-            app.NonfiberOutput = uieditfield(app.NonfiberControlPanel, 'text');
-            app.NonfiberOutput.Position = [128 139 100 22];
+            % Create NonfiberObjectsDataOutputFolder
+            app.NonfiberObjectsDataOutputFolder = uieditfield(app.NonfiberControlPanel, 'text');
+            app.NonfiberObjectsDataOutputFolder.Position = [128 139 100 22];
 
-            % Create CalculateNonfiber
-            app.CalculateNonfiber = uibutton(app.NonfiberControlPanel, 'push');
-            app.CalculateNonfiber.ButtonPushedFcn = createCallbackFcn(app, @CalculateNonfiberButtonPushed, true);
-            app.CalculateNonfiber.Position = [82 69 100 22];
-            app.CalculateNonfiber.Text = 'Calculate';
+            % Create CalculateNonfiberObjects
+            app.CalculateNonfiberObjects = uibutton(app.NonfiberControlPanel, 'push');
+            app.CalculateNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @CalculateNonfiberObjectsButtonPushed, true);
+            app.CalculateNonfiberObjects.Position = [82 69 100 22];
+            app.CalculateNonfiberObjects.Text = 'Calculate';
 
             % Create WritetoExcelNonfiber
             app.WritetoExcelNonfiber = uibutton(app.NonfiberControlPanel, 'push');
