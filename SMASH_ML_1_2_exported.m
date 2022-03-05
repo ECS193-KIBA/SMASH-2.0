@@ -183,7 +183,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: SelectFileButton
         function SelectFileButtonPushed(app, event)
             [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi'},'File Selector - dont select mask');
-            
             drawnow;
             figure(app.UIFigure)
             if FilterIndex
@@ -812,7 +811,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.num_obj = max(max(label));
             
             % Threshold Fiber Types
-            fti = app.orig_img(:,:,str2double(app.FiberTypeColorDropDown.Value));
+            fti = app.orig_img_multispectral(:,:,str2double(app.FiberTypeColorDropDown.Value));
             threshes = multithresh(fti,10);
             app.cutoff_avg = threshes(2);
             
@@ -967,7 +966,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CalculateNonfiberObjects
         function CalculateNonfiberObjectsButtonPushed(app, event)
-            img_org = app.orig_img;
+            img_org = app.orig_img_multispectral;
             app.CalculateNonfiberObjects.Enable = 'off';
             app.DoneNonfiber.Enable = 'off';
             app.pix_size = app.PixelSizeNonfiber.Value;
