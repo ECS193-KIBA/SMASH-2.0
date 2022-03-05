@@ -221,8 +221,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 RGBSize = [LayerSize 3];
 
                 TotalRGB = zeros(RGBSize, 'uint8');
-                app.FiberOutlineColorDropDown.Items = {};
-                app.FiberOutlineColorDropDown.ItemsData = {};
+                ColorDropDownItems = {};
+                ColorDropDownItemsData = {};
+
                 TotalMultiSpectral = [];
              
                 for Layer = 1:NumLayers
@@ -230,8 +231,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     ColorMap = ColorMapDataForAllLayers{1, Layer};
                     PixelsRGBAsDouble = ind2rgb(PixelsGrayscale, ColorMap);
                     PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
-                    app.FiberOutlineColorDropDown.Items = cat(2, app.FiberOutlineColorDropDown.Items, {['Channel ', num2str(Layer)]});
-                    app.FiberOutlineColorDropDown.ItemsData = cat(2, app.FiberOutlineColorDropDown.ItemsData, {num2str(Layer)});
+                    ColorDropDownItems = cat(2, ColorDropDownItems, {['Channel ', num2str(Layer)]});
+                    ColorDropDownItemsData  = cat(2, ColorDropDownItemsData, {num2str(Layer)});
 
                     PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
                     TotalMultiSpectral = cat(3, TotalMultiSpectral, PixelsGrayscaleUInt8);
@@ -240,6 +241,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
                     TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
                 end
+                app.FiberOutlineColorDropDown.Items = ColorDropDownItems;
+                app.FiberOutlineColorDropDown.ItemsData = ColorDropDownItemsData;
+                app.NucleiColorDropDown.Items = ColorDropDownItems;
+                app.NucleiColorDropDown.ItemsData = ColorDropDownItemsData;
+                app.FiberTypeColorDropDown.Items = ColorDropDownItems;
+                app.FiberTypeColorDropDown.ItemsData = ColorDropDownItemsData;
+                app.NonfiberObjectColor.Items = ColorDropDownItems;
+                app.NonfiberObjectColor.ItemsData = ColorDropDownItemsData;
                 app.orig_img = TotalRGB;
                 app.orig_img_multispectral = TotalMultiSpectral;
             else
@@ -670,7 +679,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             brd_img = imcomplement(inv_brd);
             
             % Define Nuclei
-            nuc_obj = app.orig_img(:,:,str2double(app.NucleiColorDropDown.Value));
+            nuc_obj = app.orig_img_multispectral(:,:,str2double(app.NucleiColorDropDown.Value));
             se = strel('disk',12);
             tophatFiltered = imtophat(nuc_obj,se);
             nuc_fil = imadjust(tophatFiltered);
