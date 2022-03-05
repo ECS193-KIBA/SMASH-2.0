@@ -207,47 +207,41 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingDataOutputFolder.Value = pwd;
             app.NonfiberObjectsDataOutputFolder.Value = pwd;
             
-            isMultilayerImage = strcmp(ExtName, 'czi');
+            BioformatsData = bfopen(FileName);
+            PixelDataForAllLayers = BioformatsData{1,1};
+            ColorMapDataForAllLayers = BioformatsData{1, 3};
+            isMultilayerImage = ~isempty(ColorMapDataForAllLayers{1,1});
             if isMultilayerImage
-                BioformatsData = bfopen(FileName);
-                PixelDataForAllLayers = BioformatsData{1,1};
-                ColorMapDataForAllLayers = BioformatsData{1, 3};
-
-                NumLayers = length(PixelDataForAllLayers);
-
                 LayerOnePixelData = PixelDataForAllLayers{1,1};
                 LayerSize = size(LayerOnePixelData);
                 RGBSize = [LayerSize 3];
 
                 TotalRGB = zeros(RGBSize, 'uint8');
-                ColorDropDownItems = {};
-                ColorDropDownItemsData = {};
-
                 TotalMultiSpectral = [];
-             
+                TotalColorDropDownItems = {};
+                TotalColorDropDownItemsData = {};
+
+                NumLayers = length(PixelDataForAllLayers);
                 for Layer = 1:NumLayers
                     PixelsGrayscale = PixelDataForAllLayers{Layer, 1};
                     ColorMap = ColorMapDataForAllLayers{1, Layer};
                     PixelsRGBAsDouble = ind2rgb(PixelsGrayscale, ColorMap);
                     PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
-                    ColorDropDownItems = cat(2, ColorDropDownItems, {['Channel ', num2str(Layer)]});
-                    ColorDropDownItemsData  = cat(2, ColorDropDownItemsData, {num2str(Layer)});
-
                     PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
+
                     TotalMultiSpectral = cat(3, TotalMultiSpectral, PixelsGrayscaleUInt8);
-
-
-
                     TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
+                    TotalColorDropDownItems = cat(2, TotalColorDropDownItems, {['Channel ', num2str(Layer)]});
+                    TotalColorDropDownItemsData  = cat(2, TotalColorDropDownItemsData, {num2str(Layer)});
                 end
-                app.FiberOutlineColorDropDown.Items = ColorDropDownItems;
-                app.FiberOutlineColorDropDown.ItemsData = ColorDropDownItemsData;
-                app.NucleiColorDropDown.Items = ColorDropDownItems;
-                app.NucleiColorDropDown.ItemsData = ColorDropDownItemsData;
-                app.FiberTypeColorDropDown.Items = ColorDropDownItems;
-                app.FiberTypeColorDropDown.ItemsData = ColorDropDownItemsData;
-                app.NonfiberObjectColor.Items = ColorDropDownItems;
-                app.NonfiberObjectColor.ItemsData = ColorDropDownItemsData;
+                app.FiberOutlineColorDropDown.Items = TotalColorDropDownItems;
+                app.FiberOutlineColorDropDown.ItemsData = TotalColorDropDownItemsData;
+                app.NucleiColorDropDown.Items = TotalColorDropDownItems;
+                app.NucleiColorDropDown.ItemsData = TotalColorDropDownItemsData;
+                app.FiberTypeColorDropDown.Items = TotalColorDropDownItems;
+                app.FiberTypeColorDropDown.ItemsData = TotalColorDropDownItemsData;
+                app.NonfiberObjectColor.Items = TotalColorDropDownItems;
+                app.NonfiberObjectColor.ItemsData = TotalColorDropDownItemsData;
                 app.orig_img = TotalRGB;
                 app.orig_img_multispectral = TotalMultiSpectral;
             else
