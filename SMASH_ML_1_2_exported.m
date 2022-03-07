@@ -183,7 +183,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: SelectFileButton
         function SelectFileButtonPushed(app, event)
             [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi'},'File Selector - dont select mask');
-            drawnow;
+            drawnow limitrate;
             figure(app.UIFigure)
             if FilterIndex
                 C = strsplit(FileName,'.');
@@ -250,7 +250,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.orig_img_multispectral = ImageData;
             end
 
-            imshow(app.orig_img,'Parent',app.UIAxes)
+            imshow(app.orig_img,'Parent',app.UIAxes);
             
             if exist(MaskName,'file')
                 app.InitialSegmentationButton.Enable = 'on';
@@ -296,7 +296,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                    
                    % Display segmented image
                    flat_img =flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w');
-                   imshow(flat_img,'Parent',app.UIAxes)
+                   imshow(flat_img,'Parent',app.UIAxes);
                    app.AcceptSegmentationButton.Enable = 'on';
                    
                    
@@ -310,14 +310,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FinishSegmentingButton.Enable = 'off';
             app.Prompt.Text = 'Draw line to separate fibers and adjust as needed. Right click line to delete.';
             h = drawfreehand(app.UIAxes,'Closed',false,'FaceAlpha',0);
-            uiwait(app.UIFigure)    
+            uiwait(app.UIFigure);
             app.DoneDrawingButton.Enable = 'off';
             if isvalid(h)   % Checks if line exists or was deleted
                 mask = createMask(h);
                 mask2 = bwmorph(mask,'bridge');
                 app.bw_obj = logical(app.bw_obj + mask2);
                 flat_img = flattenMaskOverlay(app.orig_img, app.bw_obj, 1, 'w');
-                imshow(flat_img,'Parent',app.UIAxes)
+                imshow(flat_img,'Parent',app.UIAxes);
             end 
             app.DrawLineButton.Enable = 'on';
             app.FinishSegmentingButton.Enable = 'on';
@@ -352,7 +352,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SortingThresholdSlider.Enable = 'off';
             app.Prompt.Text = 'Filtering, please wait.';
             
-            drawnow
+            drawnow limitrate
             app.pix_size = app.PixelSizeField.Value;
             pix_area = app.pix_size^2;
             label = bwlabel(app.bw_obj,4);
@@ -391,10 +391,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             
             dispmask = logical((nonfiberfiltered.*maybefiltered) + fiberfiltered); % Show only the fibers and nonfiber maybes
             
-            imshow(flattenMaskOverlay(app.orig_img,dispmask,0.5,'w'),'Parent',app.UIAxes)
+            imshow(flattenMaskOverlay(app.orig_img,dispmask,0.5,'w'),'Parent',app.UIAxes);
             app.Prompt.Text = '';
             app.ManualSortingButton.Enable = 'on';
-            uiwait(app.UIFigure)
+            uiwait(app.UIFigure);
             
             
                 app.SortingAxesPanel.Visible = 'on';
@@ -404,27 +404,27 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 for i = 1:length(maybe)
                     app.SortingAxesPanel.Title = [num2str(i) ' of ' num2str(length(maybe))];
                     app.notfiber = 0;
-                    imshow(codedim,'Parent',app.UIAxesL)
-                    hold(app.UIAxesL,'on')
+                    imshow(codedim,'Parent',app.UIAxesL);
+                    hold(app.UIAxesL,'on');
                     plot(cents(maybe(i),1),cents(maybe(i),2),'y*','Parent',app.UIAxesL)
                     xlim(app.UIAxesL,[(cents(maybe(i),1)-100) (cents(maybe(i),1)+100)])
                     ylim(app.UIAxesL,[(cents(maybe(i),2)-100) (cents(maybe(i),2)+100)])
                     
                     
-                    imshow(app.orig_img,'Parent',app.UIAxesR)
-                    hold(app.UIAxesR,'on')
+                    imshow(app.orig_img,'Parent',app.UIAxesR);
+                    hold(app.UIAxesR,'on');
                     plot(cents(maybe(i),1),cents(maybe(i),2),'y*','Parent',app.UIAxesR)
                     xlim(app.UIAxesR,[(cents(maybe(i),1)-100) (cents(maybe(i),1)+100)])
                     ylim(app.UIAxesR,[(cents(maybe(i),2)-100) (cents(maybe(i),2)+100)])
                 
-                    uiwait(app.UIFigure)
+                    uiwait(app.UIFigure);
                     
                     if app.notfiber
                         removeidx = Rprop(maybe(i),7);
                         tempmask(removeidx.PixelIdxList{1,1}) = 0;
                     end
-                    hold(app.UIAxesL,'off')
-                    hold(app.UIAxesR,'off')
+                    hold(app.UIAxesL,'off');
+                    hold(app.UIAxesR,'off');
                 end
                 
 
@@ -438,7 +438,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                tempmask(hiprobnonprop.PixelIdxList{1,1}) = 0;
             end
             
-            imshow(flattenMaskOverlay(app.orig_img,logical(tempmask),0.5,'w'),'Parent',app.UIAxes)
+            imshow(flattenMaskOverlay(app.orig_img,logical(tempmask),0.5,'w'),'Parent',app.UIAxes);
             
             rgb_label = label2rgb(tempmask,'jet','w','shuffle');
             imwrite(rgb_label,app.Files{2},'tiff');
@@ -481,19 +481,19 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: YesButton
         function YesButtonPushed(app, event)
             
-            uiresume(app.UIFigure)
+            uiresume(app.UIFigure);
         end
 
         % Button pushed function: NoButton
         function NoButtonPushed(app, event)
             app.notfiber = 1;
-            uiresume(app.UIFigure)
+            uiresume(app.UIFigure);
         end
 
         % Button pushed function: ManualSortingButton
         function ManualSortingButtonPushed(app, event)
             app.ManualSortingButton.Enable = 'off';
-            uiresume(app.UIFigure)
+            uiresume(app.UIFigure);
             
             
         end
@@ -538,11 +538,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     
                     flat_img = flattenMaskOverlay(app.orig_img,bw_all,0.1,'w');
                     flat_img = flattenMaskOverlay(flat_img,bw_pos,0.5,'w');
-                    imshow(flat_img,'Parent',app.UIAxes)
+                    imshow(flat_img,'Parent',app.UIAxes);
                 end
             end
             app.bw_obj = bw_pos;
-            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes)
+            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
             label = bwlabel(app.bw_obj,4);
             rgb_label = label2rgb(label,'jet','w','shuffle');
             imwrite(rgb_label,app.Files{2},'tiff');
@@ -583,8 +583,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.props.MinFeretDiameter = app.props.MinFeretDiameter * app.pix_size;
             
             % Plot properties
-            histogram(app.FeretAxes,app.props.MinFeretDiameter,20)
-            histogram(app.FiberSizeAxes,app.props.Area,20)
+            histogram(app.FeretAxes,app.props.MinFeretDiameter,20);
+            histogram(app.FiberSizeAxes,app.props.Area,20);
             
             
         end
@@ -637,10 +637,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             out = [header; sums; data];
             
             % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.FiberPropertiesDataOutputFolder.Value)
+            CreateFolderIfDirectoryIsNonexistent(app, app.FiberPropertiesDataOutputFolder.Value);
             cd(app.FiberPropertiesDataOutputFolder.Value)
 
-            writecell(out,[app.Files{4} '_Properties.xlsx'],'Range','A5')
+            writecell(out,[app.Files{4} '_Properties.xlsx'],'Range','A5');
             app.Prompt.Text = 'Write to Excel done';
             app.props = 0;
             cd(app.Files{3})
@@ -713,8 +713,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 %imshow(comb_img,'Parent',app.UIAxes2_BL)
                 %imshow(cnf_img,'Parent',app.UIAxes2_BR)
                 pos_img = flattenMaskOverlay(cnf_img,nuc_bw,0.6,'b');
-                imshow(pos_img,'Parent',app.CNFAxes)
-                uiwait(app.UIFigure)
+                imshow(pos_img,'Parent',app.CNFAxes);
+                uiwait(app.UIFigure);
             end
             
         end
@@ -722,7 +722,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: CNFExcelWrite
         function CNFExcelWriteButtonPushed(app, event)
             % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.CentralNucleiDataOutputFolder.Value)
+            CreateFolderIfDirectoryIsNonexistent(app, app.CentralNucleiDataOutputFolder.Value);
             cd(app.CentralNucleiDataOutputFolder.Value)
 
             header{1,1} = 'Border (um)';
@@ -837,17 +837,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 [tot_n, cen] = histcounts((app.areas .* pix_area),20);
                 [pos_n, cen] = histcounts((app.areas(app.ponf) .* pix_area),cen);
                 
-                imshow(app.orig_img,'Parent',app.FTAxesL)
-                imshow(img_out,'Parent',app.FTAxesR)
-                histogram(app.ave_g,255,'Parent',app.FThistL)
-                hold(app.FThistL,'on')
+                imshow(app.orig_img,'Parent',app.FTAxesL);
+                imshow(img_out,'Parent',app.FTAxesR);
+                histogram(app.ave_g,255,'Parent',app.FThistL);
+                hold(app.FThistL,'on');
                 line(app.FThistL,x,y,'LineWidth',2,'Color','r');
-                hold(app.FThistL,'off')
-                histogram('BinEdges',cen,'BinCounts',tot_n,'Parent',app.FThistR)
-                hold(app.FThistR,'on')
-                histogram('BinEdges',cen,'BinCounts',pos_n,'FaceColor','r','Parent',app.FThistR)
-                hold(app.FThistR,'off')
-                uiwait(app.UIFigure)
+                hold(app.FThistL,'off');
+                histogram('BinEdges',cen,'BinCounts',tot_n,'Parent',app.FThistR);
+                hold(app.FThistR,'on');
+                histogram('BinEdges',cen,'BinCounts',pos_n,'FaceColor','r','Parent',app.FThistR);
+                hold(app.FThistR,'off');
+                uiwait(app.UIFigure);
                 
             end
         end
@@ -855,7 +855,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: AdjustButton
         function AdjustButtonPushed(app, event)
             app.cutoff_avg = app.ThresholdEditField.Value;
-            uiresume(app.UIFigure)
+            uiresume(app.UIFigure);
         end
 
         % Button pushed function: AcceptButton
@@ -867,13 +867,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CalculateFiberTyping.Enable = 'on';
             app.WritetoExcelFT.Enable = 'on';
             app.DoneFT.Enable = 'on';
-            uiresume(app.UIFigure)
+            uiresume(app.UIFigure);
         end
 
         % Button pushed function: WritetoExcelFT
         function WritetoExcelFTButtonPushed(app, event)
             % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.FiberTypingDataOutputFolder.Value)
+            CreateFolderIfDirectoryIsNonexistent(app, app.FiberTypingDataOutputFolder.Value);
             cd(app.FiberTypingDataOutputFolder.Value)
 
             pix_area = app.pix_size^2;
@@ -943,7 +943,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: AdjustCNF
         function AdjustCNFButtonPushed(app, event)
             app.thresh_nuc = app.ThresholdCNF.Value/255;
-            uiresume(app.UIFigure)
+            uiresume(app.UIFigure);
         end
 
         % Button pushed function: AcceptCNF
@@ -955,7 +955,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CalculateCentralNuclei.Enable = 'on';
             app.CNFExcelWrite.Enable = 'on';
             app.DoneButton_CNF.Enable = 'on';
-            uiresume(app.UIFigure)
+            uiresume(app.UIFigure);
         end
 
         % Button pushed function: CalculateNonfiberObjects
@@ -982,9 +982,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             
             while app.Obj_Adj
                 ch_bw = imbinarize(ch_fil,app.thresh_nf);
-                imshow(ch_bw,'Parent',app.NonfiberAxes)
+                imshow(ch_bw,'Parent',app.NonfiberAxes);
                 
-                uiwait(app.UIFigure)
+                uiwait(app.UIFigure);
                 
                 if app.Obj_Adj
                     app.thresh_nf = app.NonfiberThreshold.Value/255;
@@ -1004,7 +1004,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: NonfiberAdjust
         function NonfiberAdjustButtonPushed(app, event)
             app.Obj_Adj = 1;
-            uiresume(app.UIFigure)
+            uiresume(app.UIFigure);
         end
 
         % Button pushed function: NonfiberAccept
@@ -1016,13 +1016,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CalculateNonfiberObjects.Enable = 'on';
             app.WritetoExcelNonfiber.Enable = 'on';
             app.DoneNonfiber.Enable = 'on';
-            uiresume(app.UIFigure)
+            uiresume(app.UIFigure);
         end
 
         % Button pushed function: WritetoExcelNonfiber
         function WritetoExcelNonfiberButtonPushed(app, event)
             % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.NonfiberObjectsDataOutputFolder.Value)
+            CreateFolderIfDirectoryIsNonexistent(app, app.NonfiberObjectsDataOutputFolder.Value);
             cd(app.NonfiberObjectsDataOutputFolder.Value)
             
             header{1,1} = 'Threshold';
@@ -1036,7 +1036,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             
             out = cat(1,header,num2cell(app.nf_data));
             
-            writecell(out, [app.Files{4} '_Properties.xlsx'], 'Range','P7')
+            writecell(out, [app.Files{4} '_Properties.xlsx'], 'Range','P7');
             app.Prompt.Text = 'Write to Excel done';
             cd(app.Files{3})
             
@@ -1091,7 +1091,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             mask = imread(app.Files{2});
             graymask = rgb2gray(mask);
             app.bw_obj = imbinarize(graymask,0.99);
-            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w'),'Parent',app.UIAxes)
+            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w'),'Parent',app.UIAxes);
                
         end
 
@@ -1112,7 +1112,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             graymask = rgb2gray(mask);
             app.bw_obj = imcomplement(imbinarize(graymask,0.99));
             app.bw_obj = imclearborder(app.bw_obj,4);
-            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes)
+            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
             app.FilterButton.Enable = 'on';
             app.SortingThresholdSlider.Enable = 'on';
         end
@@ -1133,7 +1133,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             mask = imread(app.Files{2});
             graymask = rgb2gray(mask);
             app.bw_obj = imcomplement(imbinarize(graymask,0.99));
-            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes)
+            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
         end
 
         % Button pushed function: FiberPropertiesButton
