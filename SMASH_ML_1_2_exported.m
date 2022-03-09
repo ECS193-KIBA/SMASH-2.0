@@ -509,15 +509,28 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.done = 0;
             pon = true(app.num_obj,1); % logical ones array to determine if a region has been selected
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
-            while ~app.done
-                app.Prompt.Text = 'Click on regions for removal';
+           
+            userStopped = false;
+            pointhandles = gobjects(); 
+            
+            while ~app.done && ~userStopped
+                app.Prompt.Text = 'Click on regions for removal, click esc to finish manual filtering.';
                 phand = drawpoint(app.UIAxes,'Color','w');
-                %wait(phand)
-                pos = round(phand.Position);
-                xp = pos(1);
-                yp = pos(2);
-                delete(phand)
-                if ~app.done
+                
+                if ~isvalid(phand) || isempty(phand.Position)
+                    userStopped = true;
+                else
+                    pointhandles(end+1) = phand; 
+                end
+
+                if ~app.done && ~userStopped
+                    pos = round(phand.Position);
+                    xp = pos(1);
+                    yp = pos(2);
+                    delete(phand)
+                end
+
+                if ~app.done && ~userStopped
                     % Continue if clicked point is out of bounds
                     xp_is_valid = xp > 0 & xp <= size(label,2);
                     yp_is_valid = yp > 0 & yp <= size(label,1);
@@ -1130,6 +1143,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.ManualFilterControls.Visible = 'on';
             app.RemoveObjectsButton.Enable = 'on';
+            app.FinishManualFilteringButton.Enable = 'off';
             mask = imread(app.Files{2});
             graymask = rgb2gray(mask);
             app.bw_obj = imcomplement(imbinarize(graymask,0.99));
