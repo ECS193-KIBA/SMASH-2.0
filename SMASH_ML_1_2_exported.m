@@ -3,6 +3,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        ManualFilterControls            matlab.ui.container.Panel
+        SelectObjectsButton             matlab.ui.control.Button
+        FinishManualFilteringButton     matlab.ui.control.Button
+        RemoveObjectsButton             matlab.ui.control.Button
         Toolbar                         matlab.ui.container.Panel
         NonfiberObjectsButton           matlab.ui.control.Button
         FiberTypingButton               matlab.ui.control.Button
@@ -83,9 +87,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PropertiesPanel                 matlab.ui.container.Panel
         FiberSizeAxes                   matlab.ui.control.UIAxes
         FeretAxes                       matlab.ui.control.UIAxes
-        ManualFilterControls            matlab.ui.container.Panel
-        FinishManualFilteringButton     matlab.ui.control.Button
-        RemoveObjectsButton             matlab.ui.control.Button
         SortingAxesPanel                matlab.ui.container.Panel
         MarkasfiberLabel                matlab.ui.control.Label
         NoButton                        matlab.ui.control.Button
@@ -501,6 +502,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: RemoveObjectsButton
         function RemoveObjectsButtonPushed(app, event)
             app.RemoveObjectsButton.Enable = 'off';
+            app.SelectObjectsButton.Enable = 'off';
             app.FinishManualFilteringButton.Enable = 'on';
             label = bwlabel(app.bw_obj,4);
             bw_pos = app.bw_obj;
@@ -557,6 +559,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'on';
             app.Prompt.Text = '';
             app.RemoveObjectsButton.Enable = 'on';
+            app.SelectObjectsButton.Enable = 'on';
         end
 
         % Button pushed function: FinishManualFilteringButton
@@ -1240,6 +1243,71 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             value = predict(classifier,predictors);
             app.SegmentationThresholdSlider.Value = round(value);
         end
+
+        % Button pushed function: SelectObjectsButton
+        function SelectObjectsButtonPushed(app, event)
+            app.RemoveObjectsButton.Enable = 'off';
+            app.SelectObjectsButton.Enable = 'off';
+            app.FinishManualFilteringButton.Enable = 'on';
+            label = bwlabel(app.bw_obj,4);
+            bw_selected = zeros(size(app.bw_obj), "logical");
+            bw_all = app.bw_obj;
+            app.num_obj = max(max(label));
+            app.done = 0;
+            is_object_selected_bool_map = false(app.num_obj,1);
+            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
+            while ~app.done
+                app.Prompt.Text = 'Select Regions to Merge';
+                phand = drawpoint(app.UIAxes,'Color','w');
+                %wait(phand)
+                pos = round(phand.Position);
+                xp = pos(1);
+                yp = pos(2);
+                delete(phand)
+                if ~app.done
+                    % Continue if clicked point is out of bounds
+                    xp_is_valid = xp > 0 & xp <= size(app.bw_obj,2);
+                    yp_is_valid = yp > 0 & yp <= size(app.bw_obj,1);
+                    if ~xp_is_valid || ~yp_is_valid
+                        continue
+                    end
+
+                    selected_label = label(yp,xp);
+                    is_not_clicked_on_region = selected_label == 0;
+                    if is_not_clicked_on_region
+                        continue
+                    end
+ 
+                    is_object_selected_bool_map(selected_label) = ~is_object_selected_bool_map(selected_label);
+                    idx = find(label == selected_label);
+                    if is_object_selected_bool_map(selected_label)
+                        bw_selected(idx) = 1;
+                    else
+                        bw_selected(idx) = 0;
+                    end
+                    
+                    flat_img = flattenMaskOverlay(app.orig_img,bw_all,0.5,'w');
+                    flat_img = flattenMaskOverlay(flat_img,bw_selected,0.5,'r');
+                    imshow(flat_img,'Parent',app.UIAxes);
+                end
+            end
+            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
+            label = bwlabel(app.bw_obj,4);
+            rgb_label = label2rgb(label,'jet','w','shuffle');
+            imwrite(rgb_label,app.Files{2},'tiff');
+            app.ManualFilterControls.Visible = 'off';
+            app.InitialSegmentationButton.Enable = 'on';
+            app.ManualSegmentationButton.Enable = 'on';
+            app.FiberPredictionButton.Enable = 'on';
+            app.ManualFiberFilterButton.Enable = 'on';
+            app.FiberPropertiesButton.Enable = 'on';
+            app.CentralNucleiButton.Enable = 'on';
+            app.FiberTypingButton.Enable = 'on';
+            app.NonfiberObjectsButton.Enable = 'on';
+            app.Prompt.Text = '';
+            app.RemoveObjectsButton.Enable = 'on';
+            app.SelectObjectsButton.Enable = 'on';
+        end
     end
 
     % Component initialization
@@ -1424,24 +1492,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.MarkasfiberLabel.HorizontalAlignment = 'center';
             app.MarkasfiberLabel.Position = [188 143 290 22];
             app.MarkasfiberLabel.Text = 'Mark as fiber?';
-
-            % Create ManualFilterControls
-            app.ManualFilterControls = uipanel(app.UIFigure);
-            app.ManualFilterControls.Visible = 'off';
-            app.ManualFilterControls.Position = [35 523 232 137];
-
-            % Create RemoveObjectsButton
-            app.RemoveObjectsButton = uibutton(app.ManualFilterControls, 'push');
-            app.RemoveObjectsButton.ButtonPushedFcn = createCallbackFcn(app, @RemoveObjectsButtonPushed, true);
-            app.RemoveObjectsButton.Position = [73 78 104 22];
-            app.RemoveObjectsButton.Text = 'Remove Objects';
-
-            % Create FinishManualFilteringButton
-            app.FinishManualFilteringButton = uibutton(app.ManualFilterControls, 'push');
-            app.FinishManualFilteringButton.ButtonPushedFcn = createCallbackFcn(app, @FinishManualFilteringButtonPushed, true);
-            app.FinishManualFilteringButton.Enable = 'off';
-            app.FinishManualFilteringButton.Position = [58 28 136 22];
-            app.FinishManualFilteringButton.Text = 'Finish Manual Filtering';
 
             % Create PropertiesPanel
             app.PropertiesPanel = uipanel(app.UIFigure);
@@ -1909,6 +1959,30 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.NonfiberObjectsButton.Position = [823.5 9 105 22];
             app.NonfiberObjectsButton.Text = 'Nonfiber Objects';
+
+            % Create ManualFilterControls
+            app.ManualFilterControls = uipanel(app.UIFigure);
+            app.ManualFilterControls.Visible = 'off';
+            app.ManualFilterControls.Position = [55 474 232 164];
+
+            % Create RemoveObjectsButton
+            app.RemoveObjectsButton = uibutton(app.ManualFilterControls, 'push');
+            app.RemoveObjectsButton.ButtonPushedFcn = createCallbackFcn(app, @RemoveObjectsButtonPushed, true);
+            app.RemoveObjectsButton.Position = [75 113 104 22];
+            app.RemoveObjectsButton.Text = 'Remove Objects';
+
+            % Create FinishManualFilteringButton
+            app.FinishManualFilteringButton = uibutton(app.ManualFilterControls, 'push');
+            app.FinishManualFilteringButton.ButtonPushedFcn = createCallbackFcn(app, @FinishManualFilteringButtonPushed, true);
+            app.FinishManualFilteringButton.Enable = 'off';
+            app.FinishManualFilteringButton.Position = [56 32 136 22];
+            app.FinishManualFilteringButton.Text = 'Finish Manual Filtering';
+
+            % Create SelectObjectsButton
+            app.SelectObjectsButton = uibutton(app.ManualFilterControls, 'push');
+            app.SelectObjectsButton.ButtonPushedFcn = createCallbackFcn(app, @SelectObjectsButtonPushed, true);
+            app.SelectObjectsButton.Position = [75 71 100 22];
+            app.SelectObjectsButton.Text = 'Select Objects';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
