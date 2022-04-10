@@ -4,7 +4,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
         ManualFilterControls            matlab.ui.container.Panel
-        SelectObjectsButton             matlab.ui.control.Button
+        MergeObjectsButton              matlab.ui.control.Button
         FinishManualFilteringButton     matlab.ui.control.Button
         RemoveObjectsButton             matlab.ui.control.Button
         Toolbar                         matlab.ui.container.Panel
@@ -502,7 +502,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: RemoveObjectsButton
         function RemoveObjectsButtonPushed(app, event)
             app.RemoveObjectsButton.Enable = 'off';
-            app.SelectObjectsButton.Enable = 'off';
+            app.MergeObjectsButton.Enable = 'off';
             app.FinishManualFilteringButton.Enable = 'on';
             label = bwlabel(app.bw_obj,4);
             bw_pos = app.bw_obj;
@@ -559,7 +559,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'on';
             app.Prompt.Text = '';
             app.RemoveObjectsButton.Enable = 'on';
-            app.SelectObjectsButton.Enable = 'on';
+            app.MergeObjectsButton.Enable = 'on';
         end
 
         % Button pushed function: FinishManualFilteringButton
@@ -1244,20 +1244,28 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SegmentationThresholdSlider.Value = round(value);
         end
 
-        % Button pushed function: SelectObjectsButton
-        function SelectObjectsButtonPushed(app, event)
+        % Button pushed function: MergeObjectsButton
+        function MergeObjectsButtonPushed(app, event)
             app.RemoveObjectsButton.Enable = 'off';
-            app.SelectObjectsButton.Enable = 'off';
+            app.MergeObjectsButton.Enable = 'off';
             app.FinishManualFilteringButton.Enable = 'on';
+
             label = bwlabel(app.bw_obj,4);
-            bw_selected = zeros(size(app.bw_obj), "logical");
-            bw_all = app.bw_obj;
-            app.num_obj = max(max(label));
+
+            BW_SELECTED_NONE_SELECTED = zeros(size(app.bw_obj), "logical");
+            bw_selected = BW_SELECTED_NONE_SELECTED;
             app.done = 0;
-            is_object_selected_bool_map = false(app.num_obj,1);
+
+            NONE_REGION_SELECTED = -1;
+            first_region_to_merge = NONE_REGION_SELECTED;
+
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
             while ~app.done
-                app.Prompt.Text = 'Select Regions to Merge';
+                if first_region_to_merge == NONE_REGION_SELECTED
+                    app.Prompt.Text = 'Select first region to merge';
+                else
+                    app.Prompt.Text = 'Select second region to merge to first region or unselect the first region';
+                end
                 phand = drawpoint(app.UIAxes,'Color','w');
                 %wait(phand)
                 pos = round(phand.Position);
@@ -1272,29 +1280,45 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                         continue
                     end
 
-                    selected_label = label(yp,xp);
-                    is_not_clicked_on_region = selected_label == 0;
+                    % Continue if clicked point is not a region
+                    clicked_region = label(yp,xp);
+                    is_not_clicked_on_region = clicked_region == 0;
                     if is_not_clicked_on_region
                         continue
                     end
  
-                    is_object_selected_bool_map(selected_label) = ~is_object_selected_bool_map(selected_label);
-                    idx = find(label == selected_label);
-                    if is_object_selected_bool_map(selected_label)
-                        bw_selected(idx) = 1;
+                    is_user_selecting_first_of_two_objects_to_merge = first_region_to_merge == NONE_REGION_SELECTED;
+                    is_user_unselecting_region = first_region_to_merge == clicked_region;
+                    if is_user_selecting_first_of_two_objects_to_merge
+                        bw_selected(label == clicked_region) = 1;
+                        first_region_to_merge = clicked_region;
+                    elseif is_user_unselecting_region 
+                        bw_selected(label == clicked_region) = 0;
+                        first_region_to_merge = NONE_REGION_SELECTED;
                     else
-                        bw_selected(idx) = 0;
+                        % Merging
+                        second_region_to_merge = clicked_region;
+                        disp(["Merging region", int2str(first_region_to_merge), " and ", int2str(second_region_to_merge)])
+                        app.bw_obj = app.bw_obj;
+
+                        % Reset
+                        label = bwlabel(app.bw_obj, 4);
+                        first_region_to_merge = NONE_REGION_SELECTED;
+                        bw_selected = BW_SELECTED_NONE_SELECTED;
                     end
-                    
-                    flat_img = flattenMaskOverlay(app.orig_img,bw_all,0.5,'w');
+
+                    % Draw objects and selection
+                    flat_img = flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w');
                     flat_img = flattenMaskOverlay(flat_img,bw_selected,0.5,'r');
                     imshow(flat_img,'Parent',app.UIAxes);
                 end
             end
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
             label = bwlabel(app.bw_obj,4);
+            app.num_obj = max(max(label));
             rgb_label = label2rgb(label,'jet','w','shuffle');
-            imwrite(rgb_label,app.Files{2},'tiff');
+            imwrite(rgb_label,app.Files{2},'tiff')
+
             app.ManualFilterControls.Visible = 'off';
             app.InitialSegmentationButton.Enable = 'on';
             app.ManualSegmentationButton.Enable = 'on';
@@ -1306,7 +1330,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'on';
             app.Prompt.Text = '';
             app.RemoveObjectsButton.Enable = 'on';
-            app.SelectObjectsButton.Enable = 'on';
+            app.MergeObjectsButton.Enable = 'on';
         end
     end
 
@@ -1978,11 +2002,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FinishManualFilteringButton.Position = [56 32 136 22];
             app.FinishManualFilteringButton.Text = 'Finish Manual Filtering';
 
-            % Create SelectObjectsButton
-            app.SelectObjectsButton = uibutton(app.ManualFilterControls, 'push');
-            app.SelectObjectsButton.ButtonPushedFcn = createCallbackFcn(app, @SelectObjectsButtonPushed, true);
-            app.SelectObjectsButton.Position = [75 71 100 22];
-            app.SelectObjectsButton.Text = 'Select Objects';
+            % Create MergeObjectsButton
+            app.MergeObjectsButton = uibutton(app.ManualFilterControls, 'push');
+            app.MergeObjectsButton.ButtonPushedFcn = createCallbackFcn(app, @MergeObjectsButtonPushed, true);
+            app.MergeObjectsButton.Position = [75 71 100 22];
+            app.MergeObjectsButton.Text = 'Merge Objects';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
