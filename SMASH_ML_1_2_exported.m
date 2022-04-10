@@ -94,8 +94,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         UIAxesL                         matlab.ui.control.UIAxes
         DrawLineControls                matlab.ui.container.Panel
         FinishSegmentingButton          matlab.ui.control.Button
-        DoneDrawingButton               matlab.ui.control.Button
-        DrawLineButton                  matlab.ui.control.Button
+        AcceptLineButton                matlab.ui.control.Button
+        StartDrawingButton              matlab.ui.control.Button
         Image2                          matlab.ui.control.Image
         SMASHLabel                      matlab.ui.control.Label
         Image                           matlab.ui.control.Image
@@ -207,41 +207,38 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingDataOutputFolder.Value = pwd;
             app.NonfiberObjectsDataOutputFolder.Value = pwd;
             
-            BioformatsData = bfopen(FileName);
-            PixelDataForAllLayers = BioformatsData{1,1};
-            ColorMapDataForAllLayers = BioformatsData{1, 3};
-            isMultilayerImage = ~isempty(ColorMapDataForAllLayers{1,1});
+            isMultilayerImage = strcmp(ExtName, 'czi');
             if isMultilayerImage
+                BioformatsData = bfopen(FileName);
+                PixelDataForAllLayers = BioformatsData{1,1};
+                ColorMapDataForAllLayers = BioformatsData{1, 3};
+
+                NumLayers = length(PixelDataForAllLayers);
+
                 LayerOnePixelData = PixelDataForAllLayers{1,1};
                 LayerSize = size(LayerOnePixelData);
                 RGBSize = [LayerSize 3];
 
                 TotalRGB = zeros(RGBSize, 'uint8');
+                app.FiberOutlineColorDropDown.Items = {};
+                app.FiberOutlineColorDropDown.ItemsData = {};
                 TotalMultiSpectral = [];
-                TotalColorDropDownItems = {};
-                TotalColorDropDownItemsData = {};
-
-                NumLayers = length(PixelDataForAllLayers);
+             
                 for Layer = 1:NumLayers
                     PixelsGrayscale = PixelDataForAllLayers{Layer, 1};
                     ColorMap = ColorMapDataForAllLayers{1, Layer};
                     PixelsRGBAsDouble = ind2rgb(PixelsGrayscale, ColorMap);
                     PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
-                    PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
+                    app.FiberOutlineColorDropDown.Items = cat(2, app.FiberOutlineColorDropDown.Items, {['Channel ', num2str(Layer)]});
+                    app.FiberOutlineColorDropDown.ItemsData = cat(2, app.FiberOutlineColorDropDown.ItemsData, {num2str(Layer)});
 
+                    PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
                     TotalMultiSpectral = cat(3, TotalMultiSpectral, PixelsGrayscaleUInt8);
+
+
+
                     TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
-                    TotalColorDropDownItems = cat(2, TotalColorDropDownItems, {['Channel ', num2str(Layer)]});
-                    TotalColorDropDownItemsData  = cat(2, TotalColorDropDownItemsData, {num2str(Layer)});
                 end
-                app.FiberOutlineColorDropDown.Items = TotalColorDropDownItems;
-                app.FiberOutlineColorDropDown.ItemsData = TotalColorDropDownItemsData;
-                app.NucleiColorDropDown.Items = TotalColorDropDownItems;
-                app.NucleiColorDropDown.ItemsData = TotalColorDropDownItemsData;
-                app.FiberTypeColorDropDown.Items = TotalColorDropDownItems;
-                app.FiberTypeColorDropDown.ItemsData = TotalColorDropDownItemsData;
-                app.NonfiberObjectColor.Items = TotalColorDropDownItems;
-                app.NonfiberObjectColor.ItemsData = TotalColorDropDownItemsData;
                 app.orig_img = TotalRGB;
                 app.orig_img_multispectral = TotalMultiSpectral;
             else
@@ -250,7 +247,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.orig_img_multispectral = ImageData;
             end
 
-            imshow(app.orig_img,'Parent',app.UIAxes);
+            imshow(app.orig_img,'Parent',app.UIAxes)
             
             if exist(MaskName,'file')
                 app.InitialSegmentationButton.Enable = 'on';
@@ -296,41 +293,47 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                    
                    % Display segmented image
                    flat_img =flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w');
-                   imshow(flat_img,'Parent',app.UIAxes);
+                   imshow(flat_img,'Parent',app.UIAxes)
                    app.AcceptSegmentationButton.Enable = 'on';
-                   
-                   
-               end 
+               end
         end
 
-        % Button pushed function: DrawLineButton
-        function DrawLineButtonPushed(app, event)
-            app.DoneDrawingButton.Enable = 'on';
-            app.DrawLineButton.Enable = 'off';
-            app.FinishSegmentingButton.Enable = 'off';
-            app.Prompt.Text = 'Draw line to separate fibers and adjust as needed. Right click line to delete.';
-            h = drawfreehand(app.UIAxes,'Closed',false,'FaceAlpha',0);
-            uiwait(app.UIFigure);
-            app.DoneDrawingButton.Enable = 'off';
-            if isvalid(h)   % Checks if line exists or was deleted
-                mask = createMask(h);
-                mask2 = bwmorph(mask,'bridge');
-                app.bw_obj = logical(app.bw_obj + mask2);
-                flat_img = flattenMaskOverlay(app.orig_img, app.bw_obj, 1, 'w');
-                imshow(flat_img,'Parent',app.UIAxes);
-            end 
-            app.DrawLineButton.Enable = 'on';
+        % Button pushed function: StartDrawingButton
+        function StartDrawingButtonPushed(app, event)
+            set(app.FinishSegmentingButton, 'userdata', 0);
             app.FinishSegmentingButton.Enable = 'on';
+            app.StartDrawingButton.Enable = 'off';
+            
+            while true
+                if get(app.FinishSegmentingButton, 'userdata')
+		            break;
+                end
+                app.AcceptLineButton.Enable = 'on';
+                app.Prompt.Text = 'Draw line to separate fibers and adjust as needed. Right click line to delete.';
+                h = drawfreehand(app.UIAxes,'Closed',false,'FaceAlpha',0);
+                uiwait(app.UIFigure);
+                app.AcceptLineButton.Enable = 'off';
+                if isvalid(h)   % Checks if line exists or was deleted
+                    mask = createMask(h);
+                    mask2 = bwmorph(mask,'bridge');
+                    app.bw_obj = logical(app.bw_obj + mask2);
+                    flat_img = flattenMaskOverlay(app.orig_img, app.bw_obj, 1, 'w');
+                    imshow(flat_img,'Parent',app.UIAxes);
+                end 
+                uiresume(app.UIFigure);
+            end
+            app.StartDrawingButton.Enable = 'on';
         end
 
-        % Button pushed function: DoneDrawingButton
-        function DoneDrawingButtonPushed(app, event)
+        % Button pushed function: AcceptLineButton
+        function AcceptLineButtonPushed(app, event)
             uiresume(app.UIFigure);
             app.Prompt.Text = '';
         end
 
         % Button pushed function: FinishSegmentingButton
         function FinishSegmentingButtonPushed(app, event)
+            set(app.FinishSegmentingButton, 'userdata', 1);
             label = bwlabel(~logical(app.bw_obj),4);
             rgb_label = label2rgb(label,'jet','w','shuffle');
             imwrite(rgb_label,app.Files{2},'tiff');
@@ -344,6 +347,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
             app.SegmentationParameters.Visible = 'off';
+            app.Prompt.Text = '';
         end
 
         % Button pushed function: FilterButton
@@ -1378,18 +1382,18 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DrawLineControls.Visible = 'off';
             app.DrawLineControls.Position = [38 470 153 183];
 
-            % Create DrawLineButton
-            app.DrawLineButton = uibutton(app.DrawLineControls, 'push');
-            app.DrawLineButton.ButtonPushedFcn = createCallbackFcn(app, @DrawLineButtonPushed, true);
-            app.DrawLineButton.Position = [28 137 100 22];
-            app.DrawLineButton.Text = 'Draw Line';
+            % Create StartDrawingButton
+            app.StartDrawingButton = uibutton(app.DrawLineControls, 'push');
+            app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
+            app.StartDrawingButton.Position = [28 137 100 22];
+            app.StartDrawingButton.Text = 'Start Drawing';
 
-            % Create DoneDrawingButton
-            app.DoneDrawingButton = uibutton(app.DrawLineControls, 'push');
-            app.DoneDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @DoneDrawingButtonPushed, true);
-            app.DoneDrawingButton.Enable = 'off';
-            app.DoneDrawingButton.Position = [28 82 100 22];
-            app.DoneDrawingButton.Text = 'Done Drawing';
+            % Create AcceptLineButton
+            app.AcceptLineButton = uibutton(app.DrawLineControls, 'push');
+            app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
+            app.AcceptLineButton.Enable = 'off';
+            app.AcceptLineButton.Position = [28 82 100 22];
+            app.AcceptLineButton.Text = 'Accept Line';
 
             % Create FinishSegmentingButton
             app.FinishSegmentingButton = uibutton(app.DrawLineControls, 'push');
