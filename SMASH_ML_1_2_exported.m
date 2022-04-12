@@ -327,7 +327,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 end 
                 uiresume(app.UIFigure);
             end
-            app.StartDrawingButton.Enable = 'on';
         end
 
         % Button pushed function: AcceptLineButton
@@ -339,6 +338,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: FinishSegmentingButton
         function FinishSegmentingButtonPushed(app, event)
             set(app.FinishSegmentingButton, 'userdata', 1);
+            app.StartDrawingButton.Enable = 'on';
+            app.AcceptLineButton.Enable = 'off';
+
             label = bwlabel(~logical(app.bw_obj),4);
             rgb_label = label2rgb(label,'jet','w','shuffle');
             imwrite(rgb_label,app.Files{2},'tiff');
