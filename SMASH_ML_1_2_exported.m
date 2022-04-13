@@ -155,6 +155,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 mkdir(pathDirectory)
             end
         end
+        
+        function results = GetBoldBoundary(boundaryPoints, bw)
+            results = zeros(size(app.bw_obj), "logical");
+            [numBoundaryPoints] = size(boundaryPoints);
+        end
     end
 
 
@@ -1252,8 +1257,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             label = bwlabel(app.bw_obj,4);
 
-            BW_SELECTED_NONE_SELECTED = zeros(size(app.bw_obj), "logical");
-            bw_selected = BW_SELECTED_NONE_SELECTED;
+            BW_ALL_ZEROS = zeros(size(app.bw_obj), "logical");
+            bw_selected = BW_ALL_ZEROS;
             app.done = 0;
 
             NONE_REGION_SELECTED = -1;
@@ -1299,12 +1304,25 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                         % Merging
                         second_region_to_merge = clicked_region;
                         disp(["Merging region", int2str(first_region_to_merge), " and ", int2str(second_region_to_merge)])
-                        app.bw_obj = app.bw_obj;
+                        bw_first_region_to_merge = BW_ALL_ZEROS;
+                        bw_first_region_to_merge(label == first_region_to_merge) = 1;
+                        bw_second_region_to_merge = BW_ALL_ZEROS;
+                        bw_second_region_to_merge(label == second_region_to_merge) = 1;
+                        bw_first_region_boundary = bwboundaries(bw_first_region_to_merge);
+                        bw_second_region_boundary = bwboundaries(bw_second_region_to_merge);
+
+                        
+                        
+                        bw_first_region_bolded_boundary = BW_ALL_ZEROS;
+                        bw_second_region_bolded_boundary = BW_ALL_ZEROS;
+
+                        bw_boundary_intersection = bw_first_region_bolded_boundary & bw_second_region_bolded_boundary;
+                        app.bw_obj(bw_boundary_intersection == 1) = 1;
 
                         % Reset
                         label = bwlabel(app.bw_obj, 4);
                         first_region_to_merge = NONE_REGION_SELECTED;
-                        bw_selected = BW_SELECTED_NONE_SELECTED;
+                        bw_selected = BW_ALL_ZEROS;
                     end
 
                     % Draw objects and selection
