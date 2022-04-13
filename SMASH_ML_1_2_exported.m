@@ -156,9 +156,35 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             end
         end
         
-        function results = GetBoldBoundary(boundaryPoints, bw)
+        function results = GetBoldBoundary(app, boundaryPoints)
+            boundaryPoints = boundaryPoints{1};
             results = zeros(size(app.bw_obj), "logical");
-            [numBoundaryPoints] = size(boundaryPoints);
+            [numBoundaryPoints, ~] = size(boundaryPoints);
+            for i=1:numBoundaryPoints
+                boundaryPoint = boundaryPoints(i,:);
+                r = boundaryPoint(1);
+                c = boundaryPoint(2);
+                results = AssignOneIfToBoundaryIndexIfInBound(app, r-1, c, results);
+                results = AssignOneIfToBoundaryIndexIfInBound(app, r, c+1, results);
+                results = AssignOneIfToBoundaryIndexIfInBound(app, r+1, c, results);
+                results = AssignOneIfToBoundaryIndexIfInBound(app, r, c-1, results);
+                results = AssignOneIfToBoundaryIndexIfInBound(app, r-1, c-1, results);
+                results = AssignOneIfToBoundaryIndexIfInBound(app, r-1, c+1, results);
+                results = AssignOneIfToBoundaryIndexIfInBound(app, r+1, c-1, results);
+                results = AssignOneIfToBoundaryIndexIfInBound(app, r+1, c+1, results);
+
+            end
+        end
+        
+        function results = AssignOneIfToBoundaryIndexIfInBound(app, r, c, bw)
+            results = bw;
+            if (IndexInBound(app, r, c, bw))
+                results(r,c) = 1;
+            end
+        end
+        
+        function results = IndexInBound(~, r, c, bw)
+            results = all([r c] > [0 0]) && all([r c] < size(bw));
         end
     end
 
@@ -1310,11 +1336,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                         bw_second_region_to_merge(label == second_region_to_merge) = 1;
                         bw_first_region_boundary = bwboundaries(bw_first_region_to_merge);
                         bw_second_region_boundary = bwboundaries(bw_second_region_to_merge);
-
                         
-                        
-                        bw_first_region_bolded_boundary = BW_ALL_ZEROS;
-                        bw_second_region_bolded_boundary = BW_ALL_ZEROS;
+                        bw_first_region_bolded_boundary = GetBoldBoundary(app, bw_first_region_boundary);
+                        bw_second_region_bolded_boundary = GetBoldBoundary(app, bw_second_region_boundary);
 
                         bw_boundary_intersection = bw_first_region_bolded_boundary & bw_second_region_bolded_boundary;
                         app.bw_obj(bw_boundary_intersection == 1) = 1;
