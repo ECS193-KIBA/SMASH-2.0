@@ -340,6 +340,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             set(app.FinishSegmentingButton, 'userdata', 1);
             app.StartDrawingButton.Enable = 'on';
             app.AcceptLineButton.Enable = 'off';
+            imshow(flattenMaskOverlay(app.orig_img, app.bw_obj, 1, 'w'), 'Parent', app.UIAxes);
 
             label = bwlabel(~logical(app.bw_obj),4);
             rgb_label = label2rgb(label,'jet','w','shuffle');
