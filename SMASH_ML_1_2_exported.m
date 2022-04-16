@@ -517,6 +517,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             label = bwlabel(app.bw_obj,4);
             bw_pos = app.bw_obj;
             bw_all = app.bw_obj;
+            base_flat_img = flattenMaskOverlay(app.orig_img,bw_all,0.1,'w');
             app.num_obj = max(max(label));
             app.done = 0;
             pon = true(app.num_obj,1); % logical ones array to determine if a region has been selected
@@ -560,9 +561,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     else
                         bw_pos(idx) = 0;
                     end
-                    
-                    flat_img = flattenMaskOverlay(app.orig_img,bw_all,0.1,'w');
-                    flat_img = flattenMaskOverlay(flat_img,bw_pos,0.5,'w');
+                    flat_img = flattenMaskOverlay(base_flat_img,bw_pos,0.5,'w');
                     imshow(flat_img,'Parent',app.UIAxes);
                 end
             end
