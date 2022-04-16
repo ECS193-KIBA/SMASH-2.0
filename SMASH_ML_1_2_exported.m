@@ -94,8 +94,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         UIAxesL                         matlab.ui.control.UIAxes
         DrawLineControls                matlab.ui.container.Panel
         FinishSegmentingButton          matlab.ui.control.Button
-        DoneDrawingButton               matlab.ui.control.Button
-        DrawLineButton                  matlab.ui.control.Button
+        AcceptLineButton                matlab.ui.control.Button
+        StartDrawingButton              matlab.ui.control.Button
         Image2                          matlab.ui.control.Image
         SMASHLabel                      matlab.ui.control.Label
         Image                           matlab.ui.control.Image
@@ -303,34 +303,45 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                end 
         end
 
-        % Button pushed function: DrawLineButton
-        function DrawLineButtonPushed(app, event)
-            app.DoneDrawingButton.Enable = 'on';
-            app.DrawLineButton.Enable = 'off';
-            app.FinishSegmentingButton.Enable = 'off';
-            app.Prompt.Text = 'Draw line to separate fibers and adjust as needed. Right click line to delete.';
-            h = drawfreehand(app.UIAxes,'Closed',false,'FaceAlpha',0);
-            uiwait(app.UIFigure);
-            app.DoneDrawingButton.Enable = 'off';
-            if isvalid(h)   % Checks if line exists or was deleted
-                mask = createMask(h);
-                mask2 = bwmorph(mask,'bridge');
-                app.bw_obj = logical(app.bw_obj + mask2);
-                flat_img = flattenMaskOverlay(app.orig_img, app.bw_obj, 1, 'w');
-                imshow(flat_img,'Parent',app.UIAxes);
-            end 
-            app.DrawLineButton.Enable = 'on';
+        % Button pushed function: StartDrawingButton
+        function StartDrawingButtonPushed(app, event)
+            set(app.FinishSegmentingButton, 'userdata', 0);
             app.FinishSegmentingButton.Enable = 'on';
+            app.StartDrawingButton.Enable = 'off';
+            
+            while true
+                if get(app.FinishSegmentingButton, 'userdata')
+		            break;
+                end
+                app.AcceptLineButton.Enable = 'on';
+                app.Prompt.Text = 'Draw line to separate fibers and adjust as needed. Right click line to delete.';
+                h = drawfreehand(app.UIAxes,'Closed',false,'FaceAlpha',0);
+                uiwait(app.UIFigure);
+                app.AcceptLineButton.Enable = 'off';
+                if isvalid(h)   % Checks if line exists or was deleted
+                    mask = createMask(h);
+                    mask2 = bwmorph(mask,'bridge');
+                    app.bw_obj = logical(app.bw_obj + mask2);
+                    flat_img = flattenMaskOverlay(app.orig_img, app.bw_obj, 1, 'w');
+                    imshow(flat_img,'Parent',app.UIAxes);
+                end 
+                uiresume(app.UIFigure);
+            end
         end
 
-        % Button pushed function: DoneDrawingButton
-        function DoneDrawingButtonPushed(app, event)
+        % Button pushed function: AcceptLineButton
+        function AcceptLineButtonPushed(app, event)
             uiresume(app.UIFigure);
             app.Prompt.Text = '';
         end
 
         % Button pushed function: FinishSegmentingButton
         function FinishSegmentingButtonPushed(app, event)
+            set(app.FinishSegmentingButton, 'userdata', 1);
+            app.StartDrawingButton.Enable = 'on';
+            app.AcceptLineButton.Enable = 'off';
+            imshow(flattenMaskOverlay(app.orig_img, app.bw_obj, 1, 'w'), 'Parent', app.UIAxes);
+
             label = bwlabel(~logical(app.bw_obj),4);
             rgb_label = label2rgb(label,'jet','w','shuffle');
             imwrite(rgb_label,app.Files{2},'tiff');
@@ -344,6 +355,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
             app.SegmentationParameters.Visible = 'off';
+            app.Prompt.Text = '';
         end
 
         % Button pushed function: FilterButton
@@ -1378,18 +1390,18 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DrawLineControls.Visible = 'off';
             app.DrawLineControls.Position = [38 470 153 183];
 
-            % Create DrawLineButton
-            app.DrawLineButton = uibutton(app.DrawLineControls, 'push');
-            app.DrawLineButton.ButtonPushedFcn = createCallbackFcn(app, @DrawLineButtonPushed, true);
-            app.DrawLineButton.Position = [28 137 100 22];
-            app.DrawLineButton.Text = 'Draw Line';
+            % Create StartDrawingButton
+            app.StartDrawingButton = uibutton(app.DrawLineControls, 'push');
+            app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
+            app.StartDrawingButton.Position = [28 137 100 22];
+            app.StartDrawingButton.Text = 'Start Drawing';
 
-            % Create DoneDrawingButton
-            app.DoneDrawingButton = uibutton(app.DrawLineControls, 'push');
-            app.DoneDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @DoneDrawingButtonPushed, true);
-            app.DoneDrawingButton.Enable = 'off';
-            app.DoneDrawingButton.Position = [28 82 100 22];
-            app.DoneDrawingButton.Text = 'Done Drawing';
+            % Create AcceptLineButton
+            app.AcceptLineButton = uibutton(app.DrawLineControls, 'push');
+            app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
+            app.AcceptLineButton.Enable = 'off';
+            app.AcceptLineButton.Position = [28 82 100 22];
+            app.AcceptLineButton.Text = 'Accept Line';
 
             % Create FinishSegmentingButton
             app.FinishSegmentingButton = uibutton(app.DrawLineControls, 'push');
