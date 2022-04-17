@@ -1326,12 +1326,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     app.Prompt.Text = 'Select second region to merge to first region or unselect the first region';
                 end
                 phand = drawpoint(app.UIAxes,'Color','w');
-                %wait(phand)
-                pos = round(phand.Position);
-                xp = pos(1);
-                yp = pos(2);
-                delete(phand)
+
+                if ~isvalid(phand) || isempty(phand.Position)
+                    app.done = 1;
+                end
+
                 if ~app.done
+                    pos = round(phand.Position);
+                    xp = pos(1);
+                    yp = pos(2);
+                    delete(phand)
+
                     % Continue if clicked point is out of bounds
                     xp_is_valid = xp > 0 & xp <= size(app.bw_obj,2);
                     yp_is_valid = yp > 0 & yp <= size(app.bw_obj,1);
@@ -1374,8 +1379,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
                         % Reset
                         label = bwlabel(app.bw_obj, 4);
-                        first_region_to_merge = NONE_REGION_SELECTED;
+                        clicked_region = label(yp,xp);
                         bw_selected = BW_ALL_ZEROS;
+                        bw_selected(label == clicked_region) = 1;
+                        first_region_to_merge = clicked_region;
                     end
 
                     % Draw objects and selection
