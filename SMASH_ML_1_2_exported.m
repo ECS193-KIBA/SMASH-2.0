@@ -162,17 +162,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             [numBoundaryPoints, ~] = size(boundaryPoints);
             for i=1:numBoundaryPoints
                 boundaryPoint = boundaryPoints(i,:);
-                r = boundaryPoint(1);
-                c = boundaryPoint(2);
-                results = AssignOneIfToBoundaryIndexIfInBound(app, r-1, c, results);
-                results = AssignOneIfToBoundaryIndexIfInBound(app, r, c+1, results);
-                results = AssignOneIfToBoundaryIndexIfInBound(app, r+1, c, results);
-                results = AssignOneIfToBoundaryIndexIfInBound(app, r, c-1, results);
-                results = AssignOneIfToBoundaryIndexIfInBound(app, r-1, c-1, results);
-                results = AssignOneIfToBoundaryIndexIfInBound(app, r-1, c+1, results);
-                results = AssignOneIfToBoundaryIndexIfInBound(app, r+1, c-1, results);
-                results = AssignOneIfToBoundaryIndexIfInBound(app, r+1, c+1, results);
-
+                results = AssignOnesToNeighboringPoints(app, boundaryPoint, results);
             end
         end
         
@@ -185,6 +175,44 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         
         function results = IndexInBound(~, r, c, bw)
             results = all([r c] > [0 0]) && all([r c] < size(bw));
+        end
+        
+        function results = AssignOnesToNeighboringPoints(app, boundaryPoint, bw)
+            results = bw;
+            r = boundaryPoint(1);
+            c = boundaryPoint(2);
+            results = AssignOneIfToBoundaryIndexIfInBound(app, r-1, c, results);
+            results = AssignOneIfToBoundaryIndexIfInBound(app, r, c+1, results);
+            results = AssignOneIfToBoundaryIndexIfInBound(app, r+1, c, results);
+            results = AssignOneIfToBoundaryIndexIfInBound(app, r, c-1, results);
+            results = AssignOneIfToBoundaryIndexIfInBound(app, r-1, c-1, results);
+            results = AssignOneIfToBoundaryIndexIfInBound(app, r-1, c+1, results);
+            results = AssignOneIfToBoundaryIndexIfInBound(app, r+1, c-1, results);
+            results = AssignOneIfToBoundaryIndexIfInBound(app, r+1, c+1, results);
+        end
+        
+        function results = FilterPointsThatWouldCauseUndesiredMerge(app, bw_boundary_intersection, label, first_region_to_merge, second_region_to_merge)
+            [row, col] = find(bw_boundary_intersection == 1);
+            results = bw_boundary_intersection;
+            for i = 1:numel(row)
+                r = row(i);
+                c = col(i);
+                if IsPointThatWouldCauseUndesirableMerge(app, r, c, label, first_region_to_merge, second_region_to_merge)
+                    results(r,c) = 0;
+                end
+            end
+        end
+        
+        function results = IsPointThatWouldCauseUndesirableMerge(app, r, c, label, first_region_to_merge, second_region_to_merge)
+            results = IsNotOneOfRegionsToMerge(app, r+1, c, label, first_region_to_merge, second_region_to_merge) ||...
+                      IsNotOneOfRegionsToMerge(app, r, c+1, label, first_region_to_merge, second_region_to_merge) ||...
+                      IsNotOneOfRegionsToMerge(app, r-1, c, label, first_region_to_merge, second_region_to_merge) ||...
+                      IsNotOneOfRegionsToMerge(app, r, c-1, label, first_region_to_merge, second_region_to_merge);
+        end
+        
+        function results = IsNotOneOfRegionsToMerge(app, r, c, label, first_region_to_merge, second_region_to_merge)
+            labelAtPoint = label(r,c);
+            results = labelAtPoint ~= 0 && labelAtPoint ~= first_region_to_merge && labelAtPoint ~= second_region_to_merge;
         end
     end
 
@@ -1341,7 +1369,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                         bw_second_region_bolded_boundary = GetBoldBoundary(app, bw_second_region_boundary);
 
                         bw_boundary_intersection = bw_first_region_bolded_boundary & bw_second_region_bolded_boundary;
-                        app.bw_obj(bw_boundary_intersection == 1) = 1;
+                        bw_pixels_required_to_merge = FilterPointsThatWouldCauseUndesiredMerge(app, bw_boundary_intersection, label, first_region_to_merge, second_region_to_merge);
+                        app.bw_obj(bw_pixels_required_to_merge == 1) = 1;
 
                         % Reset
                         label = bwlabel(app.bw_obj, 4);
