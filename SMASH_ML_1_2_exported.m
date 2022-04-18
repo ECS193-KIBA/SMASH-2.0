@@ -156,14 +156,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             end
         end
         
-        function results = GetBoldBoundary(app, boundaryPoints)
-            boundaryPoints = boundaryPoints{1};
-            results = zeros(size(app.bw_obj), "logical");
-            [numBoundaryPoints, ~] = size(boundaryPoints);
-            for i=1:numBoundaryPoints
-                boundaryPoint = boundaryPoints(i,:);
-                results = AssignOnesToNeighboringPoints(app, boundaryPoint, results);
-            end
+        function results = GetBoldBoundary(app, bw)
+            left = ShiftLeft(app, bw);
+            right = ShiftRight(app, bw);
+            up = ShiftUp(app, bw);
+            down = ShiftDown(app, bw);
+            upleft = ShiftUp(app, left);
+            upright = ShiftUp(app, right);
+            downleft = ShiftDown(app, left);
+            downright = ShiftDown(app, right);
+            results = bw | up | down | left | right | upleft | upright | downleft | downright;
         end
         
         function results = AssignOneIfToBoundaryIndexIfInBound(app, r, c, bw)
@@ -213,6 +215,26 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function results = IsNotOneOfRegionsToMerge(app, r, c, label, first_region_to_merge, second_region_to_merge)
             labelAtPoint = label(r,c);
             results = labelAtPoint ~= 0 && labelAtPoint ~= first_region_to_merge && labelAtPoint ~= second_region_to_merge;
+        end
+        
+        function results = ShiftLeft(app, mat)
+            results = circshift(mat,[0 -1]);
+            results(:,end) = 0;
+        end
+
+        function results = ShiftRight(app, mat)
+            results = circshift(mat,[0 1]);
+            results(:,1) = 0;
+        end
+
+        function results = ShiftUp(app, mat)
+            results = circshift(mat,[-1 0]);
+            results(end,:) = 0;
+        end
+
+        function results = ShiftDown(app, mat)
+            results = circshift(mat,[1 0]);
+            results(1,:) = 0;
         end
     end
 
@@ -1367,11 +1389,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                         bw_first_region_to_merge(label == first_region_to_merge) = 1;
                         bw_second_region_to_merge = BW_ALL_ZEROS;
                         bw_second_region_to_merge(label == second_region_to_merge) = 1;
-                        bw_first_region_boundary = bwboundaries(bw_first_region_to_merge);
-                        bw_second_region_boundary = bwboundaries(bw_second_region_to_merge);
                         
-                        bw_first_region_bolded_boundary = GetBoldBoundary(app, bw_first_region_boundary);
-                        bw_second_region_bolded_boundary = GetBoldBoundary(app, bw_second_region_boundary);
+                        bw_first_region_bolded_boundary = GetBoldBoundary(app, bw_first_region_to_merge);
+                        bw_second_region_bolded_boundary = GetBoldBoundary(app, bw_second_region_to_merge);
 
                         bw_boundary_intersection = bw_first_region_bolded_boundary & bw_second_region_bolded_boundary;
                         bw_pixels_required_to_merge = FilterPointsThatWouldCauseUndesiredMerge(app, bw_boundary_intersection, label, first_region_to_merge, second_region_to_merge);
