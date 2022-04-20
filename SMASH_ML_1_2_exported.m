@@ -169,7 +169,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         %% ==================== Merge Region Functions ====================
 
-        function results = MergeObjects(app, label, first_region_to_merge, second_region_to_merge)
+        function [new_bw_obj, is_merge_successful] = MergeObjects(app, label, first_region_to_merge, second_region_to_merge)
             % The strategy for merging is to take the two regions and
             % expand each region one pixel in each direction. Wherever the
             % newly expanded regions overlap are potential pixels we can
@@ -185,13 +185,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Find overlap.
             potential_pixels_to_fill_in = padded_first_region & padded_second_region;
+            is_merge_successful = any(any(potential_pixels_to_fill_in));
 
             % Filter out pixels that are touching foreign regions.
             bw_pixels_required_to_merge = FilterPointsThatWouldCauseUndesiredMerge(app, potential_pixels_to_fill_in, label, first_region_to_merge, second_region_to_merge);
 
             % Return result.
-            results = app.bw_obj;
-            results(bw_pixels_required_to_merge == 1) = 1;
+            new_bw_obj = app.bw_obj;
+            new_bw_obj(bw_pixels_required_to_merge == 1) = 1;
         end
 
         function results = PadBWOnePixelInEachDirection(app, bw)
@@ -1340,19 +1341,28 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.MergeObjectsButton.Enable = 'off';
             app.FinishManualFilteringButton.Enable = 'on';
 
+            % Initialize constant
+            NONE_REGION_SELECTED = -1; % Dummy variable for first_region_to_merge when no region is selected.
+
+            % Initialize local variables
             object_labels = bwlabel(app.bw_obj,4);
             bw_selected = zeros(size(app.bw_obj), "logical");
-            app.done = 0;
-
-            NONE_REGION_SELECTED = -1;
             first_region_to_merge = NONE_REGION_SELECTED;
+            is_there_an_merge_error_to_report_to_user = 0;
 
+            % Display objects.
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
+            app.done = 0;
             while ~app.done
                 if first_region_to_merge == NONE_REGION_SELECTED
                     app.Prompt.Text = 'Select first region to merge';
                 else
-                    app.Prompt.Text = 'Select second region to merge to first region or unselect the first region';
+                    if is_there_an_merge_error_to_report_to_user
+                        app.Prompt.Text = 'Merge unsuccessful, please select a region adjacent to the selected region to merge or unselect the selected region';
+                        is_there_an_merge_error_to_report_to_user = 0;
+                    else
+                        app.Prompt.Text = 'Select a region adjacent to the selected region to merge or unselect the selected region';
+                    end
                 end
 
                 roi = drawpoint(app.UIAxes,'Color','w');
@@ -1388,20 +1398,23 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                         first_region_to_merge = NONE_REGION_SELECTED;
                     else
                         %%%% Merging
-
                         app.Prompt.Text = 'Merging regions...';
                         second_region_to_merge = clicked_region;
-                        app.bw_obj = MergeObjects(app, object_labels, first_region_to_merge, second_region_to_merge);
- 
-                        %%%% Reset Local Variables
+                        [app.bw_obj, is_merged_successful] = MergeObjects(app, object_labels, first_region_to_merge, second_region_to_merge);
 
-                        % Two connected components have been merged, so we need to relabel
-                        object_labels = bwlabel(app.bw_obj, 4);
+                        if is_merged_successful
+                            %%%% Reset Local Variables
 
-                        % Select the newly created object
-                        new_object_label = object_labels(yp,xp);
-                        bw_selected = object_labels == new_object_label;
-                        first_region_to_merge = new_object_label;
+                            % Two connected components have been merged, so we need to relabel
+                            object_labels = bwlabel(app.bw_obj, 4);
+
+                            % Select the newly created object
+                            new_object_label = object_labels(yp,xp);
+                            bw_selected = object_labels == new_object_label;
+                            first_region_to_merge = new_object_label;
+                        else
+                            is_there_an_merge_error_to_report_to_user = 1;
+                        end
                     end
 
                     % Draw objects and selection
