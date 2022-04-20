@@ -150,7 +150,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     
     methods (Access = private)
 
-        function results = CreateFolderIfDirectoryIsNonexistent(app, pathDirectory)
+        function CreateFolderIfDirectoryIsNonexistent(~, pathDirectory)
             if exist(pathDirectory,'dir') == 0
                 mkdir(pathDirectory)
             end
@@ -183,7 +183,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             end
         end
         
-        function results = IsPointAdjacentToAcceptableLabels(app, r, c, object_labels, first_region_to_merge, second_region_to_merge)
+        function results = IsPointAdjacentToAcceptableLabels(~, r, c, object_labels, first_region_to_merge, second_region_to_merge)
             point_neighbor_labels = [object_labels(r+1,c), object_labels(r-1,c), object_labels(r,c+1), object_labels(r,c-1)];
             % A neighbor is acceptable as long as it's either a non-object
             % (0) or one of two objects being merge.
@@ -191,22 +191,22 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             results = all(ismember(point_neighbor_labels, acceptable_labels));
         end
         
-        function results = ShiftLeft(app, mat)
+        function results = ShiftLeft(~, mat)
             results = circshift(mat,[0 -1]);
             results(:,end) = 0;
         end
 
-        function results = ShiftRight(app, mat)
+        function results = ShiftRight(~, mat)
             results = circshift(mat,[0 1]);
             results(:,1) = 0;
         end
 
-        function results = ShiftUp(app, mat)
+        function results = ShiftUp(~, mat)
             results = circshift(mat,[-1 0]);
             results(end,:) = 0;
         end
 
-        function results = ShiftDown(app, mat)
+        function results = ShiftDown(~, mat)
             results = circshift(mat,[1 0]);
             results(1,:) = 0;
         end
@@ -233,6 +233,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             xp_is_valid = xp > 0 & xp <= size(app.bw_obj,2);
             yp_is_valid = yp > 0 & yp <= size(app.bw_obj,1);
             results = xp_is_valid && yp_is_valid;
+        end
+
+        function SaveMaskToMaskFile(app, mask)
+            rgb_label = label2rgb(mask,'jet','w','shuffle');
+            imwrite(rgb_label,app.Files{2},'tiff')
         end
     end
 
@@ -412,8 +417,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: FinishSegmentingButton
         function FinishSegmentingButtonPushed(app, event)
             label = bwlabel(~logical(app.bw_obj),4);
-            rgb_label = label2rgb(label,'jet','w','shuffle');
-            imwrite(rgb_label,app.Files{2},'tiff');
+            SaveMaskToMaskFile(app, label);
             app.DrawLineControls.Visible = 'off';
             app.InitialSegmentationButton.Enable = 'on';
             app.FiberPredictionButton.Enable = 'on';
@@ -520,8 +524,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             
             imshow(flattenMaskOverlay(app.orig_img,logical(tempmask),0.5,'w'),'Parent',app.UIAxes);
             
-            rgb_label = label2rgb(tempmask,'jet','w','shuffle');
-            imwrite(rgb_label,app.Files{2},'tiff');
+            SaveMaskToMaskFile(app, tempmask);
             
             app.FiberPredictionControlPanel.Visible = 'off';
             app.InitialSegmentationButton.Enable = 'on';
@@ -538,8 +541,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: AcceptSegmentationButton
         function AcceptSegmentationButtonPushed(app, event)
             label = bwlabel(~logical(app.bw_obj),4);
-            rgb_label = label2rgb(label,'jet','w','shuffle');
-            imwrite(rgb_label,app.Files{2},'tiff');
+            SaveMaskToMaskFile(app, label);
             app.SegmentationParameters.Visible = 'off';
             app.InitialSegmentationButton.Enable = 'on';
             app.FiberPredictionButton.Enable = 'on';
@@ -625,8 +627,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.bw_obj = bw_pos;
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
             label = bwlabel(app.bw_obj,4);
-            rgb_label = label2rgb(label,'jet','w','shuffle');
-            imwrite(rgb_label,app.Files{2},'tiff');
+            SaveMaskToMaskFile(app, label);
             app.ManualFilterControls.Visible = 'off';
             app.InitialSegmentationButton.Enable = 'on';
             app.ManualSegmentationButton.Enable = 'on';
@@ -1343,6 +1344,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 else
                     app.Prompt.Text = 'Select second region to merge to first region or unselect the first region';
                 end
+
                 roi = drawpoint(app.UIAxes,'Color','w');
 
                 if ~isvalid(roi) || isempty(roi.Position)
@@ -1401,8 +1403,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
             object_labels = bwlabel(app.bw_obj,4);
             app.num_obj = max(max(object_labels));
-            rgb_label = label2rgb(object_labels,'jet','w','shuffle');
-            imwrite(rgb_label,app.Files{2},'tiff')
+            SaveMaskToMaskFile(app, object_labels);
 
             app.ManualFilterControls.Visible = 'off';
             app.InitialSegmentationButton.Enable = 'on';
