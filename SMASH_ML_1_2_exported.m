@@ -228,6 +228,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app_orig_img_dimensions = size(app.orig_img, [1 2]);
             results = zeros(app_orig_img_dimensions, "logical");
         end
+        
+        function results = IsROIPositionInBound(app, xp, yp)
+            xp_is_valid = xp > 0 & xp <= size(app.bw_obj,2);
+            yp_is_valid = yp > 0 & yp <= size(app.bw_obj,1);
+            results = xp_is_valid && yp_is_valid;
+        end
     end
 
 
@@ -1337,29 +1343,26 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 else
                     app.Prompt.Text = 'Select second region to merge to first region or unselect the first region';
                 end
-                phand = drawpoint(app.UIAxes,'Color','w');
+                roi = drawpoint(app.UIAxes,'Color','w');
 
-                if ~isvalid(phand) || isempty(phand.Position)
+                if ~isvalid(roi) || isempty(roi.Position)
                     app.done = 1;
                 end
 
                 if ~app.done
-                    pos = round(phand.Position);
+                    pos = round(roi.Position);
                     xp = pos(1);
                     yp = pos(2);
-                    delete(phand)
+                    delete(roi)
       
                     % Continue if clicked point is out of bounds
-                    xp_is_valid = xp > 0 & xp <= size(app.bw_obj,2);
-                    yp_is_valid = yp > 0 & yp <= size(app.bw_obj,1);
-                    if ~xp_is_valid || ~yp_is_valid
+                    if ~IsROIPositionInBound(app, xp, yp)
                         continue
                     end
 
                     % Continue if clicked point is not a region
                     clicked_region = object_labels(yp,xp);
-                    is_not_clicked_on_region = clicked_region == 0;
-                    if is_not_clicked_on_region
+                    if clicked_region == 0
                         continue
                     end
  
@@ -1372,10 +1375,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                         bw_selected(object_labels == clicked_region) = 0;
                         first_region_to_merge = NONE_REGION_SELECTED;
                     else
-                        % Merging
+                        %%%% Merging
+
                         app.Prompt.Text = 'Merging regions...';
                         second_region_to_merge = clicked_region;
-                        disp(["Merging region", int2str(first_region_to_merge), " and ", int2str(second_region_to_merge)])
                         app.bw_obj = MergeObjects(app, object_labels, first_region_to_merge, second_region_to_merge);
  
                         %%%% Reset Local Variables
@@ -1391,7 +1394,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
                     % Draw objects and selection
                     flat_img = flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w');
-                    flat_img = flattenMaskOverlay(flat_img,bw_selected,0.5,'r');
+                    flat_img = flattenMaskOverlay(flat_img,bw_selected,0.8,'w');
                     imshow(flat_img,'Parent',app.UIAxes);
                 end
             end
