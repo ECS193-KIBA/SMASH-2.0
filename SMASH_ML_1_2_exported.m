@@ -156,7 +156,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             end
         end
         
-        function results = GetBoldBoundary(app, bw)
+        function results = GetBoldBoundary(app, label, region_id)
+            bw = CreateEmptyImageBWImageWithAppOrigImgDimensions(app);
+            bw(label == region_id) = 1;
+
             left = ShiftLeft(app, bw);
             right = ShiftRight(app, bw);
             up = ShiftUp(app, bw);
@@ -168,53 +171,24 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             results = bw | up | down | left | right | upleft | upright | downleft | downright;
         end
         
-        function results = AssignOneIfToBoundaryIndexIfInBound(app, r, c, bw)
-            results = bw;
-            if (IndexInBound(app, r, c, bw))
-                results(r,c) = 1;
-            end
-        end
-        
-        function results = IndexInBound(~, r, c, bw)
-            results = all([r c] > [0 0]) && all([r c] < size(bw));
-        end
-        
-        function results = AssignOnesToNeighboringPoints(app, boundaryPoint, bw)
-            results = bw;
-            r = boundaryPoint(1);
-            c = boundaryPoint(2);
-            results = AssignOneIfToBoundaryIndexIfInBound(app, r-1, c, results);
-            results = AssignOneIfToBoundaryIndexIfInBound(app, r, c+1, results);
-            results = AssignOneIfToBoundaryIndexIfInBound(app, r+1, c, results);
-            results = AssignOneIfToBoundaryIndexIfInBound(app, r, c-1, results);
-            results = AssignOneIfToBoundaryIndexIfInBound(app, r-1, c-1, results);
-            results = AssignOneIfToBoundaryIndexIfInBound(app, r-1, c+1, results);
-            results = AssignOneIfToBoundaryIndexIfInBound(app, r+1, c-1, results);
-            results = AssignOneIfToBoundaryIndexIfInBound(app, r+1, c+1, results);
-        end
-        
-        function results = FilterPointsThatWouldCauseUndesiredMerge(app, bw_boundary_intersection, label, first_region_to_merge, second_region_to_merge)
+        function results = FilterPointsThatWouldCauseUndesiredMerge(app, bw_boundary_intersection, object_labels, first_region_to_merge, second_region_to_merge)
             [row, col] = find(bw_boundary_intersection == 1);
             results = bw_boundary_intersection;
             for i = 1:numel(row)
                 r = row(i);
                 c = col(i);
-                if IsPointThatWouldCauseUndesirableMerge(app, r, c, label, first_region_to_merge, second_region_to_merge)
+                if ~IsPointAdjacentToAcceptableLabels(app, r, c, object_labels, first_region_to_merge, second_region_to_merge)
                     results(r,c) = 0;
                 end
             end
         end
         
-        function results = IsPointThatWouldCauseUndesirableMerge(app, r, c, label, first_region_to_merge, second_region_to_merge)
-            results = IsNotOneOfRegionsToMerge(app, r+1, c, label, first_region_to_merge, second_region_to_merge) ||...
-                      IsNotOneOfRegionsToMerge(app, r, c+1, label, first_region_to_merge, second_region_to_merge) ||...
-                      IsNotOneOfRegionsToMerge(app, r-1, c, label, first_region_to_merge, second_region_to_merge) ||...
-                      IsNotOneOfRegionsToMerge(app, r, c-1, label, first_region_to_merge, second_region_to_merge);
-        end
-        
-        function results = IsNotOneOfRegionsToMerge(app, r, c, label, first_region_to_merge, second_region_to_merge)
-            labelAtPoint = label(r,c);
-            results = labelAtPoint ~= 0 && labelAtPoint ~= first_region_to_merge && labelAtPoint ~= second_region_to_merge;
+        function results = IsPointAdjacentToAcceptableLabels(app, r, c, object_labels, first_region_to_merge, second_region_to_merge)
+            point_neighbor_labels = [object_labels(r+1,c), object_labels(r-1,c), object_labels(r,c+1), object_labels(r,c-1)];
+            % A neighbor is acceptable as long as it's either a non-object
+            % (0) or one of two objects being merge.
+            acceptable_labels = [0 first_region_to_merge second_region_to_merge];
+            results = all(ismember(point_neighbor_labels, acceptable_labels));
         end
         
         function results = ShiftLeft(app, mat)
@@ -235,6 +209,24 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function results = ShiftDown(app, mat)
             results = circshift(mat,[1 0]);
             results(1,:) = 0;
+        end
+        
+        function results = MergeObjects(app, label, first_region_to_merge, second_region_to_merge)
+            bw_first_region_bolded_boundary = GetBoldBoundary(app, label, first_region_to_merge);
+            bw_second_region_bolded_boundary = GetBoldBoundary(app, label, second_region_to_merge);
+            bw_boundary_intersection = bw_first_region_bolded_boundary & bw_second_region_bolded_boundary;
+            bw_pixels_required_to_merge = FilterPointsThatWouldCauseUndesiredMerge(app, bw_boundary_intersection, label, first_region_to_merge, second_region_to_merge);
+            
+            results = app.bw_obj;
+            results(bw_pixels_required_to_merge == 1) = 1;
+        end
+        
+        function results = CreateEmptyImageBWImageWithAppOrigImgDimensions(app)
+             % [1 2] specifies that we only want the width and height
+             % dimension respectively, and ignore the 3rd dimension, which
+             % 3 for RGB channels.
+            app_orig_img_dimensions = size(app.orig_img, [1 2]);
+            results = zeros(app_orig_img_dimensions, "logical");
         end
     end
 
@@ -1331,10 +1323,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.MergeObjectsButton.Enable = 'off';
             app.FinishManualFilteringButton.Enable = 'on';
 
-            label = bwlabel(app.bw_obj,4);
-
-            BW_ALL_ZEROS = zeros(size(app.bw_obj), "logical");
-            bw_selected = BW_ALL_ZEROS;
+            object_labels = bwlabel(app.bw_obj,4);
+            bw_selected = CreateEmptyImageBWImageWithAppOrigImgDimensions(app);
             app.done = 0;
 
             NONE_REGION_SELECTED = -1;
@@ -1358,7 +1348,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     xp = pos(1);
                     yp = pos(2);
                     delete(phand)
-
+      
                     % Continue if clicked point is out of bounds
                     xp_is_valid = xp > 0 & xp <= size(app.bw_obj,2);
                     yp_is_valid = yp > 0 & yp <= size(app.bw_obj,1);
@@ -1367,7 +1357,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     end
 
                     % Continue if clicked point is not a region
-                    clicked_region = label(yp,xp);
+                    clicked_region = object_labels(yp,xp);
                     is_not_clicked_on_region = clicked_region == 0;
                     if is_not_clicked_on_region
                         continue
@@ -1376,33 +1366,27 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     is_user_selecting_first_of_two_objects_to_merge = first_region_to_merge == NONE_REGION_SELECTED;
                     is_user_unselecting_region = first_region_to_merge == clicked_region;
                     if is_user_selecting_first_of_two_objects_to_merge
-                        bw_selected(label == clicked_region) = 1;
+                        bw_selected(object_labels == clicked_region) = 1;
                         first_region_to_merge = clicked_region;
                     elseif is_user_unselecting_region 
-                        bw_selected(label == clicked_region) = 0;
+                        bw_selected(object_labels == clicked_region) = 0;
                         first_region_to_merge = NONE_REGION_SELECTED;
                     else
                         % Merging
+                        app.Prompt.Text = 'Merging regions...';
                         second_region_to_merge = clicked_region;
                         disp(["Merging region", int2str(first_region_to_merge), " and ", int2str(second_region_to_merge)])
-                        bw_first_region_to_merge = BW_ALL_ZEROS;
-                        bw_first_region_to_merge(label == first_region_to_merge) = 1;
-                        bw_second_region_to_merge = BW_ALL_ZEROS;
-                        bw_second_region_to_merge(label == second_region_to_merge) = 1;
-                        
-                        bw_first_region_bolded_boundary = GetBoldBoundary(app, bw_first_region_to_merge);
-                        bw_second_region_bolded_boundary = GetBoldBoundary(app, bw_second_region_to_merge);
+                        app.bw_obj = MergeObjects(app, object_labels, first_region_to_merge, second_region_to_merge);
+ 
+                        %%%% Reset Local Variables
 
-                        bw_boundary_intersection = bw_first_region_bolded_boundary & bw_second_region_bolded_boundary;
-                        bw_pixels_required_to_merge = FilterPointsThatWouldCauseUndesiredMerge(app, bw_boundary_intersection, label, first_region_to_merge, second_region_to_merge);
-                        app.bw_obj(bw_pixels_required_to_merge == 1) = 1;
+                        % Two connected components have been merged, so we need to relabel
+                        object_labels = bwlabel(app.bw_obj, 4);
 
-                        % Reset
-                        label = bwlabel(app.bw_obj, 4);
-                        clicked_region = label(yp,xp);
-                        bw_selected = BW_ALL_ZEROS;
-                        bw_selected(label == clicked_region) = 1;
-                        first_region_to_merge = clicked_region;
+                        % Select the newly created object
+                        new_object_label = object_labels(yp,xp);
+                        bw_selected = object_labels == new_object_label;
+                        first_region_to_merge = new_object_label;
                     end
 
                     % Draw objects and selection
@@ -1412,9 +1396,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 end
             end
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
-            label = bwlabel(app.bw_obj,4);
-            app.num_obj = max(max(label));
-            rgb_label = label2rgb(label,'jet','w','shuffle');
+            object_labels = bwlabel(app.bw_obj,4);
+            app.num_obj = max(max(object_labels));
+            rgb_label = label2rgb(object_labels,'jet','w','shuffle');
             imwrite(rgb_label,app.Files{2},'tiff')
 
             app.ManualFilterControls.Visible = 'off';
