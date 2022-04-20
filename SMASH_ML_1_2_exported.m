@@ -155,11 +155,47 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 mkdir(pathDirectory)
             end
         end
-        
-        function results = GetBoldBoundary(app, label, region_id)
-            bw = CreateEmptyImageBWImageWithAppOrigImgDimensions(app);
-            bw(label == region_id) = 1;
 
+        function SaveMaskToMaskFile(app, mask)
+            rgb_label = label2rgb(mask,'jet','w','shuffle');
+            imwrite(rgb_label,app.Files{2},'tiff')
+        end
+
+        function results = IsROIPositionInBound(app, xp, yp)
+            xp_is_valid = xp > 0 & xp <= size(app.bw_obj,2);
+            yp_is_valid = yp > 0 & yp <= size(app.bw_obj,1);
+            results = xp_is_valid && yp_is_valid;
+        end
+
+        %% ==================== Merge Region Functions ====================
+
+        function results = MergeObjects(app, label, first_region_to_merge, second_region_to_merge)
+            % The strategy for merging is to take the two regions and
+            % expand each region one pixel in each direction. Wherever the
+            % newly expanded regions overlap are potential pixels we can
+            % fill in to merge the regions. However, there is an edge case
+            % where if a foreign region is also touching one of these
+            % overlap pixels, we want to avoid filling in these pixels
+            % because they would cause the foreign region to also become
+            % merged with the selected regions.
+
+            % Expand regions in each direction.
+            padded_first_region = PadBWOnePixelInEachDirection(app, label == first_region_to_merge);
+            padded_second_region = PadBWOnePixelInEachDirection(app, label == second_region_to_merge);
+
+            % Find overlap.
+            potential_pixels_to_fill_in = padded_first_region & padded_second_region;
+
+            % Filter out pixels that are touching foreign regions.
+            bw_pixels_required_to_merge = FilterPointsThatWouldCauseUndesiredMerge(app, potential_pixels_to_fill_in, label, first_region_to_merge, second_region_to_merge);
+
+            % Return result.
+            results = app.bw_obj;
+            results(bw_pixels_required_to_merge == 1) = 1;
+        end
+
+        function results = PadBWOnePixelInEachDirection(app, bw)
+            % Create shifted masks for each direction
             left = ShiftLeft(app, bw);
             right = ShiftRight(app, bw);
             up = ShiftUp(app, bw);
@@ -168,7 +204,33 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             upright = ShiftUp(app, right);
             downleft = ShiftDown(app, left);
             downright = ShiftDown(app, right);
+
+            % OR the masks together to pad bw
             results = bw | up | down | left | right | upleft | upright | downleft | downright;
+        end
+
+        function results = ShiftLeft(~, mat)
+            results = circshift(mat,[0 -1]);
+            % Remove wrapped around pixels
+            results(:,end) = 0;
+        end
+
+        function results = ShiftRight(~, mat)
+            results = circshift(mat,[0 1]);
+            % Remove wrapped around pixels
+            results(:,1) = 0;
+        end
+
+        function results = ShiftUp(~, mat)
+            results = circshift(mat,[-1 0]);
+            % Remove wrapped around pixels
+            results(end,:) = 0;
+        end
+
+        function results = ShiftDown(~, mat)
+            results = circshift(mat,[1 0]);
+            % Remove wrapped around pixels
+            results(1,:) = 0;
         end
         
         function results = FilterPointsThatWouldCauseUndesiredMerge(app, bw_boundary_intersection, object_labels, first_region_to_merge, second_region_to_merge)
@@ -185,59 +247,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         
         function results = IsPointAdjacentToAcceptableLabels(~, r, c, object_labels, first_region_to_merge, second_region_to_merge)
             point_neighbor_labels = [object_labels(r+1,c), object_labels(r-1,c), object_labels(r,c+1), object_labels(r,c-1)];
-            % A neighbor is acceptable as long as it's either a non-object
-            % (0) or one of two objects being merge.
+            % A neighbor is acceptable as long as it's either a non-object (0) or one of two objects being merge.
             acceptable_labels = [0 first_region_to_merge second_region_to_merge];
             results = all(ismember(point_neighbor_labels, acceptable_labels));
-        end
-        
-        function results = ShiftLeft(~, mat)
-            results = circshift(mat,[0 -1]);
-            results(:,end) = 0;
-        end
-
-        function results = ShiftRight(~, mat)
-            results = circshift(mat,[0 1]);
-            results(:,1) = 0;
-        end
-
-        function results = ShiftUp(~, mat)
-            results = circshift(mat,[-1 0]);
-            results(end,:) = 0;
-        end
-
-        function results = ShiftDown(~, mat)
-            results = circshift(mat,[1 0]);
-            results(1,:) = 0;
-        end
-        
-        function results = MergeObjects(app, label, first_region_to_merge, second_region_to_merge)
-            bw_first_region_bolded_boundary = GetBoldBoundary(app, label, first_region_to_merge);
-            bw_second_region_bolded_boundary = GetBoldBoundary(app, label, second_region_to_merge);
-            bw_boundary_intersection = bw_first_region_bolded_boundary & bw_second_region_bolded_boundary;
-            bw_pixels_required_to_merge = FilterPointsThatWouldCauseUndesiredMerge(app, bw_boundary_intersection, label, first_region_to_merge, second_region_to_merge);
-            
-            results = app.bw_obj;
-            results(bw_pixels_required_to_merge == 1) = 1;
-        end
-        
-        function results = CreateEmptyImageBWImageWithAppOrigImgDimensions(app)
-             % [1 2] specifies that we only want the width and height
-             % dimension respectively, and ignore the 3rd dimension, which
-             % 3 for RGB channels.
-            app_orig_img_dimensions = size(app.orig_img, [1 2]);
-            results = zeros(app_orig_img_dimensions, "logical");
-        end
-        
-        function results = IsROIPositionInBound(app, xp, yp)
-            xp_is_valid = xp > 0 & xp <= size(app.bw_obj,2);
-            yp_is_valid = yp > 0 & yp <= size(app.bw_obj,1);
-            results = xp_is_valid && yp_is_valid;
-        end
-
-        function SaveMaskToMaskFile(app, mask)
-            rgb_label = label2rgb(mask,'jet','w','shuffle');
-            imwrite(rgb_label,app.Files{2},'tiff')
         end
     end
 
@@ -602,9 +614,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 delete(phand)
                 if ~app.done
                     % Continue if clicked point is out of bounds
-                    xp_is_valid = xp > 0 & xp <= size(label,2);
-                    yp_is_valid = yp > 0 & yp <= size(label,1);
-                    if ~xp_is_valid || ~yp_is_valid
+                    if ~IsROIPositionInBound(app, xp, yp)
                         continue
                     end
                     regS = label(yp,xp);
@@ -1331,7 +1341,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FinishManualFilteringButton.Enable = 'on';
 
             object_labels = bwlabel(app.bw_obj,4);
-            bw_selected = CreateEmptyImageBWImageWithAppOrigImgDimensions(app);
+            bw_selected = zeros(size(app.bw_obj), "logical");
             app.done = 0;
 
             NONE_REGION_SELECTED = -1;
