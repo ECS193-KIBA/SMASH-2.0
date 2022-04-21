@@ -183,6 +183,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: SelectFileButton
         function SelectFileButtonPushed(app, event)
             [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi'},'File Selector - dont select mask');
+
             drawnow limitrate;
             figure(app.UIFigure)
             if FilterIndex
@@ -228,6 +229,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     PixelsRGBAsDouble = ind2rgb(PixelsGrayscale, ColorMap);
                     PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
                     PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
+
+                    % Autoscaling - scale the pixel intensity for each channel
+                    MaxIntensity = max(PixelsGrayscaleUInt8,[],'all');
+                    MinIntensity = min(PixelsGrayscaleUInt8,[],'all');
+                    ActualRange = MaxIntensity - MinIntensity;
+                    UInt8Range = 255;
+                    ScalingFactor = UInt8Range / ActualRange;
+                    PixelsGrayscaleUInt8 = ScalingFactor * PixelsGrayscaleUInt8;
+                    PixelsRGBAsUInt8 = ScalingFactor * PixelsRGBAsUInt8;
 
                     TotalMultiSpectral = cat(3, TotalMultiSpectral, PixelsGrayscaleUInt8);
                     TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
@@ -305,6 +315,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: StartDrawingButton
         function StartDrawingButtonPushed(app, event)
+            
             set(app.FinishSegmentingButton, 'userdata', 0);
             app.FinishSegmentingButton.Enable = 'on';
             app.StartDrawingButton.Enable = 'off';
