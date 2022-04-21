@@ -186,6 +186,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             drawnow limitrate;
             figure(app.UIFigure)
             if FilterIndex
+                if FileName == 0
+                    return
+                end
                 C = strsplit(FileName,'.');
                 ExtName = C(end);
                 FileNameS = (C(1:(end-1)));
