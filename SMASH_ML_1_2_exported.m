@@ -183,10 +183,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: SelectFileButton
         function SelectFileButtonPushed(app, event)
             [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi'},'File Selector - dont select mask');
-
             drawnow limitrate;
             figure(app.UIFigure)
             if FilterIndex
+                if FileName == 0
+                    return
+                end
                 C = strsplit(FileName,'.');
                 ExtName = C(end);
                 FileNameS = (C(1:(end-1)));
@@ -315,7 +317,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: StartDrawingButton
         function StartDrawingButtonPushed(app, event)
-            
             set(app.FinishSegmentingButton, 'userdata', 0);
             app.FinishSegmentingButton.Enable = 'on';
             app.StartDrawingButton.Enable = 'off';
