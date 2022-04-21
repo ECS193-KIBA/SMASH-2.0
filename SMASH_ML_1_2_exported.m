@@ -3,6 +3,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        UITable                         matlab.ui.control.Table
         Toolbar                         matlab.ui.container.Panel
         NonfiberObjectsButton           matlab.ui.control.Button
         FiberTypingButton               matlab.ui.control.Button
@@ -229,9 +230,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
                     PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
 
+                    % Retrieve color name from the RGB values
+                    RGBValues = ColorMap(end,:);
+                    ConvertedRGB = colornames('HTML4', RGBValues,'RGB');
+                    ColorName = char(ConvertedRGB);
+
                     TotalMultiSpectral = cat(3, TotalMultiSpectral, PixelsGrayscaleUInt8);
                     TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
-                    TotalColorDropDownItems = cat(2, TotalColorDropDownItems, {['Channel ', num2str(Layer)]});
+
+                    % Include only color name in the channel drop down menu
+                    TotalColorDropDownItems = cat(2, TotalColorDropDownItems, {[ColorName]});
                     TotalColorDropDownItemsData  = cat(2, TotalColorDropDownItemsData, {num2str(Layer)});
                 end
                 app.FiberOutlineColorDropDown.Items = TotalColorDropDownItems;
@@ -249,7 +257,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.orig_img = ImageData;
                 app.orig_img_multispectral = ImageData;
             end
-
+            app.UITable.Visible = 'on';
+            app.UITable.RowName = {'hello', 'hello'};
             imshow(app.orig_img,'Parent',app.UIAxes);
             
             if exist(MaskName,'file')
@@ -1265,6 +1274,18 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             value = predict(classifier,predictors);
             app.SegmentationThresholdSlider.Value = round(value);
         end
+
+        % Cell edit callback: UITable
+        function UITableCellEdit(app, event)
+            indices = event.Indices;
+            newData = event.NewData;
+            
+        end
+
+        % Button down function: UITable
+        function UITableButtonDown(app, event)
+            app.UITable.Data = {1 2 3 4};
+        end
     end
 
     % Component initialization
@@ -1934,6 +1955,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.NonfiberObjectsButton.Position = [823.5 9 105 22];
             app.NonfiberObjectsButton.Text = 'Nonfiber Objects';
+
+            % Create UITable
+            app.UITable = uitable(app.UIFigure);
+            app.UITable.ColumnName = {'Channel'; 'Color'};
+            app.UITable.RowName = {'Channel 1, Channel 2'};
+            app.UITable.ColumnEditable = [true true];
+            app.UITable.CellEditCallback = createCallbackFcn(app, @UITableCellEdit, true);
+            app.UITable.Visible = 'off';
+            app.UITable.ButtonDownFcn = createCallbackFcn(app, @UITableButtonDown, true);
+            app.UITable.Position = [31 158 302 185];
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
