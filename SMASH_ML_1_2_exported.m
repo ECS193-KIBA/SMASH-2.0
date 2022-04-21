@@ -112,6 +112,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
         FilenameLabel                   matlab.ui.control.Label
         SelectFileButton                matlab.ui.control.Button
+        ChannelColorBox                 matlab.ui.control.UIAxes
         UIAxes                          matlab.ui.control.UIAxes
     end
 
@@ -256,8 +257,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.orig_img = ImageData;
                 app.orig_img_multispectral = ImageData;
             end
-            app.UITable.Visible = 'on';
-            app.UITable.RowName = {'hello', 'hello'};
             imshow(app.orig_img,'Parent',app.UIAxes);
             
             if exist(MaskName,'file')
@@ -1300,6 +1299,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIAxes.GridColor = 'none';
             app.UIAxes.MinorGridColor = 'none';
             app.UIAxes.Position = [266 9 909 698];
+
+            % Create ChannelColorBox
+            app.ChannelColorBox = uiaxes(app.UIFigure);
+            app.ChannelColorBox.XTick = [];
+            app.ChannelColorBox.YTick = [];
+            app.ChannelColorBox.Color = [0 1 1];
+            app.ChannelColorBox.Box = 'on';
+            app.ChannelColorBox.Position = [20 188 262 151];
 
             % Create SelectFileButton
             app.SelectFileButton = uibutton(app.UIFigure, 'push');
