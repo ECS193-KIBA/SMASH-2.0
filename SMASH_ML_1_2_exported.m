@@ -3,7 +3,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
-        UITable                         matlab.ui.control.Table
         Toolbar                         matlab.ui.container.Panel
         NonfiberObjectsButton           matlab.ui.control.Button
         FiberTypingButton               matlab.ui.control.Button
@@ -1275,14 +1274,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SegmentationThresholdSlider.Value = round(value);
         end
 
-        % Cell edit callback: UITable
-        function UITableCellEdit(app, event)
-            indices = event.Indices;
-            newData = event.NewData;
-            
-        end
-
-        % Button down function: UITable
+        % Callback function
         function UITableButtonDown(app, event)
             app.UITable.Data = {1 2 3 4};
         end
@@ -1955,16 +1947,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.NonfiberObjectsButton.Position = [823.5 9 105 22];
             app.NonfiberObjectsButton.Text = 'Nonfiber Objects';
-
-            % Create UITable
-            app.UITable = uitable(app.UIFigure);
-            app.UITable.ColumnName = {'Channel'; 'Color'};
-            app.UITable.RowName = {'Channel 1, Channel 2'};
-            app.UITable.ColumnEditable = [true true];
-            app.UITable.CellEditCallback = createCallbackFcn(app, @UITableCellEdit, true);
-            app.UITable.Visible = 'off';
-            app.UITable.ButtonDownFcn = createCallbackFcn(app, @UITableButtonDown, true);
-            app.UITable.Position = [31 158 302 185];
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
