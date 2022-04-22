@@ -5,7 +5,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         UIFigure                        matlab.ui.Figure
         ManualSegmentationControls      matlab.ui.container.Panel
         FinishDrawingButton             matlab.ui.control.Button
-        FinishMergingButton             matlab.ui.control.Button
         StartMergingButton              matlab.ui.control.Button
         MergeObjectsModeLabel           matlab.ui.control.Label
         DrawingModeLabel                matlab.ui.control.Label
@@ -158,6 +157,109 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             if exist(pathDirectory,'dir') == 0
                 mkdir(pathDirectory)
             end
+        end
+
+        function SaveMaskToMaskFile(app, mask)
+            rgb_label = label2rgb(mask,'jet','w','shuffle');
+            imwrite(rgb_label,app.Files{2},'tiff')
+        end
+
+        function results = IsROIPositionInBound(app, xp, yp)
+            xp_is_valid = xp > 0 & xp <= size(app.bw_obj,2);
+            yp_is_valid = yp > 0 & yp <= size(app.bw_obj,1);
+            results = xp_is_valid && yp_is_valid;
+        end
+
+        function results = ReadMaskFromMaskFile(app)
+            mask = imread(app.Files{2});
+            graymask = rgb2gray(mask);
+            results = imbinarize(graymask,0.99);
+        end
+
+        %% ==================== Merge Region Functions ====================
+
+        function [new_bw_obj, is_merge_successful] = MergeObjects(app, label, first_region_to_merge, second_region_to_merge)
+            % The strategy for merging is to take the two regions and
+            % expand each region one pixel in each direction. Wherever the
+            % newly expanded regions overlap are potential pixels we can
+            % fill in to merge the regions. However, there is an edge case
+            % where if a foreign region is also touching one of these
+            % overlap pixels, we want to avoid filling in these pixels
+            % because they would cause the foreign region to also become
+            % merged with the selected regions.
+
+            % Expand regions in each direction.
+            padded_first_region = PadBWOnePixelInEachDirection(app, label == first_region_to_merge);
+            padded_second_region = PadBWOnePixelInEachDirection(app, label == second_region_to_merge);
+
+            % Find overlap.
+            potential_pixels_to_fill_in = padded_first_region & padded_second_region;
+            is_merge_successful = any(any(potential_pixels_to_fill_in));
+
+            % Filter out pixels that are touching foreign regions.
+            bw_pixels_required_to_merge = FilterPointsThatWouldCauseUndesiredMerge(app, potential_pixels_to_fill_in, label, first_region_to_merge, second_region_to_merge);
+
+            % Return result.
+            new_bw_obj = app.bw_obj;
+            new_bw_obj(bw_pixels_required_to_merge == 1) = 1;
+        end
+
+        function results = PadBWOnePixelInEachDirection(app, bw)
+            % Create shifted masks for each direction
+            left = ShiftLeft(app, bw);
+            right = ShiftRight(app, bw);
+            up = ShiftUp(app, bw);
+            down = ShiftDown(app, bw);
+            upleft = ShiftUp(app, left);
+            upright = ShiftUp(app, right);
+            downleft = ShiftDown(app, left);
+            downright = ShiftDown(app, right);
+
+            % OR the masks together to pad bw
+            results = bw | up | down | left | right | upleft | upright | downleft | downright;
+        end
+
+        function results = ShiftLeft(~, mat)
+            results = circshift(mat,[0 -1]);
+            % Remove wrapped around pixels
+            results(:,end) = 0;
+        end
+
+        function results = ShiftRight(~, mat)
+            results = circshift(mat,[0 1]);
+            % Remove wrapped around pixels
+            results(:,1) = 0;
+        end
+
+        function results = ShiftUp(~, mat)
+            results = circshift(mat,[-1 0]);
+            % Remove wrapped around pixels
+            results(end,:) = 0;
+        end
+
+        function results = ShiftDown(~, mat)
+            results = circshift(mat,[1 0]);
+            % Remove wrapped around pixels
+            results(1,:) = 0;
+        end
+
+        function results = FilterPointsThatWouldCauseUndesiredMerge(app, bw_boundary_intersection, object_labels, first_region_to_merge, second_region_to_merge)
+            [row, col] = find(bw_boundary_intersection == 1);
+            results = bw_boundary_intersection;
+            for i = 1:numel(row)
+                r = row(i);
+                c = col(i);
+                if ~IsPointAdjacentToAcceptableLabels(app, r, c, object_labels, first_region_to_merge, second_region_to_merge)
+                    results(r,c) = 0;
+                end
+            end
+        end
+
+        function results = IsPointAdjacentToAcceptableLabels(~, r, c, object_labels, first_region_to_merge, second_region_to_merge)
+            point_neighbor_labels = [object_labels(r+1,c), object_labels(r-1,c), object_labels(r,c+1), object_labels(r,c-1)];
+            % A neighbor is acceptable as long as it's either a non-object (0) or one of two objects being merge.
+            acceptable_labels = [0 first_region_to_merge second_region_to_merge];
+            results = all(ismember(point_neighbor_labels, acceptable_labels));
         end
     end
 
@@ -453,10 +555,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             end
             
             imshow(flattenMaskOverlay(app.orig_img,logical(tempmask),0.5,'w'),'Parent',app.UIAxes);
-            
-            rgb_label = label2rgb(tempmask,'jet','w','shuffle');
-            imwrite(rgb_label,app.Files{2},'tiff');
-            
+
+            SaveMaskToMaskFile(app, tempmask);
+
             app.FiberPredictionControlPanel.Visible = 'off';
             app.InitialSegmentationButton.Enable = 'on';
             app.ManualSegmentationButton.Enable = 'on';
@@ -472,8 +573,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: AcceptSegmentationButton
         function AcceptSegmentationButtonPushed(app, event)
             label = bwlabel(~logical(app.bw_obj),4);
-            rgb_label = label2rgb(label,'jet','w','shuffle');
-            imwrite(rgb_label,app.Files{2},'tiff');
+            SaveMaskToMaskFile(app, label);
             app.SegmentationParameters.Visible = 'off';
             app.InitialSegmentationButton.Enable = 'on';
             app.FiberPredictionButton.Enable = 'on';
@@ -547,9 +647,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
                 if ~app.done && ~userStopped
                     % Continue if clicked point is out of bounds
-                    xp_is_valid = xp > 0 & xp <= size(label,2);
-                    yp_is_valid = yp > 0 & yp <= size(label,1);
-                    if ~xp_is_valid || ~yp_is_valid
+                    if ~IsROIPositionInBound(app, xp, yp)
                         continue
                     end
                     regS = label(yp,xp);
@@ -570,8 +668,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.bw_obj = bw_pos;
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
             label = bwlabel(app.bw_obj,4);
-            rgb_label = label2rgb(label,'jet','w','shuffle');
-            imwrite(rgb_label,app.Files{2},'tiff');
+            SaveMaskToMaskFile(app, label);
             app.ManualFilterControls.Visible = 'off';
             app.InitialSegmentationButton.Enable = 'on';
             app.ManualSegmentationButton.Enable = 'on';
@@ -590,7 +687,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = 'Click anywhere to continue';
             app.FinishManualFilteringButton.Enable = 'off';
             app.done = 1;
-            
         end
 
         % Button pushed function: CalculateFiberProperties
@@ -1114,11 +1210,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingButton.Enable = 'off';
             app.NonfiberObjectsButton.Enable = 'off';
             app.ManualSegmentationControls.Visible = 'on';
-            mask = imread(app.Files{2});
-            graymask = rgb2gray(mask);
-            app.bw_obj = imbinarize(graymask,0.99);
+            app.bw_obj = ReadMaskFromMaskFile(app);
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w'),'Parent',app.UIAxes);
-               
         end
 
         % Button pushed function: FiberPredictionButton
@@ -1134,9 +1227,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.FiberPredictionControlPanel.Visible = 'on';
             % acquire mask and show over image
-            mask = imread(app.Files{2});
-            graymask = rgb2gray(mask);
-            app.bw_obj = imcomplement(imbinarize(graymask,0.99));
+            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             app.bw_obj = imclearborder(app.bw_obj,4);
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
             app.FilterButton.Enable = 'on';
@@ -1157,9 +1248,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualFilterControls.Visible = 'on';
             app.RemoveObjectsButton.Enable = 'on';
             app.FinishManualFilteringButton.Enable = 'off';
-            mask = imread(app.Files{2});
-            graymask = rgb2gray(mask);
-            app.bw_obj = imcomplement(imbinarize(graymask,0.99));
+            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
         end
 
@@ -1176,9 +1265,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.PropertiesControlPanel.Visible = 'on';
             app.PropertiesPanel.Visible = 'on';
-            mask = imread(app.Files{2});
-            graymask = rgb2gray(mask);
-            app.bw_obj = imcomplement(imbinarize(graymask,0.99));
+            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             app.bw_obj = imclearborder(app.bw_obj,4);
                
         end
@@ -1200,9 +1287,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AdjustCNF.Enable = 'off';
             app.AcceptCNF.Enable = 'off';
             app.CNFExcelWrite.Enable = 'off';
-            mask = imread(app.Files{2});
-            graymask = rgb2gray(mask);
-            app.bw_obj = imcomplement(imbinarize(graymask,0.99));
+            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
         end
 
         % Button pushed function: FiberTypingButton
@@ -1221,9 +1306,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeFiberType.Enable = 'on';
             app.FiberTypeColorDropDown.Enable = 'on';
             app.WritetoExcelFT.Enable = 'off';
-            mask = imread(app.Files{2});
-            graymask = rgb2gray(mask);
-            app.bw_obj = imcomplement(imbinarize(graymask,0.99));
+            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
         end
 
         % Button pushed function: NonfiberObjectsButton
@@ -1268,11 +1351,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SegmentationThresholdSlider.Value = round(value);
         end
 
-        % Button pushed function: FinishMergingButton
-        function FinishMergingButtonPushed(app, event)
-            
-        end
-
         % Button pushed function: FinishDrawingButton
         function FinishDrawingButtonPushed(app, event)
             app.done = 1;
@@ -1286,9 +1364,113 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             imshow(flattenMaskOverlay(app.orig_img, app.bw_obj, 1, 'w'), 'Parent', app.UIAxes);
 
             label = bwlabel(~logical(app.bw_obj),4);
-            rgb_label = label2rgb(label,'jet','w','shuffle');
-            imwrite(rgb_label,app.Files{2},'tiff');
+            SaveMaskToMaskFile(app, label);
 
+            app.Prompt.Text = '';
+        end
+
+        % Button pushed function: StartMergingButton
+        function StartMergingButtonPushed(app, event)
+            app.StartDrawingButton.Enable = 'off';
+            app.StartMergingButton.Enable = 'off';
+            app.CloseManualSegmentationButton.Enable = 'off';
+
+            % Load mask
+            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+
+            % Initialize constant
+            NONE_REGION_SELECTED = -1; % Dummy variable for first_region_to_merge when no region is selected.
+
+            % Initialize local variables
+            object_labels = bwlabel(app.bw_obj,4);
+            bw_selected = zeros(size(app.bw_obj), "logical");
+            first_region_to_merge = NONE_REGION_SELECTED;
+            is_there_an_merge_error_to_report_to_user = 0;
+
+            % Display objects.
+            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
+            app.done = 0;
+            while ~app.done
+                if first_region_to_merge == NONE_REGION_SELECTED
+                    app.Prompt.Text = 'Select first region to merge or press ESC to finish merge mode';
+                else
+                    if is_there_an_merge_error_to_report_to_user
+                        app.Prompt.Text = 'Merge unsuccessful, please click adjacent region to merge or click selected region to unselect or press ECS to finish merge mode';
+                        is_there_an_merge_error_to_report_to_user = 0;
+                    else
+                        app.Prompt.Text = 'Click adjacent region to merge or click selected region to unselect or press ECS to finish merge mode';
+                    end
+                end
+
+                roi = drawpoint(app.UIAxes,'Color','w');
+
+                if ~isvalid(roi) || isempty(roi.Position)
+                    app.done = 1;
+                end
+
+                if ~app.done
+                    pos = round(roi.Position);
+                    xp = pos(1);
+                    yp = pos(2);
+                    delete(roi)
+
+                    % Continue if clicked point is out of bounds
+                    if ~IsROIPositionInBound(app, xp, yp)
+                        continue
+                    end
+
+                    % Continue if clicked point is not a region
+                    clicked_region = object_labels(yp,xp);
+                    if clicked_region == 0
+                        continue
+                    end
+
+                    is_user_selecting_first_of_two_objects_to_merge = first_region_to_merge == NONE_REGION_SELECTED;
+                    is_user_unselecting_region = first_region_to_merge == clicked_region;
+                    if is_user_selecting_first_of_two_objects_to_merge
+                        bw_selected(object_labels == clicked_region) = 1;
+                        first_region_to_merge = clicked_region;
+                    elseif is_user_unselecting_region
+                        bw_selected(object_labels == clicked_region) = 0;
+                        first_region_to_merge = NONE_REGION_SELECTED;
+                    else
+                        %%%% Merging
+                        app.Prompt.Text = 'Merging regions...';
+                        second_region_to_merge = clicked_region;
+                        [app.bw_obj, is_merged_successful] = MergeObjects(app, object_labels, first_region_to_merge, second_region_to_merge);
+
+                        if is_merged_successful
+                            %%%% Reset Local Variables
+
+                            % Two connected components have been merged, so we need to relabel
+                            object_labels = bwlabel(app.bw_obj, 4);
+
+                            % Select the newly created object
+                            new_object_label = object_labels(yp,xp);
+                            bw_selected = object_labels == new_object_label;
+                            first_region_to_merge = new_object_label;
+                        else
+                            is_there_an_merge_error_to_report_to_user = 1;
+                        end
+                    end
+
+                    % Draw objects and selection
+                    flat_img = flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w');
+                    flat_img = flattenMaskOverlay(flat_img,bw_selected,0.8,'w');
+                    imshow(flat_img,'Parent',app.UIAxes);
+                end
+            end
+            object_labels = bwlabel(app.bw_obj,4);
+            app.num_obj = max(max(object_labels));
+            SaveMaskToMaskFile(app, object_labels);
+
+            % Go back to drawing lines instead of regions
+            app.bw_obj = imcomplement(app.bw_obj);
+            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w'),'Parent',app.UIAxes);
+
+            app.StartDrawingButton.Enable = 'on';
+            app.StartMergingButton.Enable = 'on';
+            app.CloseManualSegmentationButton.Enable = 'on';
             app.Prompt.Text = '';
         end
     end
@@ -1940,7 +2122,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Create ManualSegmentationControls
             app.ManualSegmentationControls = uipanel(app.UIFigure);
             app.ManualSegmentationControls.Visible = 'off';
-            app.ManualSegmentationControls.Position = [56 47 263 318];
+            app.ManualSegmentationControls.Position = [49 332 263 318];
 
             % Create StartDrawingButton
             app.StartDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
@@ -1951,43 +2133,38 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Create AcceptLineButton
             app.AcceptLineButton = uibutton(app.ManualSegmentationControls, 'push');
             app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
+            app.AcceptLineButton.BackgroundColor = [0.9608 0.9608 0.9608];
             app.AcceptLineButton.Enable = 'off';
-            app.AcceptLineButton.Position = [144 251 100 22];
+            app.AcceptLineButton.Position = [149 222 100 51];
             app.AcceptLineButton.Text = 'Accept Line';
 
             % Create CloseManualSegmentationButton
             app.CloseManualSegmentationButton = uibutton(app.ManualSegmentationControls, 'push');
             app.CloseManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseManualSegmentationButtonPushed, true);
-            app.CloseManualSegmentationButton.Position = [35 68 182 53];
+            app.CloseManualSegmentationButton.Position = [35 47 182 60];
             app.CloseManualSegmentationButton.Text = 'Close Manual Segmentation';
 
             % Create DrawingModeLabel
             app.DrawingModeLabel = uilabel(app.ManualSegmentationControls);
-            app.DrawingModeLabel.Position = [36 282 83 22];
+            app.DrawingModeLabel.Position = [30 283 83 22];
             app.DrawingModeLabel.Text = 'Drawing Mode';
 
             % Create MergeObjectsModeLabel
             app.MergeObjectsModeLabel = uilabel(app.ManualSegmentationControls);
-            app.MergeObjectsModeLabel.Position = [32 191 117 22];
+            app.MergeObjectsModeLabel.Position = [27 181 117 22];
             app.MergeObjectsModeLabel.Text = 'Merge Objects Mode';
 
             % Create StartMergingButton
             app.StartMergingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.StartMergingButton.Position = [29 160 100 22];
+            app.StartMergingButton.ButtonPushedFcn = createCallbackFcn(app, @StartMergingButtonPushed, true);
+            app.StartMergingButton.Position = [29 148 100 22];
             app.StartMergingButton.Text = 'Start Merging';
-
-            % Create FinishMergingButton
-            app.FinishMergingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.FinishMergingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishMergingButtonPushed, true);
-            app.FinishMergingButton.Enable = 'off';
-            app.FinishMergingButton.Position = [141 160 100 22];
-            app.FinishMergingButton.Text = 'Finish Merging';
 
             % Create FinishDrawingButton
             app.FinishDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
             app.FinishDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishDrawingButtonPushed, true);
             app.FinishDrawingButton.Enable = 'off';
-            app.FinishDrawingButton.Position = [82 220 100 22];
+            app.FinishDrawingButton.Position = [29 222 100 22];
             app.FinishDrawingButton.Text = 'Finish Drawing';
 
             % Show the figure after all components are created
