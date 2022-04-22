@@ -313,7 +313,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: StartDrawingButton
         function StartDrawingButtonPushed(app, event)
-            set(app.FinishDrawingButton, 'userdata', 0);
+            app.done = 0;
             app.CloseManualSegmentationButton.Enable = 'off';
             app.StartDrawingButton.Enable = 'off';
             app.FinishDrawingButton.Enable = 'on';
@@ -324,7 +324,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.Prompt.Text = 'Draw line to separate fibers and adjust as needed. Right click line to delete.';
                 h = drawfreehand(app.UIAxes,'Closed',false,'FaceAlpha',0);
                 uiwait(app.UIFigure);
-                if get(app.FinishDrawingButton, 'userdata')
+                if app.done
 		            break;
                 end
                 app.AcceptLineButton.Enable = 'off';
@@ -1275,7 +1275,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FinishDrawingButton
         function FinishDrawingButtonPushed(app, event)
-            set(app.FinishDrawingButton, 'userdata', 1);
+            app.done = 1;
             uiresume(app.UIFigure);
             app.StartDrawingButton.Enable = 'on';
             app.AcceptLineButton.Enable = 'off';
