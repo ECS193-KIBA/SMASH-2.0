@@ -3,6 +3,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        ManualSegmentationControls      matlab.ui.container.Panel
+        FinishDrawingButton             matlab.ui.control.Button
+        FinishMergingButton             matlab.ui.control.Button
+        StartMergingButton              matlab.ui.control.Button
+        MergeObjectsModeLabel           matlab.ui.control.Label
+        DrawingModeLabel                matlab.ui.control.Label
+        CloseManualSegmentationButton   matlab.ui.control.Button
+        AcceptLineButton                matlab.ui.control.Button
+        StartDrawingButton              matlab.ui.control.Button
         Toolbar                         matlab.ui.container.Panel
         NonfiberObjectsButton           matlab.ui.control.Button
         FiberTypingButton               matlab.ui.control.Button
@@ -92,10 +101,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         YesButton                       matlab.ui.control.Button
         UIAxesR                         matlab.ui.control.UIAxes
         UIAxesL                         matlab.ui.control.UIAxes
-        DrawLineControls                matlab.ui.container.Panel
-        FinishSegmentingButton          matlab.ui.control.Button
-        AcceptLineButton                matlab.ui.control.Button
-        StartDrawingButton              matlab.ui.control.Button
         Image2                          matlab.ui.control.Image
         SMASHLabel                      matlab.ui.control.Label
         Image                           matlab.ui.control.Image
@@ -308,18 +313,20 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: StartDrawingButton
         function StartDrawingButtonPushed(app, event)
-            set(app.FinishSegmentingButton, 'userdata', 0);
-            app.FinishSegmentingButton.Enable = 'on';
+            set(app.FinishDrawingButton, 'userdata', 0);
+            app.CloseManualSegmentationButton.Enable = 'off';
             app.StartDrawingButton.Enable = 'off';
+            app.FinishDrawingButton.Enable = 'on';
+            app.StartMergingButton.Enable = 'off';
             
             while true
-                if get(app.FinishSegmentingButton, 'userdata')
-		            break;
-                end
                 app.AcceptLineButton.Enable = 'on';
                 app.Prompt.Text = 'Draw line to separate fibers and adjust as needed. Right click line to delete.';
                 h = drawfreehand(app.UIAxes,'Closed',false,'FaceAlpha',0);
                 uiwait(app.UIFigure);
+                if get(app.FinishDrawingButton, 'userdata')
+		            break;
+                end
                 app.AcceptLineButton.Enable = 'off';
                 if isvalid(h)   % Checks if line exists or was deleted
                     mask = createMask(h);
@@ -338,17 +345,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = '';
         end
 
-        % Button pushed function: FinishSegmentingButton
-        function FinishSegmentingButtonPushed(app, event)
-            set(app.FinishSegmentingButton, 'userdata', 1);
-            app.StartDrawingButton.Enable = 'on';
-            app.AcceptLineButton.Enable = 'off';
-            imshow(flattenMaskOverlay(app.orig_img, app.bw_obj, 1, 'w'), 'Parent', app.UIAxes);
-
-            label = bwlabel(~logical(app.bw_obj),4);
-            rgb_label = label2rgb(label,'jet','w','shuffle');
-            imwrite(rgb_label,app.Files{2},'tiff');
-            app.DrawLineControls.Visible = 'off';
+        % Button pushed function: CloseManualSegmentationButton
+        function CloseManualSegmentationButtonPushed(app, event)
+            app.ManualSegmentationControls.Visible = 'off';
             app.InitialSegmentationButton.Enable = 'on';
             app.FiberPredictionButton.Enable = 'on';
             app.ManualFiberFilterButton.Enable = 'on';
@@ -1114,7 +1113,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'off';
             app.FiberTypingButton.Enable = 'off';
             app.NonfiberObjectsButton.Enable = 'off';
-            app.DrawLineControls.Visible = 'on';
+            app.ManualSegmentationControls.Visible = 'on';
             mask = imread(app.Files{2});
             graymask = rgb2gray(mask);
             app.bw_obj = imbinarize(graymask,0.99);
@@ -1268,6 +1267,30 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             value = predict(classifier,predictors);
             app.SegmentationThresholdSlider.Value = round(value);
         end
+
+        % Button pushed function: FinishMergingButton
+        function FinishMergingButtonPushed(app, event)
+            
+        end
+
+        % Button pushed function: FinishDrawingButton
+        function FinishDrawingButtonPushed(app, event)
+            set(app.FinishDrawingButton, 'userdata', 1);
+            uiresume(app.UIFigure);
+            app.StartDrawingButton.Enable = 'on';
+            app.AcceptLineButton.Enable = 'off';
+            app.StartMergingButton.Enable = 'on';
+            app.FinishDrawingButton.Enable = 'off';
+            app.CloseManualSegmentationButton.Enable = 'on';
+
+            imshow(flattenMaskOverlay(app.orig_img, app.bw_obj, 1, 'w'), 'Parent', app.UIAxes);
+
+            label = bwlabel(~logical(app.bw_obj),4);
+            rgb_label = label2rgb(label,'jet','w','shuffle');
+            imwrite(rgb_label,app.Files{2},'tiff');
+
+            app.Prompt.Text = '';
+        end
     end
 
     % Component initialization
@@ -1386,30 +1409,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Image2.VerticalAlignment = 'top';
             app.Image2.Position = [1088 723 122 45];
             app.Image2.ImageSource = 'LabLogo.png';
-
-            % Create DrawLineControls
-            app.DrawLineControls = uipanel(app.UIFigure);
-            app.DrawLineControls.Visible = 'off';
-            app.DrawLineControls.Position = [38 470 153 183];
-
-            % Create StartDrawingButton
-            app.StartDrawingButton = uibutton(app.DrawLineControls, 'push');
-            app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
-            app.StartDrawingButton.Position = [28 137 100 22];
-            app.StartDrawingButton.Text = 'Start Drawing';
-
-            % Create AcceptLineButton
-            app.AcceptLineButton = uibutton(app.DrawLineControls, 'push');
-            app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
-            app.AcceptLineButton.Enable = 'off';
-            app.AcceptLineButton.Position = [28 82 100 22];
-            app.AcceptLineButton.Text = 'Accept Line';
-
-            % Create FinishSegmentingButton
-            app.FinishSegmentingButton = uibutton(app.DrawLineControls, 'push');
-            app.FinishSegmentingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishSegmentingButtonPushed, true);
-            app.FinishSegmentingButton.Position = [21 28 115 22];
-            app.FinishSegmentingButton.Text = 'Finish Segmenting';
 
             % Create SortingAxesPanel
             app.SortingAxesPanel = uipanel(app.UIFigure);
@@ -1937,6 +1936,59 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.NonfiberObjectsButton.Position = [823.5 9 105 22];
             app.NonfiberObjectsButton.Text = 'Nonfiber Objects';
+
+            % Create ManualSegmentationControls
+            app.ManualSegmentationControls = uipanel(app.UIFigure);
+            app.ManualSegmentationControls.Visible = 'off';
+            app.ManualSegmentationControls.Position = [56 47 263 318];
+
+            % Create StartDrawingButton
+            app.StartDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
+            app.StartDrawingButton.Position = [28 251 100 22];
+            app.StartDrawingButton.Text = 'Start Drawing';
+
+            % Create AcceptLineButton
+            app.AcceptLineButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
+            app.AcceptLineButton.Enable = 'off';
+            app.AcceptLineButton.Position = [144 251 100 22];
+            app.AcceptLineButton.Text = 'Accept Line';
+
+            % Create CloseManualSegmentationButton
+            app.CloseManualSegmentationButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.CloseManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseManualSegmentationButtonPushed, true);
+            app.CloseManualSegmentationButton.Position = [35 68 182 53];
+            app.CloseManualSegmentationButton.Text = 'Close Manual Segmentation';
+
+            % Create DrawingModeLabel
+            app.DrawingModeLabel = uilabel(app.ManualSegmentationControls);
+            app.DrawingModeLabel.Position = [36 282 83 22];
+            app.DrawingModeLabel.Text = 'Drawing Mode';
+
+            % Create MergeObjectsModeLabel
+            app.MergeObjectsModeLabel = uilabel(app.ManualSegmentationControls);
+            app.MergeObjectsModeLabel.Position = [32 191 117 22];
+            app.MergeObjectsModeLabel.Text = 'Merge Objects Mode';
+
+            % Create StartMergingButton
+            app.StartMergingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.StartMergingButton.Position = [29 160 100 22];
+            app.StartMergingButton.Text = 'Start Merging';
+
+            % Create FinishMergingButton
+            app.FinishMergingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.FinishMergingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishMergingButtonPushed, true);
+            app.FinishMergingButton.Enable = 'off';
+            app.FinishMergingButton.Position = [141 160 100 22];
+            app.FinishMergingButton.Text = 'Finish Merging';
+
+            % Create FinishDrawingButton
+            app.FinishDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.FinishDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishDrawingButtonPushed, true);
+            app.FinishDrawingButton.Enable = 'off';
+            app.FinishDrawingButton.Position = [82 220 100 22];
+            app.FinishDrawingButton.Text = 'Finish Drawing';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
