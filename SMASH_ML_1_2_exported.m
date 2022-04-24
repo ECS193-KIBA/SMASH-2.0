@@ -1259,7 +1259,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function DetectValueButtonPushed(app, event)
             foc = app.FiberOutlineColorDropDown.Value;
             foc = str2double(foc);
-            lam = app.orig_img(:,:,foc);  % fiber outline color
+            lam = app.orig_img_multispectral(:,:,foc);  % fiber outline color
             hist = imhist(lam);
             hist = hist(1:end-1);
             AverageIntensity = mean2(lam);
