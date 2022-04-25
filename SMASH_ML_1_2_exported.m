@@ -338,6 +338,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     PixelsRGBAsDouble = ind2rgb(PixelsGrayscale, ColorMap);
                     PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
                     PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
+                    
+                    % Autoscaling - scale the pixel intensity for each channel
+                    MaxIntensity = max(PixelsGrayscaleUInt8,[],'all');
+                    MinIntensity = min(PixelsGrayscaleUInt8,[],'all');
+                    ActualRange = MaxIntensity - MinIntensity;
+                    UInt8Range = 255;
+                    ScalingFactor = UInt8Range / ActualRange;
+                    PixelsGrayscaleUInt8 = ScalingFactor * PixelsGrayscaleUInt8;
+                    PixelsRGBAsUInt8 = ScalingFactor * PixelsRGBAsUInt8;
 
                     TotalMultiSpectral = cat(3, TotalMultiSpectral, PixelsGrayscaleUInt8);
                     TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
@@ -499,7 +508,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             maybefiltered = ismember(label,maybe);
             
             tempmask = label;
-
             
             codedim = cat(3,nonfiberfiltered,fiberfiltered,maybefiltered); % Color coded image
             codedim = uint8(codedim);                                      % Magenta - nonfibers
@@ -594,7 +602,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: YesButton
         function YesButtonPushed(app, event)
-            
             uiresume(app.UIFigure);
         end
 
@@ -608,8 +615,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function ManualSortingButtonPushed(app, event)
             app.ManualSortingButton.Enable = 'off';
             uiresume(app.UIFigure);
-            
-            
         end
 
         % Button pushed function: RemoveObjectsButton
@@ -1332,7 +1337,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function DetectValueButtonPushed(app, event)
             foc = app.FiberOutlineColorDropDown.Value;
             foc = str2double(foc);
-            lam = app.orig_img(:,:,foc);  % fiber outline color
+            lam = app.orig_img_multispectral(:,:,foc);  % fiber outline color
             hist = imhist(lam);
             hist = hist(1:end-1);
             AverageIntensity = mean2(lam);
