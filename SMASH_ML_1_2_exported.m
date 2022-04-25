@@ -153,7 +153,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     
     methods (Access = private)
 
-        function results = CreateFolderIfDirectoryIsNonexistent(app, pathDirectory)
+        function CreateFolderIfDirectoryIsNonexistent(~, pathDirectory)
             if exist(pathDirectory,'dir') == 0
                 mkdir(pathDirectory)
             end
