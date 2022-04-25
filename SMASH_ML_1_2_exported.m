@@ -3,6 +3,43 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        SegmentationParameters          matlab.ui.container.Panel
+        DetectValueButton               matlab.ui.control.Button
+        SegmentationThresholdSlider     matlab.ui.control.Slider
+        SegmentationThresholdSliderLabel  matlab.ui.control.Label
+        AcceptSegmentationButton        matlab.ui.control.Button
+        FiberOutlineColorDropDown       matlab.ui.control.DropDown
+        FiberOutlineColorDropDownLabel  matlab.ui.control.Label
+        SegmentButton                   matlab.ui.control.Button
+        PixelSizeField                  matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
+        FiberOutlineChannelColorBox     matlab.ui.control.UIAxes
+        FiberTypingControlPanel         matlab.ui.container.Panel
+        DoneFT                          matlab.ui.control.Button
+        WritetoExcelFT                  matlab.ui.control.Button
+        CalculateFiberTyping            matlab.ui.control.Button
+        FiberTypeColorDropDown          matlab.ui.control.DropDown
+        FiberTypeColorDropDownLabel     matlab.ui.control.Label
+        FiberTypingDataOutputFolder     matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label  matlab.ui.control.Label
+        PixelSizeFiberType              matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
+        FiberTypingChannelColorBox      matlab.ui.control.UIAxes
+        CNFControlPanel                 matlab.ui.container.Panel
+        CentralNucleiDataOutputFolder   matlab.ui.control.EditField
+        DataOutputFolderEditField_2Label  matlab.ui.control.Label
+        MinimumNucleusSizeum2EditField  matlab.ui.control.NumericEditField
+        MinimumNucleusSizeum2EditFieldLabel  matlab.ui.control.Label
+        DistancefromborderEditField     matlab.ui.control.NumericEditField
+        DistancefromborderEditFieldLabel  matlab.ui.control.Label
+        DoneButton_CNF                  matlab.ui.control.Button
+        CNFExcelWrite                   matlab.ui.control.Button
+        CalculateCentralNuclei          matlab.ui.control.Button
+        NucleiColorDropDown             matlab.ui.control.DropDown
+        NucleiColorDropDownLabel        matlab.ui.control.Label
+        PixelSizeumpixelEditField_2     matlab.ui.control.NumericEditField
+        PixelSizeumpixelLabel           matlab.ui.control.Label
+        CNFChannelColorBox              matlab.ui.control.UIAxes
         Toolbar                         matlab.ui.container.Panel
         NonfiberObjectsButton           matlab.ui.control.Button
         FiberTypingButton               matlab.ui.control.Button
@@ -12,7 +49,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         FiberPredictionButton           matlab.ui.control.Button
         ManualSegmentationButton        matlab.ui.control.Button
         InitialSegmentationButton       matlab.ui.control.Button
+        NonfiberPanel                   matlab.ui.container.Panel
+        NonfiberAccept                  matlab.ui.control.Button
+        NonfiberAdjust                  matlab.ui.control.Button
+        NonfiberThreshold               matlab.ui.control.NumericEditField
+        ThresholdEditField_2Label_2     matlab.ui.control.Label
+        NonfiberAxes                    matlab.ui.control.UIAxes
         NonfiberControlPanel            matlab.ui.container.Panel
+        NonfiberObjectColor             matlab.ui.control.DropDown
         PixelSizeNonfiber               matlab.ui.control.NumericEditField
         PixelSizeumpixelLabel_2         matlab.ui.control.Label
         DoneNonfiber                    matlab.ui.control.Button
@@ -20,14 +64,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         CalculateNonfiberObjects        matlab.ui.control.Button
         NonfiberObjectsDataOutputFolder  matlab.ui.control.EditField
         DataOutputFolderEditField_3Label_2  matlab.ui.control.Label
-        NonfiberObjectColor             matlab.ui.control.DropDown
         ObjectColorDropDownLabel        matlab.ui.control.Label
-        NonfiberPanel                   matlab.ui.container.Panel
-        NonfiberAccept                  matlab.ui.control.Button
-        NonfiberAdjust                  matlab.ui.control.Button
-        NonfiberThreshold               matlab.ui.control.NumericEditField
-        ThresholdEditField_2Label_2     matlab.ui.control.Label
-        NonfiberAxes                    matlab.ui.control.UIAxes
+        NonfiberChannelColorBox         matlab.ui.control.UIAxes
         CNFPanel                        matlab.ui.container.Panel
         AcceptCNF                       matlab.ui.control.Button
         AdjustCNF                       matlab.ui.control.Button
@@ -43,30 +81,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         FThistL                         matlab.ui.control.UIAxes
         FTAxesR                         matlab.ui.control.UIAxes
         FTAxesL                         matlab.ui.control.UIAxes
-        FiberTypingControlPanel         matlab.ui.container.Panel
-        DoneFT                          matlab.ui.control.Button
-        WritetoExcelFT                  matlab.ui.control.Button
-        CalculateFiberTyping            matlab.ui.control.Button
-        FiberTypeColorDropDown          matlab.ui.control.DropDown
-        FiberTypeColorDropDownLabel     matlab.ui.control.Label
-        FiberTypingDataOutputFolder     matlab.ui.control.EditField
-        DataOutputFolderEditField_3Label  matlab.ui.control.Label
-        PixelSizeFiberType              matlab.ui.control.NumericEditField
-        PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
-        CNFControlPanel                 matlab.ui.container.Panel
-        CentralNucleiDataOutputFolder   matlab.ui.control.EditField
-        DataOutputFolderEditField_2Label  matlab.ui.control.Label
-        MinimumNucleusSizeum2EditField  matlab.ui.control.NumericEditField
-        MinimumNucleusSizeum2EditFieldLabel  matlab.ui.control.Label
-        DistancefromborderEditField     matlab.ui.control.NumericEditField
-        DistancefromborderEditFieldLabel  matlab.ui.control.Label
-        DoneButton_CNF                  matlab.ui.control.Button
-        CNFExcelWrite                   matlab.ui.control.Button
-        CalculateCentralNuclei          matlab.ui.control.Button
-        NucleiColorDropDown             matlab.ui.control.DropDown
-        NucleiColorDropDownLabel        matlab.ui.control.Label
-        PixelSizeumpixelEditField_2     matlab.ui.control.NumericEditField
-        PixelSizeumpixelLabel           matlab.ui.control.Label
         FiberPredictionControlPanel     matlab.ui.container.Panel
         SortingThresholdSlider          matlab.ui.control.Slider
         SortingThresholdHigherrequiresmoremanualsortingLabel  matlab.ui.control.Label
@@ -100,19 +114,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         SMASHLabel                      matlab.ui.control.Label
         Image                           matlab.ui.control.Image
         Prompt                          matlab.ui.control.Label
-        SegmentationParameters          matlab.ui.container.Panel
-        DetectValueButton               matlab.ui.control.Button
-        SegmentationThresholdSlider     matlab.ui.control.Slider
-        SegmentationThresholdSliderLabel  matlab.ui.control.Label
-        AcceptSegmentationButton        matlab.ui.control.Button
-        FiberOutlineColorDropDown       matlab.ui.control.DropDown
-        FiberOutlineColorDropDownLabel  matlab.ui.control.Label
-        SegmentButton                   matlab.ui.control.Button
-        PixelSizeField                  matlab.ui.control.NumericEditField
-        PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
         FilenameLabel                   matlab.ui.control.Label
         SelectFileButton                matlab.ui.control.Button
-        ChannelColorBox                 matlab.ui.control.UIAxes
         UIAxes                          matlab.ui.control.UIAxes
     end
 
@@ -146,6 +149,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         num_nf
         nf_data
         segmodel
+        channelRGB % Contains all the RGB values of the channel colors
     end
     
     methods (Access = private)
@@ -221,6 +225,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 TotalMultiSpectral = [];
                 TotalColorDropDownItems = {};
                 TotalColorDropDownItemsData = {};
+                
+                app.channelRGB = {};
 
                 NumLayers = length(PixelDataForAllLayers);
                 for Layer = 1:NumLayers
@@ -241,6 +247,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     % Include only color name in the channel drop down menu
                     TotalColorDropDownItems = cat(2, TotalColorDropDownItems, {[ColorName]});
                     TotalColorDropDownItemsData  = cat(2, TotalColorDropDownItemsData, {num2str(Layer)});
+
+                    % Add the RGB values of the channel color 
+                    app.channelRGB = cat(1, app.channelRGB, RGBValues);
                 end
                 app.FiberOutlineColorDropDown.Items = TotalColorDropDownItems;
                 app.FiberOutlineColorDropDown.ItemsData = TotalColorDropDownItemsData;
@@ -272,6 +281,58 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.InitialSegmentationButton.Enable = 'on';
             end
             
+
+            if isMultilayerImage
+                % Nonfiber
+                % Get RGB values of color channel and convert to numeric matrix
+                NonfiberRGBValueOfChannel1 = app.channelRGB(str2double(app.NonfiberObjectColor.Value), :);
+                NonfiberRGBNumericalValue = cell2mat(NonfiberRGBValueOfChannel1(1,:));
+            
+                % Update color on color box
+                app.NonfiberChannelColorBox.Color = NonfiberRGBNumericalValue;
+
+                
+                % CNF
+                % Get RGB values of color channel and convert to numeric matrix
+                CNFRGBValueOfChannel1 = app.channelRGB(str2double(app.NucleiColorDropDown.Value), :);
+                CNFRGBNumericalValue = cell2mat(CNFRGBValueOfChannel1(1,:));
+            
+                % Update color on color box
+                app.CNFChannelColorBox.Color = CNFRGBNumericalValue;
+
+
+                % FiberTyping
+                % Get RGB values of color channel and convert to numeric matrix
+                FiberTypingRGBValueOfChannel1 = app.channelRGB(str2double(app.FiberTypeColorDropDown.Value), :);
+                FiberTypingRGBNumericalValue = cell2mat(FiberTypingRGBValueOfChannel1(1,:));
+            
+                % Update color on color box
+                app.FiberTypingChannelColorBox.Color = FiberTypingRGBNumericalValue;
+
+
+                % FiberOutline
+                % Get RGB values of color channel and convert to numeric matrix
+                FiberOutlineRGBValueOfChannel1 = app.channelRGB(str2double(app.FiberOutlineColorDropDown.Value), :);
+                FiberOutlineRGBNumericalValue = cell2mat(FiberOutlineRGBValueOfChannel1(1,:));
+            
+                % Update color on color box
+                app.FiberOutlineChannelColorBox.Color = FiberOutlineRGBNumericalValue;
+            else
+                % Add red, green, and blue to channelRGB
+                app.channelRGB = cat(2, app.channelRGB, [1 0 0]);
+                app.channelRGB = cat(2, app.channelRGB, [0 1 0]);
+                app.channelRGB = cat(2, app.channelRGB, [0 0 1]);
+
+                % Get RGB values of color channel and convert to numeric matrix
+                RGBValueOfChannel1 = app.channelRGB(1, :);
+                RGBNumericalValue = cell2mat(RGBValueOfChannel1(1,:));
+            
+                % Update color on color box
+                app.NonfiberChannelColorBox.Color = RGBNumericalValue;
+                app.CNFChannelColorBox.Color = RGBNumericalValue;
+                app.FiberTypingChannelColorBox = RGBNumericalValue;
+                app.FiberOutlineChannelColorBox = RGBNumericalValue;
+            end
             
         end
 
@@ -1105,6 +1166,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingButton.Enable = 'off';
             app.NonfiberObjectsButton.Enable = 'off';
             app.SegmentationParameters.Visible = 'on';
+            app.FiberOutlineChannelColorBox.Visible = 'on';
         end
 
         % Button pushed function: ManualSegmentationButton
@@ -1205,6 +1267,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AdjustCNF.Enable = 'off';
             app.AcceptCNF.Enable = 'off';
             app.CNFExcelWrite.Enable = 'off';
+            app.CNFChannelColorBox.Visible = 'on';
             mask = imread(app.Files{2});
             graymask = rgb2gray(mask);
             app.bw_obj = imcomplement(imbinarize(graymask,0.99));
@@ -1226,6 +1289,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeFiberType.Enable = 'on';
             app.FiberTypeColorDropDown.Enable = 'on';
             app.WritetoExcelFT.Enable = 'off';
+            app.FiberTypingChannelColorBox.Visible = 'on';
             mask = imread(app.Files{2});
             graymask = rgb2gray(mask);
             app.bw_obj = imcomplement(imbinarize(graymask,0.99));
@@ -1248,6 +1312,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberAdjust.Enable = 'off';
             app.NonfiberAccept.Enable = 'off';
             app.WritetoExcelNonfiber.Enable = 'off';
+            app.NonfiberChannelColorBox.Visible = 'on';
         end
 
         % Button pushed function: DetectValueButton
@@ -1273,9 +1338,55 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SegmentationThresholdSlider.Value = round(value);
         end
 
-        % Callback function
-        function UITableButtonDown(app, event)
-            app.UITable.Data = {1 2 3 4};
+        % Value changed function: NonfiberObjectColor
+        function NonfiberObjectColorValueChanged(app, event)
+            % Retreive the index of the color channel
+            color_channel_index = str2double(app.NonfiberObjectColor.Value);
+            % Get RGB values of color channel and convert to numeric matrix
+            RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
+            RGB1DValue = cell2mat(RGBValueOfColorChannel(1,:));
+            
+            % Update color on color box
+            app.NonfiberChannelColorBox.Color = RGB1DValue;
+        end
+
+        % Value changed function: FiberTypeColorDropDown
+        function FiberTypeColorValueChanged(app, event)
+            % Retreive the index of the color channel
+            color_channel_index = str2double(app.FiberTypeColorDropDown.Value);
+            % Get RGB values of color channel and convert to numeric matrix
+            RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
+            RGB1DValue = cell2mat(RGBValueOfColorChannel(1,:));
+            
+            % Update color on color box
+            app.FiberTypingChannelColorBox.Color = RGB1DValue;
+            
+        end
+
+        % Value changed function: NucleiColorDropDown
+        function NucleiColorValueChanged(app, event)
+            % Retreive the index of the color channel
+            color_channel_index = str2double(app.NucleiColorDropDown.Value);
+            % Get RGB values of color channel and convert to numeric matrix
+            RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
+            RGB1DValue = cell2mat(RGBValueOfColorChannel(1,:));
+            
+            % Update color on color box
+            app.CNFChannelColorBox.Color = RGB1DValue;
+            
+        end
+
+        % Value changed function: FiberOutlineColorDropDown
+        function FiberOutlineColorValueChanged(app, event)
+            % Retreive the index of the color channel
+            color_channel_index = str2double(app.FiberOutlineColorDropDown.Value);
+            % Get RGB values of color channel and convert to numeric matrix
+            RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
+            RGB1DValue = cell2mat(RGBValueOfColorChannel(1,:));
+            
+            % Update color on color box
+            app.FiberOutlineChannelColorBox.Color = RGB1DValue;
+            
         end
     end
 
@@ -1300,14 +1411,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIAxes.MinorGridColor = 'none';
             app.UIAxes.Position = [266 9 909 698];
 
-            % Create ChannelColorBox
-            app.ChannelColorBox = uiaxes(app.UIFigure);
-            app.ChannelColorBox.XTick = [];
-            app.ChannelColorBox.YTick = [];
-            app.ChannelColorBox.Color = [0 1 1];
-            app.ChannelColorBox.Box = 'on';
-            app.ChannelColorBox.Position = [20 188 262 151];
-
             % Create SelectFileButton
             app.SelectFileButton = uibutton(app.UIFigure, 'push');
             app.SelectFileButton.ButtonPushedFcn = createCallbackFcn(app, @SelectFileButtonPushed, true);
@@ -1318,65 +1421,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FilenameLabel = uilabel(app.UIFigure);
             app.FilenameLabel.Position = [156 676 130 22];
             app.FilenameLabel.Text = 'Filename';
-
-            % Create SegmentationParameters
-            app.SegmentationParameters = uipanel(app.UIFigure);
-            app.SegmentationParameters.Visible = 'off';
-            app.SegmentationParameters.Position = [18 406 260 245];
-
-            % Create PixelSizeumpixelEditFieldLabel
-            app.PixelSizeumpixelEditFieldLabel = uilabel(app.SegmentationParameters);
-            app.PixelSizeumpixelEditFieldLabel.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditFieldLabel.Position = [16 200 114 22];
-            app.PixelSizeumpixelEditFieldLabel.Text = 'Pixel Size (um/pixel)';
-
-            % Create PixelSizeField
-            app.PixelSizeField = uieditfield(app.SegmentationParameters, 'numeric');
-            app.PixelSizeField.Position = [145 200 100 22];
-
-            % Create SegmentButton
-            app.SegmentButton = uibutton(app.SegmentationParameters, 'push');
-            app.SegmentButton.ButtonPushedFcn = createCallbackFcn(app, @SegmentButtonPushed, true);
-            app.SegmentButton.Position = [144 65 100 22];
-            app.SegmentButton.Text = 'Segment';
-
-            % Create FiberOutlineColorDropDownLabel
-            app.FiberOutlineColorDropDownLabel = uilabel(app.SegmentationParameters);
-            app.FiberOutlineColorDropDownLabel.HorizontalAlignment = 'right';
-            app.FiberOutlineColorDropDownLabel.Position = [24 158 106 22];
-            app.FiberOutlineColorDropDownLabel.Text = 'Fiber Outline Color';
-
-            % Create FiberOutlineColorDropDown
-            app.FiberOutlineColorDropDown = uidropdown(app.SegmentationParameters);
-            app.FiberOutlineColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.FiberOutlineColorDropDown.ItemsData = {'1', '2', '3'};
-            app.FiberOutlineColorDropDown.Position = [145 158 100 22];
-            app.FiberOutlineColorDropDown.Value = '1';
-
-            % Create AcceptSegmentationButton
-            app.AcceptSegmentationButton = uibutton(app.SegmentationParameters, 'push');
-            app.AcceptSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptSegmentationButtonPushed, true);
-            app.AcceptSegmentationButton.Enable = 'off';
-            app.AcceptSegmentationButton.Position = [81 33 100 22];
-            app.AcceptSegmentationButton.Text = 'Accept';
-
-            % Create SegmentationThresholdSliderLabel
-            app.SegmentationThresholdSliderLabel = uilabel(app.SegmentationParameters);
-            app.SegmentationThresholdSliderLabel.HorizontalAlignment = 'center';
-            app.SegmentationThresholdSliderLabel.Position = [13 101 80 43];
-            app.SegmentationThresholdSliderLabel.Text = {'Segmentation'; 'Threshold'};
-
-            % Create SegmentationThresholdSlider
-            app.SegmentationThresholdSlider = uislider(app.SegmentationParameters);
-            app.SegmentationThresholdSlider.Limits = [0 50];
-            app.SegmentationThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SegmentationThresholdSliderValueChanged, true);
-            app.SegmentationThresholdSlider.Position = [101 128 139 3];
-
-            % Create DetectValueButton
-            app.DetectValueButton = uibutton(app.SegmentationParameters, 'push');
-            app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
-            app.DetectValueButton.Position = [24 65 100 22];
-            app.DetectValueButton.Text = 'Detect Value';
 
             % Create Prompt
             app.Prompt = uilabel(app.UIFigure);
@@ -1581,139 +1625,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SortingThresholdSlider.MinorTicks = [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9];
             app.SortingThresholdSlider.Position = [150 195 92 3];
 
-            % Create CNFControlPanel
-            app.CNFControlPanel = uipanel(app.UIFigure);
-            app.CNFControlPanel.Visible = 'off';
-            app.CNFControlPanel.Position = [16 360 259 293];
-
-            % Create PixelSizeumpixelLabel
-            app.PixelSizeumpixelLabel = uilabel(app.CNFControlPanel);
-            app.PixelSizeumpixelLabel.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelLabel.Position = [48 255 58 28];
-            app.PixelSizeumpixelLabel.Text = {'Pixel Size'; 'um/pixel'};
-
-            % Create PixelSizeumpixelEditField_2
-            app.PixelSizeumpixelEditField_2 = uieditfield(app.CNFControlPanel, 'numeric');
-            app.PixelSizeumpixelEditField_2.Position = [121 261 100 22];
-
-            % Create NucleiColorDropDownLabel
-            app.NucleiColorDropDownLabel = uilabel(app.CNFControlPanel);
-            app.NucleiColorDropDownLabel.HorizontalAlignment = 'right';
-            app.NucleiColorDropDownLabel.Position = [39 226 71 22];
-            app.NucleiColorDropDownLabel.Text = 'Nuclei Color';
-
-            % Create NucleiColorDropDown
-            app.NucleiColorDropDown = uidropdown(app.CNFControlPanel);
-            app.NucleiColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.NucleiColorDropDown.ItemsData = {'1', '2', '3'};
-            app.NucleiColorDropDown.Position = [125 226 100 22];
-            app.NucleiColorDropDown.Value = '1';
-
-            % Create CalculateCentralNuclei
-            app.CalculateCentralNuclei = uibutton(app.CNFControlPanel, 'push');
-            app.CalculateCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @CalculateCentralNucleiPushed, true);
-            app.CalculateCentralNuclei.Position = [85 66 100 22];
-            app.CalculateCentralNuclei.Text = 'Calculate';
-
-            % Create CNFExcelWrite
-            app.CNFExcelWrite = uibutton(app.CNFControlPanel, 'push');
-            app.CNFExcelWrite.ButtonPushedFcn = createCallbackFcn(app, @CNFExcelWriteButtonPushed, true);
-            app.CNFExcelWrite.Position = [24 33 100 22];
-            app.CNFExcelWrite.Text = 'Write To Excel';
-
-            % Create DoneButton_CNF
-            app.DoneButton_CNF = uibutton(app.CNFControlPanel, 'push');
-            app.DoneButton_CNF.ButtonPushedFcn = createCallbackFcn(app, @DoneButton_CNFPushed, true);
-            app.DoneButton_CNF.Position = [142 33 100 22];
-            app.DoneButton_CNF.Text = 'Done';
-
-            % Create DistancefromborderEditFieldLabel
-            app.DistancefromborderEditFieldLabel = uilabel(app.CNFControlPanel);
-            app.DistancefromborderEditFieldLabel.HorizontalAlignment = 'right';
-            app.DistancefromborderEditFieldLabel.Position = [15 194 118 22];
-            app.DistancefromborderEditFieldLabel.Text = 'Distance from border';
-
-            % Create DistancefromborderEditField
-            app.DistancefromborderEditField = uieditfield(app.CNFControlPanel, 'numeric');
-            app.DistancefromborderEditField.Position = [148 194 100 22];
-
-            % Create MinimumNucleusSizeum2EditFieldLabel
-            app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CNFControlPanel);
-            app.MinimumNucleusSizeum2EditFieldLabel.HorizontalAlignment = 'right';
-            app.MinimumNucleusSizeum2EditFieldLabel.Position = [7 157 128 28];
-            app.MinimumNucleusSizeum2EditFieldLabel.Text = {'Minimum Nucleus Size'; '(um^2)'};
-
-            % Create MinimumNucleusSizeum2EditField
-            app.MinimumNucleusSizeum2EditField = uieditfield(app.CNFControlPanel, 'numeric');
-            app.MinimumNucleusSizeum2EditField.Position = [150 163 100 22];
-
-            % Create DataOutputFolderEditField_2Label
-            app.DataOutputFolderEditField_2Label = uilabel(app.CNFControlPanel);
-            app.DataOutputFolderEditField_2Label.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_2Label.Position = [16 128 108 22];
-            app.DataOutputFolderEditField_2Label.Text = 'Data Output Folder';
-
-            % Create CentralNucleiDataOutputFolder
-            app.CentralNucleiDataOutputFolder = uieditfield(app.CNFControlPanel, 'text');
-            app.CentralNucleiDataOutputFolder.Position = [139 128 109 22];
-
-            % Create FiberTypingControlPanel
-            app.FiberTypingControlPanel = uipanel(app.UIFigure);
-            app.FiberTypingControlPanel.Visible = 'off';
-            app.FiberTypingControlPanel.Position = [16 367 256 293];
-
-            % Create PixelSizeumpixelEditField_3Label
-            app.PixelSizeumpixelEditField_3Label = uilabel(app.FiberTypingControlPanel);
-            app.PixelSizeumpixelEditField_3Label.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditField_3Label.Position = [45 236 58 28];
-            app.PixelSizeumpixelEditField_3Label.Text = {'Pixel Size'; '(um/pixel)'};
-
-            % Create PixelSizeFiberType
-            app.PixelSizeFiberType = uieditfield(app.FiberTypingControlPanel, 'numeric');
-            app.PixelSizeFiberType.Position = [118 242 100 22];
-
-            % Create DataOutputFolderEditField_3Label
-            app.DataOutputFolderEditField_3Label = uilabel(app.FiberTypingControlPanel);
-            app.DataOutputFolderEditField_3Label.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_3Label.Position = [19 144 108 22];
-            app.DataOutputFolderEditField_3Label.Text = 'Data Output Folder';
-
-            % Create FiberTypingDataOutputFolder
-            app.FiberTypingDataOutputFolder = uieditfield(app.FiberTypingControlPanel, 'text');
-            app.FiberTypingDataOutputFolder.Position = [142 144 100 22];
-
-            % Create FiberTypeColorDropDownLabel
-            app.FiberTypeColorDropDownLabel = uilabel(app.FiberTypingControlPanel);
-            app.FiberTypeColorDropDownLabel.HorizontalAlignment = 'right';
-            app.FiberTypeColorDropDownLabel.Position = [17 197 94 22];
-            app.FiberTypeColorDropDownLabel.Text = 'Fiber Type Color';
-
-            % Create FiberTypeColorDropDown
-            app.FiberTypeColorDropDown = uidropdown(app.FiberTypingControlPanel);
-            app.FiberTypeColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.FiberTypeColorDropDown.ItemsData = {'1', '2', '3'};
-            app.FiberTypeColorDropDown.Position = [126 197 100 22];
-            app.FiberTypeColorDropDown.Value = '1';
-
-            % Create CalculateFiberTyping
-            app.CalculateFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
-            app.CalculateFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberTypingButtonPushed, true);
-            app.CalculateFiberTyping.Position = [80 90 100 22];
-            app.CalculateFiberTyping.Text = 'Calculate';
-
-            % Create WritetoExcelFT
-            app.WritetoExcelFT = uibutton(app.FiberTypingControlPanel, 'push');
-            app.WritetoExcelFT.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelFTButtonPushed, true);
-            app.WritetoExcelFT.Enable = 'off';
-            app.WritetoExcelFT.Position = [26 45 100 22];
-            app.WritetoExcelFT.Text = 'Write to Excel';
-
-            % Create DoneFT
-            app.DoneFT = uibutton(app.FiberTypingControlPanel, 'push');
-            app.DoneFT.ButtonPushedFcn = createCallbackFcn(app, @DoneFTButtonPushed, true);
-            app.DoneFT.Position = [145 45 100 22];
-            app.DoneFT.Text = 'Done';
-
             % Create FiberTypingPanel
             app.FiberTypingPanel = uipanel(app.UIFigure);
             app.FiberTypingPanel.Visible = 'off';
@@ -1803,59 +1714,27 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AcceptCNF.Position = [477 67 100 22];
             app.AcceptCNF.Text = 'Accept';
 
-            % Create NonfiberPanel
-            app.NonfiberPanel = uipanel(app.UIFigure);
-            app.NonfiberPanel.Visible = 'off';
-            app.NonfiberPanel.Position = [281 24 886 679];
-
-            % Create NonfiberAxes
-            app.NonfiberAxes = uiaxes(app.NonfiberPanel);
-            xlabel(app.NonfiberAxes, 'X')
-            ylabel(app.NonfiberAxes, 'Y')
-            app.NonfiberAxes.PlotBoxAspectRatio = [1.35976789168279 1 1];
-            app.NonfiberAxes.XColor = 'none';
-            app.NonfiberAxes.YColor = 'none';
-            app.NonfiberAxes.Position = [22 117 844 553];
-
-            % Create ThresholdEditField_2Label_2
-            app.ThresholdEditField_2Label_2 = uilabel(app.NonfiberPanel);
-            app.ThresholdEditField_2Label_2.HorizontalAlignment = 'right';
-            app.ThresholdEditField_2Label_2.Position = [116 84 59 22];
-            app.ThresholdEditField_2Label_2.Text = 'Threshold';
-
-            % Create NonfiberThreshold
-            app.NonfiberThreshold = uieditfield(app.NonfiberPanel, 'numeric');
-            app.NonfiberThreshold.Position = [190 84 100 22];
-
-            % Create NonfiberAdjust
-            app.NonfiberAdjust = uibutton(app.NonfiberPanel, 'push');
-            app.NonfiberAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAdjustButtonPushed, true);
-            app.NonfiberAdjust.Position = [333 85 100 22];
-            app.NonfiberAdjust.Text = 'Adjust';
-
-            % Create NonfiberAccept
-            app.NonfiberAccept = uibutton(app.NonfiberPanel, 'push');
-            app.NonfiberAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAcceptButtonPushed, true);
-            app.NonfiberAccept.Position = [467 84 100 22];
-            app.NonfiberAccept.Text = 'Accept';
-
             % Create NonfiberControlPanel
             app.NonfiberControlPanel = uipanel(app.UIFigure);
             app.NonfiberControlPanel.Visible = 'off';
-            app.NonfiberControlPanel.Position = [20 359 252 301];
+            app.NonfiberControlPanel.Position = [20 359 258 301];
+
+            % Create NonfiberChannelColorBox
+            app.NonfiberChannelColorBox = uiaxes(app.NonfiberControlPanel);
+            app.NonfiberChannelColorBox.XColor = [0.149 0.149 0.149];
+            app.NonfiberChannelColorBox.XTick = [];
+            app.NonfiberChannelColorBox.YTick = [];
+            app.NonfiberChannelColorBox.Color = [0 1 1];
+            app.NonfiberChannelColorBox.Box = 'on';
+            app.NonfiberChannelColorBox.Visible = 'off';
+            app.NonfiberChannelColorBox.PickableParts = 'none';
+            app.NonfiberChannelColorBox.Position = [229 193 30 30];
 
             % Create ObjectColorDropDownLabel
             app.ObjectColorDropDownLabel = uilabel(app.NonfiberControlPanel);
             app.ObjectColorDropDownLabel.HorizontalAlignment = 'right';
             app.ObjectColorDropDownLabel.Position = [38 197 72 22];
             app.ObjectColorDropDownLabel.Text = 'Object Color';
-
-            % Create NonfiberObjectColor
-            app.NonfiberObjectColor = uidropdown(app.NonfiberControlPanel);
-            app.NonfiberObjectColor.Items = {'Red', 'Green', 'Blue'};
-            app.NonfiberObjectColor.ItemsData = {'1', '2', '3'};
-            app.NonfiberObjectColor.Position = [125 197 100 22];
-            app.NonfiberObjectColor.Value = '1';
 
             % Create DataOutputFolderEditField_3Label_2
             app.DataOutputFolderEditField_3Label_2 = uilabel(app.NonfiberControlPanel);
@@ -1894,6 +1773,50 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Create PixelSizeNonfiber
             app.PixelSizeNonfiber = uieditfield(app.NonfiberControlPanel, 'numeric');
             app.PixelSizeNonfiber.Position = [125 253 100 22];
+
+            % Create NonfiberObjectColor
+            app.NonfiberObjectColor = uidropdown(app.NonfiberControlPanel);
+            app.NonfiberObjectColor.Items = {'Red', 'Green', 'Blue'};
+            app.NonfiberObjectColor.ItemsData = {'1', '2', '3'};
+            app.NonfiberObjectColor.ValueChangedFcn = createCallbackFcn(app, @NonfiberObjectColorValueChanged, true);
+            app.NonfiberObjectColor.Position = [125 197 100 22];
+            app.NonfiberObjectColor.Value = '1';
+
+            % Create NonfiberPanel
+            app.NonfiberPanel = uipanel(app.UIFigure);
+            app.NonfiberPanel.Visible = 'off';
+            app.NonfiberPanel.Position = [281 24 886 679];
+
+            % Create NonfiberAxes
+            app.NonfiberAxes = uiaxes(app.NonfiberPanel);
+            xlabel(app.NonfiberAxes, 'X')
+            ylabel(app.NonfiberAxes, 'Y')
+            app.NonfiberAxes.PlotBoxAspectRatio = [1.35976789168279 1 1];
+            app.NonfiberAxes.XColor = 'none';
+            app.NonfiberAxes.YColor = 'none';
+            app.NonfiberAxes.Position = [22 117 844 553];
+
+            % Create ThresholdEditField_2Label_2
+            app.ThresholdEditField_2Label_2 = uilabel(app.NonfiberPanel);
+            app.ThresholdEditField_2Label_2.HorizontalAlignment = 'right';
+            app.ThresholdEditField_2Label_2.Position = [116 84 59 22];
+            app.ThresholdEditField_2Label_2.Text = 'Threshold';
+
+            % Create NonfiberThreshold
+            app.NonfiberThreshold = uieditfield(app.NonfiberPanel, 'numeric');
+            app.NonfiberThreshold.Position = [190 84 100 22];
+
+            % Create NonfiberAdjust
+            app.NonfiberAdjust = uibutton(app.NonfiberPanel, 'push');
+            app.NonfiberAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAdjustButtonPushed, true);
+            app.NonfiberAdjust.Position = [333 85 100 22];
+            app.NonfiberAdjust.Text = 'Adjust';
+
+            % Create NonfiberAccept
+            app.NonfiberAccept = uibutton(app.NonfiberPanel, 'push');
+            app.NonfiberAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAcceptButtonPushed, true);
+            app.NonfiberAccept.Position = [467 84 100 22];
+            app.NonfiberAccept.Text = 'Accept';
 
             % Create Toolbar
             app.Toolbar = uipanel(app.UIFigure);
@@ -1954,6 +1877,231 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.NonfiberObjectsButton.Position = [823.5 9 105 22];
             app.NonfiberObjectsButton.Text = 'Nonfiber Objects';
+
+            % Create CNFControlPanel
+            app.CNFControlPanel = uipanel(app.UIFigure);
+            app.CNFControlPanel.Visible = 'off';
+            app.CNFControlPanel.Position = [16 360 259 293];
+
+            % Create CNFChannelColorBox
+            app.CNFChannelColorBox = uiaxes(app.CNFControlPanel);
+            app.CNFChannelColorBox.XColor = [0.149 0.149 0.149];
+            app.CNFChannelColorBox.XTick = [];
+            app.CNFChannelColorBox.YTick = [];
+            app.CNFChannelColorBox.Color = [0 1 1];
+            app.CNFChannelColorBox.Box = 'on';
+            app.CNFChannelColorBox.PickableParts = 'none';
+            app.CNFChannelColorBox.Position = [229 220.5 30 30];
+
+            % Create PixelSizeumpixelLabel
+            app.PixelSizeumpixelLabel = uilabel(app.CNFControlPanel);
+            app.PixelSizeumpixelLabel.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelLabel.Position = [48 255 58 28];
+            app.PixelSizeumpixelLabel.Text = {'Pixel Size'; 'um/pixel'};
+
+            % Create PixelSizeumpixelEditField_2
+            app.PixelSizeumpixelEditField_2 = uieditfield(app.CNFControlPanel, 'numeric');
+            app.PixelSizeumpixelEditField_2.Position = [121 261 100 22];
+
+            % Create NucleiColorDropDownLabel
+            app.NucleiColorDropDownLabel = uilabel(app.CNFControlPanel);
+            app.NucleiColorDropDownLabel.HorizontalAlignment = 'right';
+            app.NucleiColorDropDownLabel.Position = [39 226 71 22];
+            app.NucleiColorDropDownLabel.Text = 'Nuclei Color';
+
+            % Create NucleiColorDropDown
+            app.NucleiColorDropDown = uidropdown(app.CNFControlPanel);
+            app.NucleiColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.NucleiColorDropDown.ItemsData = {'1', '2', '3'};
+            app.NucleiColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NucleiColorValueChanged, true);
+            app.NucleiColorDropDown.Position = [125 226 100 22];
+            app.NucleiColorDropDown.Value = '1';
+
+            % Create CalculateCentralNuclei
+            app.CalculateCentralNuclei = uibutton(app.CNFControlPanel, 'push');
+            app.CalculateCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @CalculateCentralNucleiPushed, true);
+            app.CalculateCentralNuclei.Position = [85 66 100 22];
+            app.CalculateCentralNuclei.Text = 'Calculate';
+
+            % Create CNFExcelWrite
+            app.CNFExcelWrite = uibutton(app.CNFControlPanel, 'push');
+            app.CNFExcelWrite.ButtonPushedFcn = createCallbackFcn(app, @CNFExcelWriteButtonPushed, true);
+            app.CNFExcelWrite.Position = [24 33 100 22];
+            app.CNFExcelWrite.Text = 'Write To Excel';
+
+            % Create DoneButton_CNF
+            app.DoneButton_CNF = uibutton(app.CNFControlPanel, 'push');
+            app.DoneButton_CNF.ButtonPushedFcn = createCallbackFcn(app, @DoneButton_CNFPushed, true);
+            app.DoneButton_CNF.Position = [142 33 100 22];
+            app.DoneButton_CNF.Text = 'Done';
+
+            % Create DistancefromborderEditFieldLabel
+            app.DistancefromborderEditFieldLabel = uilabel(app.CNFControlPanel);
+            app.DistancefromborderEditFieldLabel.HorizontalAlignment = 'right';
+            app.DistancefromborderEditFieldLabel.Position = [15 194 118 22];
+            app.DistancefromborderEditFieldLabel.Text = 'Distance from border';
+
+            % Create DistancefromborderEditField
+            app.DistancefromborderEditField = uieditfield(app.CNFControlPanel, 'numeric');
+            app.DistancefromborderEditField.Position = [148 194 100 22];
+
+            % Create MinimumNucleusSizeum2EditFieldLabel
+            app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CNFControlPanel);
+            app.MinimumNucleusSizeum2EditFieldLabel.HorizontalAlignment = 'right';
+            app.MinimumNucleusSizeum2EditFieldLabel.Position = [7 157 128 28];
+            app.MinimumNucleusSizeum2EditFieldLabel.Text = {'Minimum Nucleus Size'; '(um^2)'};
+
+            % Create MinimumNucleusSizeum2EditField
+            app.MinimumNucleusSizeum2EditField = uieditfield(app.CNFControlPanel, 'numeric');
+            app.MinimumNucleusSizeum2EditField.Position = [150 163 100 22];
+
+            % Create DataOutputFolderEditField_2Label
+            app.DataOutputFolderEditField_2Label = uilabel(app.CNFControlPanel);
+            app.DataOutputFolderEditField_2Label.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_2Label.Position = [16 128 108 22];
+            app.DataOutputFolderEditField_2Label.Text = 'Data Output Folder';
+
+            % Create CentralNucleiDataOutputFolder
+            app.CentralNucleiDataOutputFolder = uieditfield(app.CNFControlPanel, 'text');
+            app.CentralNucleiDataOutputFolder.Position = [139 128 109 22];
+
+            % Create FiberTypingControlPanel
+            app.FiberTypingControlPanel = uipanel(app.UIFigure);
+            app.FiberTypingControlPanel.Visible = 'off';
+            app.FiberTypingControlPanel.Position = [16 367 265 293];
+
+            % Create FiberTypingChannelColorBox
+            app.FiberTypingChannelColorBox = uiaxes(app.FiberTypingControlPanel);
+            app.FiberTypingChannelColorBox.XColor = [0.149 0.149 0.149];
+            app.FiberTypingChannelColorBox.XTick = [];
+            app.FiberTypingChannelColorBox.YTick = [];
+            app.FiberTypingChannelColorBox.Color = [0 1 1];
+            app.FiberTypingChannelColorBox.Box = 'on';
+            app.FiberTypingChannelColorBox.PickableParts = 'none';
+            app.FiberTypingChannelColorBox.Position = [229 193 30 30];
+
+            % Create PixelSizeumpixelEditField_3Label
+            app.PixelSizeumpixelEditField_3Label = uilabel(app.FiberTypingControlPanel);
+            app.PixelSizeumpixelEditField_3Label.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditField_3Label.Position = [45 236 58 28];
+            app.PixelSizeumpixelEditField_3Label.Text = {'Pixel Size'; '(um/pixel)'};
+
+            % Create PixelSizeFiberType
+            app.PixelSizeFiberType = uieditfield(app.FiberTypingControlPanel, 'numeric');
+            app.PixelSizeFiberType.Position = [118 242 100 22];
+
+            % Create DataOutputFolderEditField_3Label
+            app.DataOutputFolderEditField_3Label = uilabel(app.FiberTypingControlPanel);
+            app.DataOutputFolderEditField_3Label.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_3Label.Position = [19 144 108 22];
+            app.DataOutputFolderEditField_3Label.Text = 'Data Output Folder';
+
+            % Create FiberTypingDataOutputFolder
+            app.FiberTypingDataOutputFolder = uieditfield(app.FiberTypingControlPanel, 'text');
+            app.FiberTypingDataOutputFolder.Position = [142 144 100 22];
+
+            % Create FiberTypeColorDropDownLabel
+            app.FiberTypeColorDropDownLabel = uilabel(app.FiberTypingControlPanel);
+            app.FiberTypeColorDropDownLabel.HorizontalAlignment = 'right';
+            app.FiberTypeColorDropDownLabel.Position = [17 197 94 22];
+            app.FiberTypeColorDropDownLabel.Text = 'Fiber Type Color';
+
+            % Create FiberTypeColorDropDown
+            app.FiberTypeColorDropDown = uidropdown(app.FiberTypingControlPanel);
+            app.FiberTypeColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.FiberTypeColorDropDown.ItemsData = {'1', '2', '3'};
+            app.FiberTypeColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberTypeColorValueChanged, true);
+            app.FiberTypeColorDropDown.Position = [126 197 100 22];
+            app.FiberTypeColorDropDown.Value = '1';
+
+            % Create CalculateFiberTyping
+            app.CalculateFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
+            app.CalculateFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberTypingButtonPushed, true);
+            app.CalculateFiberTyping.Position = [80 90 100 22];
+            app.CalculateFiberTyping.Text = 'Calculate';
+
+            % Create WritetoExcelFT
+            app.WritetoExcelFT = uibutton(app.FiberTypingControlPanel, 'push');
+            app.WritetoExcelFT.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelFTButtonPushed, true);
+            app.WritetoExcelFT.Enable = 'off';
+            app.WritetoExcelFT.Position = [26 45 100 22];
+            app.WritetoExcelFT.Text = 'Write to Excel';
+
+            % Create DoneFT
+            app.DoneFT = uibutton(app.FiberTypingControlPanel, 'push');
+            app.DoneFT.ButtonPushedFcn = createCallbackFcn(app, @DoneFTButtonPushed, true);
+            app.DoneFT.Position = [145 45 100 22];
+            app.DoneFT.Text = 'Done';
+
+            % Create SegmentationParameters
+            app.SegmentationParameters = uipanel(app.UIFigure);
+            app.SegmentationParameters.Visible = 'off';
+            app.SegmentationParameters.Position = [18 406 286 245];
+
+            % Create FiberOutlineChannelColorBox
+            app.FiberOutlineChannelColorBox = uiaxes(app.SegmentationParameters);
+            app.FiberOutlineChannelColorBox.XColor = [0.149 0.149 0.149];
+            app.FiberOutlineChannelColorBox.XTick = [];
+            app.FiberOutlineChannelColorBox.YTick = [];
+            app.FiberOutlineChannelColorBox.Color = [0 1 1];
+            app.FiberOutlineChannelColorBox.Box = 'on';
+            app.FiberOutlineChannelColorBox.PickableParts = 'none';
+            app.FiberOutlineChannelColorBox.Position = [250 154 30 30];
+
+            % Create PixelSizeumpixelEditFieldLabel
+            app.PixelSizeumpixelEditFieldLabel = uilabel(app.SegmentationParameters);
+            app.PixelSizeumpixelEditFieldLabel.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditFieldLabel.Position = [16 200 114 22];
+            app.PixelSizeumpixelEditFieldLabel.Text = 'Pixel Size (um/pixel)';
+
+            % Create PixelSizeField
+            app.PixelSizeField = uieditfield(app.SegmentationParameters, 'numeric');
+            app.PixelSizeField.Position = [145 200 100 22];
+
+            % Create SegmentButton
+            app.SegmentButton = uibutton(app.SegmentationParameters, 'push');
+            app.SegmentButton.ButtonPushedFcn = createCallbackFcn(app, @SegmentButtonPushed, true);
+            app.SegmentButton.Position = [144 65 100 22];
+            app.SegmentButton.Text = 'Segment';
+
+            % Create FiberOutlineColorDropDownLabel
+            app.FiberOutlineColorDropDownLabel = uilabel(app.SegmentationParameters);
+            app.FiberOutlineColorDropDownLabel.HorizontalAlignment = 'right';
+            app.FiberOutlineColorDropDownLabel.Position = [24 158 106 22];
+            app.FiberOutlineColorDropDownLabel.Text = 'Fiber Outline Color';
+
+            % Create FiberOutlineColorDropDown
+            app.FiberOutlineColorDropDown = uidropdown(app.SegmentationParameters);
+            app.FiberOutlineColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.FiberOutlineColorDropDown.ItemsData = {'1', '2', '3'};
+            app.FiberOutlineColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberOutlineColorValueChanged, true);
+            app.FiberOutlineColorDropDown.Position = [145 158 100 22];
+            app.FiberOutlineColorDropDown.Value = '1';
+
+            % Create AcceptSegmentationButton
+            app.AcceptSegmentationButton = uibutton(app.SegmentationParameters, 'push');
+            app.AcceptSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptSegmentationButtonPushed, true);
+            app.AcceptSegmentationButton.Enable = 'off';
+            app.AcceptSegmentationButton.Position = [81 33 100 22];
+            app.AcceptSegmentationButton.Text = 'Accept';
+
+            % Create SegmentationThresholdSliderLabel
+            app.SegmentationThresholdSliderLabel = uilabel(app.SegmentationParameters);
+            app.SegmentationThresholdSliderLabel.HorizontalAlignment = 'center';
+            app.SegmentationThresholdSliderLabel.Position = [13 101 80 43];
+            app.SegmentationThresholdSliderLabel.Text = {'Segmentation'; 'Threshold'};
+
+            % Create SegmentationThresholdSlider
+            app.SegmentationThresholdSlider = uislider(app.SegmentationParameters);
+            app.SegmentationThresholdSlider.Limits = [0 50];
+            app.SegmentationThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SegmentationThresholdSliderValueChanged, true);
+            app.SegmentationThresholdSlider.Position = [101 128 139 3];
+
+            % Create DetectValueButton
+            app.DetectValueButton = uibutton(app.SegmentationParameters, 'push');
+            app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
+            app.DetectValueButton.Position = [24 65 100 22];
+            app.DetectValueButton.Text = 'Detect Value';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
