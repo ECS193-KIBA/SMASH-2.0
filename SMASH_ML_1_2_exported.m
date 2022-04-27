@@ -182,13 +182,23 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: SelectFileButton
         function SelectFileButtonPushed(app, event)
-            [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi'},'File Selector - dont select mask');
+            if ismac
+                [FileName,PathName,FilterIndex] = uigetfile({'*'},'File Selector - dont select mask');
+                
+            else
+                [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi';'*.lif'},'File Selector - dont select mask');
+                
+                
+            
+            end
             drawnow limitrate;
             figure(app.UIFigure)
+            
             if FilterIndex
                 if FileName == 0
                     return
                 end
+        
                 C = strsplit(FileName,'.');
                 ExtName = C(end);
                 FileNameS = (C(1:(end-1)));
@@ -196,7 +206,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 MaskName = strcat(FileNameS,'_mask.',ExtName);
                 MaskName = MaskName{1};
             end
-            
+  
             app.FilenameLabel.Text = FileNameS;
             app.Files{1} = FileName;
             app.Files{2} = MaskName;
@@ -251,6 +261,63 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 ImageData = imread(FileName);
                 app.orig_img = ImageData;
                 app.orig_img_multispectral = ImageData;
+
+                %H&E image 
+
+                %read image
+                HEImage = imread("example.jpg");
+                imshow(HEImage), title("H&E image");
+                text(size(HEImage,2),size(HEImage,1)+15, ...
+                "Image containing H&E", ...
+                "FontSize",7,"HorizontalAlignment","right");
+                
+                %use k-means clustering to segment image in RGB color space
+                numColors = 3;
+                L = imsegkmeans(HEImage, numColors); %returns a label corresponding to each cluster
+                B = labeloverlay(HEImage,L);
+                imshow(B)
+                title("RGB")
+
+                %convert rgb into L*a*b*
+                Lab_HEImage = rgb2lab(HEImage);
+
+                %use k-means clustering to classify in a*b* space
+                ab = Lab_HEImage(:,:,2:3);
+                ab = im2single(ab);
+                pixel_labels = imsegkmeans(ab,numColors, "NumAttempts",3)
+                B2 = labeloverlay(HEImage, pixel_labels);
+                imshow(B2)
+                title("Labeled Image a*b*")
+
+                %create images that segment H&E by color
+                mask1 = pixel_labels == 1;
+                cluster1 = HEImage.*uint8(mask1);
+                imshow(cluster1)
+                title("Objects in Cluster 1");
+
+               mask2 = pixel_labels == 2;
+               cluster2 = HEImage.*uint8(mask2);    
+               imshow(cluster2)
+               title("Objects in Cluster 2");
+             
+              mask3 = pixel_labels == 3;
+              cluster3 = HEImage.*uint8(mask3);
+              imshow(cluster3)
+              title("Objects in Cluster 3");
+
+              %segment Nuclei
+              L = Lab_HEImage(:,:,1);
+              L_blue = L.*double(mask3);
+              L_blue = rescale(L_blue);
+              idx_light_blue = imbinarize(nonzeros(L_blue));
+              blue_idx = find(mask3);
+              mask_dark_blue = mask3;
+              mask_dark_blue(blue_idx(idx_light_blue)) = 0;
+              blue_nuclei = HEImage.*uint8(mask_dark_blue);
+              imshow(blue_nuclei)
+              title("Blue Nuclei");
+                
+
             end
 
             imshow(app.orig_img,'Parent',app.UIAxes);
@@ -303,7 +370,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                    app.AcceptSegmentationButton.Enable = 'on';
                    
                    
-               end 
+               end
         end
 
         % Button pushed function: StartDrawingButton
