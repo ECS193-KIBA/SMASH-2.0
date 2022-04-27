@@ -193,7 +193,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             end
             drawnow limitrate;
             figure(app.UIFigure)
-            
+
             if FilterIndex
                 if FileName == 0
                     return
@@ -205,14 +205,47 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 FileNameS = FileNameS{1};
                 MaskName = strcat(FileNameS,'_mask.',ExtName);
                 MaskName = MaskName{1};
+                app.FilenameLabel.Text = FileNameS;
+                app.Files{1} = FileName;
+                app.Files{2} = MaskName;
+                app.Files{3} = PathName;
+                app.Files{4} = FileNameS;
+                cd(PathName)
+                a = '.tif';
+                b = '.tiff';
+                c = '.jpg';
+                d = '.png';
+                e = '.bmp';
+                f = '.czi';
+                g = '.lif';
+                if isequal(ExtName, a)
+                    fig = uifigure
+                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+                elseif isequal(ExtName, b)
+                    fig = uifigure 
+                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+                elseif isequal(ExtName, c)
+                    fig = uifigure 
+                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+                elseif isequal(ExtName, d)
+                    fig = uifigure 
+                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+                elseif isequal(ExtName, e)
+                    fig = uifigure 
+                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+                elseif isequal(ExtName, f)
+                    fig = uifigure 
+                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+                elseif isequal(ExtName, g)
+                    fig = uifigure 
+                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+                else
+                    fig = uifigure
+                    uialert(fig, 'Image Selection Unsuccessful. Upload an image with the following extensions:.tif, .tiff, .jpg, .png, .bmp, .czi, .lif','Upload Error')
+                    return
+                end   
             end
-  
-            app.FilenameLabel.Text = FileNameS;
-            app.Files{1} = FileName;
-            app.Files{2} = MaskName;
-            app.Files{3} = PathName;
-            app.Files{4} = FileNameS;
-            cd(PathName)
+ 
     
             % Change output directory to where image is located
             app.FiberPropertiesDataOutputFolder.Value = pwd;
