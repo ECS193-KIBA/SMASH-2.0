@@ -631,7 +631,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
            
             userStopped = false;
-            pointhandles = gobjects(); 
             
             while ~app.done && ~userStopped
                 app.Prompt.Text = 'Click on regions for removal, click esc to finish manual filtering.';
@@ -639,8 +638,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 
                 if ~isvalid(phand) || isempty(phand.Position)
                     userStopped = true;
-                else
-                    pointhandles(end+1) = phand; 
                 end
 
                 if ~app.done && ~userStopped
