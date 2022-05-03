@@ -786,8 +786,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             min_nuc_pix = app.MinimumNucleusSizeum2EditField.Value/(app.pix_size^2);
             border = app.DistancefromborderEditField.Value;
             border_pix = border/app.pix_size;
-            label_org = bwlabel(app.bw_obj,4);
-            num_fib = max(max(label_org));
+            label_org = bwconncomp(app.bw_obj,4);
+            num_fib = label_org.NumObjects;
             
             % Create border region
             inv_img = imcomplement(app.bw_obj);
@@ -1116,7 +1116,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 
             end
             
-            label = bwlabel(ch_bw,4);
+            label = bwconncomp(ch_bw,4);
             nfprops = regionprops(label,'Centroid','Area');
             area_nf = [nfprops.Area]'*app.pix_size^2;
             cents_nf = cat(1,nfprops.Centroid);
