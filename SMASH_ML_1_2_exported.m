@@ -116,6 +116,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
         FilenameLabel                   matlab.ui.control.Label
         SelectFileButton                matlab.ui.control.Button
+        Panel                           matlab.ui.container.Panel
         UIAxes                          matlab.ui.control.UIAxes
     end
 
@@ -1491,15 +1492,24 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIFigure.Position = [100 100 1199 779];
             app.UIFigure.Name = 'MATLAB App';
 
+            % Create Panel
+            app.Panel = uipanel(app.UIFigure);
+            app.Panel.ForegroundColor = [0.9412 0.9412 0.9412];
+            app.Panel.BorderType = 'none';
+            app.Panel.Position = [266 9 909 698];
+
             % Create UIAxes
-            app.UIAxes = uiaxes(app.UIFigure);
+            app.UIAxes = uiaxes(app.Panel);
             xlabel(app.UIAxes, 'X')
             ylabel(app.UIAxes, 'Y')
             app.UIAxes.XColor = 'none';
+            app.UIAxes.XTick = [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1];
+            app.UIAxes.XTickLabel = {'0'; '0.1'; '0.2'; '0.3'; '0.4'; '0.5'; '0.6'; '0.7'; '0.8'; '0.9'; '1'};
             app.UIAxes.YColor = 'none';
+            app.UIAxes.YTick = [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1];
             app.UIAxes.GridColor = 'none';
             app.UIAxes.MinorGridColor = 'none';
-            app.UIAxes.Position = [266 9 909 698];
+            app.UIAxes.Position = [2 23 909 698];
 
             % Create SelectFileButton
             app.SelectFileButton = uibutton(app.UIFigure, 'push');
