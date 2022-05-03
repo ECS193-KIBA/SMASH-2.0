@@ -116,7 +116,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
         FilenameLabel                   matlab.ui.control.Label
         SelectFileButton                matlab.ui.control.Button
-        Panel                           matlab.ui.container.Panel
+        UIAxesContainer                 matlab.ui.container.Panel
         UIAxes                          matlab.ui.control.UIAxes
     end
 
@@ -730,6 +730,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'on';
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
+            app.UIAxesContainer.Visible = 'on';
         end
 
         % Button pushed function: WritetoExcelButton
@@ -916,6 +917,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
+            app.UIAxesContainer.Visible = 'on';
         end
 
         % Button pushed function: CalculateFiberTyping
@@ -1066,6 +1068,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'on';
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
+            app.UIAxesContainer.Visible = 'on';
         end
 
         % Button pushed function: AdjustCNF
@@ -1187,7 +1190,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
             app.SelectFileButton.Enable = 'on';
-            
+            app.UIAxesContainer.Visible = 'on';
         end
 
         % Button pushed function: InitialSegmentationButton
@@ -1273,7 +1276,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PropertiesPanel.Visible = 'on';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             app.bw_obj = imclearborder(app.bw_obj,4);
-               
+            app.UIAxesContainer.Visible = 'off';
         end
 
         % Button pushed function: CentralNucleiButton
@@ -1294,6 +1297,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AcceptCNF.Enable = 'off';
             app.CNFExcelWrite.Enable = 'off';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+            app.UIAxesContainer.Visible = 'off';
         end
 
         % Button pushed function: FiberTypingButton
@@ -1313,6 +1317,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypeColorDropDown.Enable = 'on';
             app.WritetoExcelFT.Enable = 'off';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+            app.UIAxesContainer.Visible = 'off';
         end
 
         % Button pushed function: NonfiberObjectsButton
@@ -1332,6 +1337,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberAdjust.Enable = 'off';
             app.NonfiberAccept.Enable = 'off';
             app.WritetoExcelNonfiber.Enable = 'off';
+            app.UIAxesContainer.Visible = 'off';
         end
 
         % Button pushed function: DetectValueButton
@@ -1492,14 +1498,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIFigure.Position = [100 100 1199 779];
             app.UIFigure.Name = 'MATLAB App';
 
-            % Create Panel
-            app.Panel = uipanel(app.UIFigure);
-            app.Panel.ForegroundColor = [0.9412 0.9412 0.9412];
-            app.Panel.BorderType = 'none';
-            app.Panel.Position = [266 9 909 698];
+            % Create UIAxesContainer
+            app.UIAxesContainer = uipanel(app.UIFigure);
+            app.UIAxesContainer.ForegroundColor = [0.9412 0.9412 0.9412];
+            app.UIAxesContainer.BorderType = 'none';
+            app.UIAxesContainer.Position = [266 9 909 698];
 
             % Create UIAxes
-            app.UIAxes = uiaxes(app.Panel);
+            app.UIAxes = uiaxes(app.UIAxesContainer);
             xlabel(app.UIAxes, 'X')
             ylabel(app.UIAxes, 'Y')
             app.UIAxes.XColor = 'none';
