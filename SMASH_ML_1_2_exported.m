@@ -3,6 +3,18 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        NonfiberClassificationPanel     matlab.ui.container.Panel
+        NonfiberClassificationAxes_L    matlab.ui.control.UIAxes
+        NonfiberClassificationAxes_R    matlab.ui.control.UIAxes
+        NonfiberPanel                   matlab.ui.container.Panel
+        NonfiberThreshold               matlab.ui.control.NumericEditField
+        NonfiberAccept                  matlab.ui.control.Button
+        NonfiberAdjust                  matlab.ui.control.Button
+        ThresholdEditField_2Label_2     matlab.ui.control.Label
+        NonfiberAxes                    matlab.ui.control.UIAxes
+        PropertiesPanel                 matlab.ui.container.Panel
+        FiberSizeAxes                   matlab.ui.control.UIAxes
+        FeretAxes                       matlab.ui.control.UIAxes
         ManualSegmentationControls      matlab.ui.container.Panel
         FinishDrawingButton             matlab.ui.control.Button
         StartMergingButton              matlab.ui.control.Button
@@ -11,6 +23,28 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         CloseManualSegmentationButton   matlab.ui.control.Button
         AcceptLineButton                matlab.ui.control.Button
         StartDrawingButton              matlab.ui.control.Button
+        FiberTypingControlPanel         matlab.ui.container.Panel
+        DoneFT                          matlab.ui.control.Button
+        WritetoExcelFT                  matlab.ui.control.Button
+        CalculateFiberTyping            matlab.ui.control.Button
+        FiberTypeColorDropDown          matlab.ui.control.DropDown
+        FiberTypeColorDropDownLabel     matlab.ui.control.Label
+        FiberTypingDataOutputFolder     matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label  matlab.ui.control.Label
+        PixelSizeFiberType              matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
+        NonfiberClassificationControlPanel  matlab.ui.container.Panel
+        NonfiberClassificationAccept    matlab.ui.control.Button
+        NonfiberClassificationAdjust    matlab.ui.control.Button
+        NonfiberClassificationThreshold  matlab.ui.control.NumericEditField
+        ThresholdEditField_2Label_3     matlab.ui.control.Label
+        NonfiberClassificationDone      matlab.ui.control.Button
+        NonfiberClassificationWritetoExcel  matlab.ui.control.Button
+        ClassifyNonfiberObjects         matlab.ui.control.Button
+        NonfiberObjectsClassificationDataOutputFolder  matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label_3  matlab.ui.control.Label
+        NonfiberObjectClassificationColorDropDown  matlab.ui.control.DropDown
+        ClassificationColorChannelLabel  matlab.ui.control.Label
         Toolbar                         matlab.ui.container.Panel
         NonfiberObjectsButton           matlab.ui.control.Button
         FiberTypingButton               matlab.ui.control.Button
@@ -20,22 +54,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         FiberPredictionButton           matlab.ui.control.Button
         ManualSegmentationButton        matlab.ui.control.Button
         InitialSegmentationButton       matlab.ui.control.Button
-        NonfiberControlPanel            matlab.ui.container.Panel
-        PixelSizeNonfiber               matlab.ui.control.NumericEditField
-        PixelSizeumpixelLabel_2         matlab.ui.control.Label
-        DoneNonfiber                    matlab.ui.control.Button
-        WritetoExcelNonfiber            matlab.ui.control.Button
-        CalculateNonfiberObjects        matlab.ui.control.Button
-        NonfiberObjectsDataOutputFolder  matlab.ui.control.EditField
-        DataOutputFolderEditField_3Label_2  matlab.ui.control.Label
-        NonfiberObjectColor             matlab.ui.control.DropDown
-        ObjectColorDropDownLabel        matlab.ui.control.Label
-        NonfiberPanel                   matlab.ui.container.Panel
-        NonfiberAccept                  matlab.ui.control.Button
-        NonfiberAdjust                  matlab.ui.control.Button
-        NonfiberThreshold               matlab.ui.control.NumericEditField
-        ThresholdEditField_2Label_2     matlab.ui.control.Label
-        NonfiberAxes                    matlab.ui.control.UIAxes
         CNFPanel                        matlab.ui.container.Panel
         AcceptCNF                       matlab.ui.control.Button
         AdjustCNF                       matlab.ui.control.Button
@@ -51,16 +69,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         FThistL                         matlab.ui.control.UIAxes
         FTAxesR                         matlab.ui.control.UIAxes
         FTAxesL                         matlab.ui.control.UIAxes
-        FiberTypingControlPanel         matlab.ui.container.Panel
-        DoneFT                          matlab.ui.control.Button
-        WritetoExcelFT                  matlab.ui.control.Button
-        CalculateFiberTyping            matlab.ui.control.Button
-        FiberTypeColorDropDown          matlab.ui.control.DropDown
-        FiberTypeColorDropDownLabel     matlab.ui.control.Label
-        FiberTypingDataOutputFolder     matlab.ui.control.EditField
-        DataOutputFolderEditField_3Label  matlab.ui.control.Label
-        PixelSizeFiberType              matlab.ui.control.NumericEditField
-        PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
         CNFControlPanel                 matlab.ui.container.Panel
         CentralNucleiDataOutputFolder   matlab.ui.control.EditField
         DataOutputFolderEditField_2Label  matlab.ui.control.Label
@@ -88,9 +96,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         DataOutputFolderEditFieldLabel  matlab.ui.control.Label
         DoneButton                      matlab.ui.control.Button
         WritetoExcelButton              matlab.ui.control.Button
-        PropertiesPanel                 matlab.ui.container.Panel
-        FiberSizeAxes                   matlab.ui.control.UIAxes
-        FeretAxes                       matlab.ui.control.UIAxes
         ManualFilterControls            matlab.ui.container.Panel
         FinishManualFilteringButton     matlab.ui.control.Button
         RemoveObjectsButton             matlab.ui.control.Button
@@ -105,8 +110,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         Image                           matlab.ui.control.Image
         Prompt                          matlab.ui.control.Label
         SegmentationParameters          matlab.ui.container.Panel
-        DetectValueButton               matlab.ui.control.Button
         SegmentationThresholdSlider     matlab.ui.control.Slider
+        DetectValueButton               matlab.ui.control.Button
         SegmentationThresholdSliderLabel  matlab.ui.control.Label
         AcceptSegmentationButton        matlab.ui.control.Button
         FiberOutlineColorDropDown       matlab.ui.control.DropDown
@@ -116,6 +121,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
         FilenameLabel                   matlab.ui.control.Label
         SelectFileButton                matlab.ui.control.Button
+        NonfiberControlPanel            matlab.ui.container.Panel
+        PixelSizeNonfiber               matlab.ui.control.NumericEditField
+        PixelSizeumpixelLabel_2         matlab.ui.control.Label
+        DoneNonfiber                    matlab.ui.control.Button
+        WritetoExcelNonfiber            matlab.ui.control.Button
+        CalculateNonfiberObjects        matlab.ui.control.Button
+        NonfiberObjectsDataOutputFolder  matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label_2  matlab.ui.control.Label
+        NonfiberObjectColor             matlab.ui.control.DropDown
+        ObjectColorDropDownLabel        matlab.ui.control.Label
         UIAxes                          matlab.ui.control.UIAxes
     end
 
@@ -148,6 +163,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         thresh_nf
         num_nf
         nf_data
+        nf_mask
+        nf_bw_obj
         segmodel
     end
     
@@ -260,6 +277,37 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % A neighbor is acceptable as long as it's either a non-object (0) or one of two objects being merge.
             acceptable_labels = [0 first_region_to_merge second_region_to_merge];
             results = all(ismember(point_neighbor_labels, acceptable_labels));
+        end
+        
+        function [cutoff_avg, mean_intensity, areas] = ClassifyObjects(app, regions_mask, channel_name)
+            % Labelled objects -> app.nf_mask
+            num = max(max(regions_mask));
+            disp(num);
+
+            % Threshold Objects
+            fti = app.orig_img_multispectral(:,:,str2double(channel_name));
+            threshes = multithresh(fti,10);
+            cutoff_avg = threshes(2);
+            app.NonfiberClassificationThreshold.Enable = 'on';
+            app.NonfiberClassificationThreshold.Value = double(cutoff_avg);
+            
+            % Fiber Properties
+            rprop = regionprops(regions_mask,fti,'MeanIntensity','Centroid','Area','PixelIdxList');
+            mean_intensity = [rprop.MeanIntensity];
+            areas = [rprop.Area];
+            
+            % Determine which regions are above threshold
+            app.ponf = false(num,1); % logical zeros array of size num
+            app.ponf(mean_intensity > cutoff_avg) = 1;
+            img_out = single(app.nf_bw_obj).* 0.3;
+            p_ind = find(app.ponf);
+            for i = 1:length(p_ind)
+                img_out(regions_mask == p_ind(i)) = 1;
+            end
+
+            % Display image
+            imshow(app.orig_img,'Parent',app.NonfiberClassificationAxes_L);
+            imshow(img_out,'Parent',app.NonfiberClassificationAxes_R);
         end
     end
 
@@ -885,7 +933,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             header{10,2} = 'Fiber Blue Center';
             header{10,3} = 'Fiber Positive CNF';
             
-            data = zeros(app.num_obj,3);
             farea = [app.fprop.Area]';
             farea = farea.*(app.pix_size^2);
             data = cat(2,farea,app.cen_pix.*app.pix_size^2,app.cen_nuc) ;
@@ -937,7 +984,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             rprop = regionprops(label,fti,'MeanIntensity','Centroid','Area','PixelIdxList');
             app.ave_g = [rprop.MeanIntensity];
             app.areas = [rprop.Area];
-            cents = cat(1,rprop.Centroid);
             
             app.ThresholdEditField.Enable = 'on';
             app.ThresholdEditFieldLabel.Enable = 'on';
@@ -1116,7 +1162,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 
             end
             
+            app.nf_bw_obj = ch_bw;
             label = bwlabel(ch_bw,4);
+            app.nf_mask = label;
             nfprops = regionprops(label,'Centroid','Area');
             area_nf = [nfprops.Area]'*app.pix_size^2;
             cents_nf = cat(1,nfprops.Centroid);
@@ -1127,7 +1175,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: NonfiberAdjust
         function NonfiberAdjustButtonPushed(app, event)
-            app.Obj_Adj = 1;
+            app.Obj_Adj = 1; 
             uiresume(app.UIFigure);
         end
 
@@ -1174,6 +1222,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = '';
             app.NonfiberPanel.Visible = 'off';
             app.NonfiberControlPanel.Visible = 'off';
+            app.NonfiberClassificationPanel.Visible = 'on';
             app.InitialSegmentationButton.Enable = 'on';
             app.ManualSegmentationButton.Enable = 'on';
             app.FiberPredictionButton.Enable = 'on';
@@ -1324,6 +1373,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberPropertiesButton.Enable = 'off';
             app.NonfiberPanel.Visible = 'on';
             app.NonfiberControlPanel.Visible = 'on';
+            app.NonfiberClassificationControlPanel.Visible = 'on';
             app.NonfiberThreshold.Enable = 'off';
             app.NonfiberAdjust.Enable = 'off';
             app.NonfiberAccept.Enable = 'off';
@@ -1475,6 +1525,49 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CloseManualSegmentationButton.Enable = 'on';
             app.Prompt.Text = '';
         end
+
+        % Button pushed function: ClassifyNonfiberObjects
+        function ClassifyNonfiberObjectsButtonPushed(app, event)
+            ClassifyObjects(app, app.nf_mask, app.NonfiberObjectClassificationColorDropDown.Value);
+        end
+
+        % Button pushed function: NonfiberClassificationAdjust
+        function NonfiberClassificationAdjustButtonPushed(app, event)
+            uiresume(app.UIFigure);
+        end
+
+        % Button pushed function: NonfiberClassificationAccept
+        function NonfiberClassificationAcceptButtonPushed(app, event)
+            app.NonfiberClassificationThreshold.Enable = 'off';
+            app.NonfiberClassificationAccept.Enable = 'off';
+            app.NonfiberClassificationAdjust.Enable = 'off';
+            app.ClassifyNonfiberObjects.Enable = 'on';
+            app.NonfiberClassificationWritetoExcel.Enable = 'on';
+            app.NonfiberClassificationDone.Enable = 'on';
+            uiresume(app.UIFigure);
+        end
+
+        % Button pushed function: NonfiberClassificationDone
+        function NonfiberClassificationDoneButtonPushed(app, event)
+            app.nf_mask = 0;
+            app.Prompt.Text = '';
+            app.NonfiberPanel.Visible = 'off';
+            app.NonfiberClassificationControlPanel.Visible = 'off';
+            app.InitialSegmentationButton.Enable = 'on';
+            app.ManualSegmentationButton.Enable = 'on';
+            app.FiberPredictionButton.Enable = 'on';
+            app.ManualFiberFilterButton.Enable = 'on';
+            app.FiberPropertiesButton.Enable = 'on';
+            app.CentralNucleiButton.Enable = 'on';
+            app.FiberTypingButton.Enable = 'on';
+            app.NonfiberObjectsButton.Enable = 'on';
+            app.SelectFileButton.Enable = 'on';
+        end
+
+        % Button pushed function: NonfiberClassificationWritetoExcel
+        function NonfiberClassificationWritetoExcelButtonPushed(app, event)
+            
+        end
     end
 
     % Component initialization
@@ -1497,6 +1590,62 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIAxes.GridColor = 'none';
             app.UIAxes.MinorGridColor = 'none';
             app.UIAxes.Position = [266 9 909 698];
+
+            % Create NonfiberControlPanel
+            app.NonfiberControlPanel = uipanel(app.UIFigure);
+            app.NonfiberControlPanel.Visible = 'off';
+            app.NonfiberControlPanel.Position = [20 359 252 301];
+
+            % Create ObjectColorDropDownLabel
+            app.ObjectColorDropDownLabel = uilabel(app.NonfiberControlPanel);
+            app.ObjectColorDropDownLabel.HorizontalAlignment = 'right';
+            app.ObjectColorDropDownLabel.Position = [38 197 72 22];
+            app.ObjectColorDropDownLabel.Text = 'Object Color';
+
+            % Create NonfiberObjectColor
+            app.NonfiberObjectColor = uidropdown(app.NonfiberControlPanel);
+            app.NonfiberObjectColor.Items = {'Red', 'Green', 'Blue'};
+            app.NonfiberObjectColor.ItemsData = {'1', '2', '3'};
+            app.NonfiberObjectColor.Position = [125 197 100 22];
+            app.NonfiberObjectColor.Value = '1';
+
+            % Create DataOutputFolderEditField_3Label_2
+            app.DataOutputFolderEditField_3Label_2 = uilabel(app.NonfiberControlPanel);
+            app.DataOutputFolderEditField_3Label_2.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_3Label_2.Position = [5 139 108 22];
+            app.DataOutputFolderEditField_3Label_2.Text = 'Data Output Folder';
+
+            % Create NonfiberObjectsDataOutputFolder
+            app.NonfiberObjectsDataOutputFolder = uieditfield(app.NonfiberControlPanel, 'text');
+            app.NonfiberObjectsDataOutputFolder.Position = [128 139 100 22];
+
+            % Create CalculateNonfiberObjects
+            app.CalculateNonfiberObjects = uibutton(app.NonfiberControlPanel, 'push');
+            app.CalculateNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @CalculateNonfiberObjectsButtonPushed, true);
+            app.CalculateNonfiberObjects.Position = [82 69 100 22];
+            app.CalculateNonfiberObjects.Text = 'Calculate';
+
+            % Create WritetoExcelNonfiber
+            app.WritetoExcelNonfiber = uibutton(app.NonfiberControlPanel, 'push');
+            app.WritetoExcelNonfiber.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelNonfiberButtonPushed, true);
+            app.WritetoExcelNonfiber.Position = [20 26 100 22];
+            app.WritetoExcelNonfiber.Text = 'Write to Excel';
+
+            % Create DoneNonfiber
+            app.DoneNonfiber = uibutton(app.NonfiberControlPanel, 'push');
+            app.DoneNonfiber.ButtonPushedFcn = createCallbackFcn(app, @DoneNonfiberButtonPushed, true);
+            app.DoneNonfiber.Position = [144 27 100 22];
+            app.DoneNonfiber.Text = 'Done';
+
+            % Create PixelSizeumpixelLabel_2
+            app.PixelSizeumpixelLabel_2 = uilabel(app.NonfiberControlPanel);
+            app.PixelSizeumpixelLabel_2.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelLabel_2.Position = [52 247 58 28];
+            app.PixelSizeumpixelLabel_2.Text = {'Pixel Size'; '(um/pixel)'};
+
+            % Create PixelSizeNonfiber
+            app.PixelSizeNonfiber = uieditfield(app.NonfiberControlPanel, 'numeric');
+            app.PixelSizeNonfiber.Position = [125 253 100 22];
 
             % Create SelectFileButton
             app.SelectFileButton = uibutton(app.UIFigure, 'push');
@@ -1556,17 +1705,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SegmentationThresholdSliderLabel.Position = [13 101 80 43];
             app.SegmentationThresholdSliderLabel.Text = {'Segmentation'; 'Threshold'};
 
-            % Create SegmentationThresholdSlider
-            app.SegmentationThresholdSlider = uislider(app.SegmentationParameters);
-            app.SegmentationThresholdSlider.Limits = [0 50];
-            app.SegmentationThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SegmentationThresholdSliderValueChanged, true);
-            app.SegmentationThresholdSlider.Position = [101 128 139 3];
-
             % Create DetectValueButton
             app.DetectValueButton = uibutton(app.SegmentationParameters, 'push');
             app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
             app.DetectValueButton.Position = [24 65 100 22];
             app.DetectValueButton.Text = 'Detect Value';
+
+            % Create SegmentationThresholdSlider
+            app.SegmentationThresholdSlider = uislider(app.SegmentationParameters);
+            app.SegmentationThresholdSlider.Limits = [0 50];
+            app.SegmentationThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SegmentationThresholdSliderValueChanged, true);
+            app.SegmentationThresholdSlider.Position = [101 128 139 3];
 
             % Create Prompt
             app.Prompt = uilabel(app.UIFigure);
@@ -1653,23 +1802,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FinishManualFilteringButton.Enable = 'off';
             app.FinishManualFilteringButton.Position = [58 28 136 22];
             app.FinishManualFilteringButton.Text = 'Finish Manual Filtering';
-
-            % Create PropertiesPanel
-            app.PropertiesPanel = uipanel(app.UIFigure);
-            app.PropertiesPanel.Visible = 'off';
-            app.PropertiesPanel.Position = [285 24 890 679];
-
-            % Create FeretAxes
-            app.FeretAxes = uiaxes(app.PropertiesPanel);
-            title(app.FeretAxes, 'Minimum Feret Diameter (um)')
-            app.FeretAxes.PlotBoxAspectRatio = [3.2695652173913 1 1];
-            app.FeretAxes.Position = [53 365 799 285];
-
-            % Create FiberSizeAxes
-            app.FiberSizeAxes = uiaxes(app.PropertiesPanel);
-            title(app.FiberSizeAxes, 'Fiber Area (um^2)')
-            app.FiberSizeAxes.PlotBoxAspectRatio = [3.29824561403509 1 1];
-            app.FiberSizeAxes.Position = [53 67 799 285];
 
             % Create PropertiesControlPanel
             app.PropertiesControlPanel = uipanel(app.UIFigure);
@@ -1823,63 +1955,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiDataOutputFolder = uieditfield(app.CNFControlPanel, 'text');
             app.CentralNucleiDataOutputFolder.Position = [139 128 109 22];
 
-            % Create FiberTypingControlPanel
-            app.FiberTypingControlPanel = uipanel(app.UIFigure);
-            app.FiberTypingControlPanel.Visible = 'off';
-            app.FiberTypingControlPanel.Position = [16 367 256 293];
-
-            % Create PixelSizeumpixelEditField_3Label
-            app.PixelSizeumpixelEditField_3Label = uilabel(app.FiberTypingControlPanel);
-            app.PixelSizeumpixelEditField_3Label.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditField_3Label.Position = [45 236 58 28];
-            app.PixelSizeumpixelEditField_3Label.Text = {'Pixel Size'; '(um/pixel)'};
-
-            % Create PixelSizeFiberType
-            app.PixelSizeFiberType = uieditfield(app.FiberTypingControlPanel, 'numeric');
-            app.PixelSizeFiberType.Position = [118 242 100 22];
-
-            % Create DataOutputFolderEditField_3Label
-            app.DataOutputFolderEditField_3Label = uilabel(app.FiberTypingControlPanel);
-            app.DataOutputFolderEditField_3Label.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_3Label.Position = [19 144 108 22];
-            app.DataOutputFolderEditField_3Label.Text = 'Data Output Folder';
-
-            % Create FiberTypingDataOutputFolder
-            app.FiberTypingDataOutputFolder = uieditfield(app.FiberTypingControlPanel, 'text');
-            app.FiberTypingDataOutputFolder.Position = [142 144 100 22];
-
-            % Create FiberTypeColorDropDownLabel
-            app.FiberTypeColorDropDownLabel = uilabel(app.FiberTypingControlPanel);
-            app.FiberTypeColorDropDownLabel.HorizontalAlignment = 'right';
-            app.FiberTypeColorDropDownLabel.Position = [17 197 94 22];
-            app.FiberTypeColorDropDownLabel.Text = 'Fiber Type Color';
-
-            % Create FiberTypeColorDropDown
-            app.FiberTypeColorDropDown = uidropdown(app.FiberTypingControlPanel);
-            app.FiberTypeColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.FiberTypeColorDropDown.ItemsData = {'1', '2', '3'};
-            app.FiberTypeColorDropDown.Position = [126 197 100 22];
-            app.FiberTypeColorDropDown.Value = '1';
-
-            % Create CalculateFiberTyping
-            app.CalculateFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
-            app.CalculateFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberTypingButtonPushed, true);
-            app.CalculateFiberTyping.Position = [80 90 100 22];
-            app.CalculateFiberTyping.Text = 'Calculate';
-
-            % Create WritetoExcelFT
-            app.WritetoExcelFT = uibutton(app.FiberTypingControlPanel, 'push');
-            app.WritetoExcelFT.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelFTButtonPushed, true);
-            app.WritetoExcelFT.Enable = 'off';
-            app.WritetoExcelFT.Position = [26 45 100 22];
-            app.WritetoExcelFT.Text = 'Write to Excel';
-
-            % Create DoneFT
-            app.DoneFT = uibutton(app.FiberTypingControlPanel, 'push');
-            app.DoneFT.ButtonPushedFcn = createCallbackFcn(app, @DoneFTButtonPushed, true);
-            app.DoneFT.Position = [145 45 100 22];
-            app.DoneFT.Text = 'Done';
-
             % Create FiberTypingPanel
             app.FiberTypingPanel = uipanel(app.UIFigure);
             app.FiberTypingPanel.Visible = 'off';
@@ -1969,98 +2044,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AcceptCNF.Position = [477 67 100 22];
             app.AcceptCNF.Text = 'Accept';
 
-            % Create NonfiberPanel
-            app.NonfiberPanel = uipanel(app.UIFigure);
-            app.NonfiberPanel.Visible = 'off';
-            app.NonfiberPanel.Position = [281 24 886 679];
-
-            % Create NonfiberAxes
-            app.NonfiberAxes = uiaxes(app.NonfiberPanel);
-            xlabel(app.NonfiberAxes, 'X')
-            ylabel(app.NonfiberAxes, 'Y')
-            app.NonfiberAxes.PlotBoxAspectRatio = [1.35976789168279 1 1];
-            app.NonfiberAxes.XColor = 'none';
-            app.NonfiberAxes.YColor = 'none';
-            app.NonfiberAxes.Position = [22 117 844 553];
-
-            % Create ThresholdEditField_2Label_2
-            app.ThresholdEditField_2Label_2 = uilabel(app.NonfiberPanel);
-            app.ThresholdEditField_2Label_2.HorizontalAlignment = 'right';
-            app.ThresholdEditField_2Label_2.Position = [116 84 59 22];
-            app.ThresholdEditField_2Label_2.Text = 'Threshold';
-
-            % Create NonfiberThreshold
-            app.NonfiberThreshold = uieditfield(app.NonfiberPanel, 'numeric');
-            app.NonfiberThreshold.Position = [190 84 100 22];
-
-            % Create NonfiberAdjust
-            app.NonfiberAdjust = uibutton(app.NonfiberPanel, 'push');
-            app.NonfiberAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAdjustButtonPushed, true);
-            app.NonfiberAdjust.Position = [333 85 100 22];
-            app.NonfiberAdjust.Text = 'Adjust';
-
-            % Create NonfiberAccept
-            app.NonfiberAccept = uibutton(app.NonfiberPanel, 'push');
-            app.NonfiberAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAcceptButtonPushed, true);
-            app.NonfiberAccept.Position = [467 84 100 22];
-            app.NonfiberAccept.Text = 'Accept';
-
-            % Create NonfiberControlPanel
-            app.NonfiberControlPanel = uipanel(app.UIFigure);
-            app.NonfiberControlPanel.Visible = 'off';
-            app.NonfiberControlPanel.Position = [20 359 252 301];
-
-            % Create ObjectColorDropDownLabel
-            app.ObjectColorDropDownLabel = uilabel(app.NonfiberControlPanel);
-            app.ObjectColorDropDownLabel.HorizontalAlignment = 'right';
-            app.ObjectColorDropDownLabel.Position = [38 197 72 22];
-            app.ObjectColorDropDownLabel.Text = 'Object Color';
-
-            % Create NonfiberObjectColor
-            app.NonfiberObjectColor = uidropdown(app.NonfiberControlPanel);
-            app.NonfiberObjectColor.Items = {'Red', 'Green', 'Blue'};
-            app.NonfiberObjectColor.ItemsData = {'1', '2', '3'};
-            app.NonfiberObjectColor.Position = [125 197 100 22];
-            app.NonfiberObjectColor.Value = '1';
-
-            % Create DataOutputFolderEditField_3Label_2
-            app.DataOutputFolderEditField_3Label_2 = uilabel(app.NonfiberControlPanel);
-            app.DataOutputFolderEditField_3Label_2.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_3Label_2.Position = [5 139 108 22];
-            app.DataOutputFolderEditField_3Label_2.Text = 'Data Output Folder';
-
-            % Create NonfiberObjectsDataOutputFolder
-            app.NonfiberObjectsDataOutputFolder = uieditfield(app.NonfiberControlPanel, 'text');
-            app.NonfiberObjectsDataOutputFolder.Position = [128 139 100 22];
-
-            % Create CalculateNonfiberObjects
-            app.CalculateNonfiberObjects = uibutton(app.NonfiberControlPanel, 'push');
-            app.CalculateNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @CalculateNonfiberObjectsButtonPushed, true);
-            app.CalculateNonfiberObjects.Position = [82 69 100 22];
-            app.CalculateNonfiberObjects.Text = 'Calculate';
-
-            % Create WritetoExcelNonfiber
-            app.WritetoExcelNonfiber = uibutton(app.NonfiberControlPanel, 'push');
-            app.WritetoExcelNonfiber.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelNonfiberButtonPushed, true);
-            app.WritetoExcelNonfiber.Position = [20 26 100 22];
-            app.WritetoExcelNonfiber.Text = 'Write to Excel';
-
-            % Create DoneNonfiber
-            app.DoneNonfiber = uibutton(app.NonfiberControlPanel, 'push');
-            app.DoneNonfiber.ButtonPushedFcn = createCallbackFcn(app, @DoneNonfiberButtonPushed, true);
-            app.DoneNonfiber.Position = [144 27 100 22];
-            app.DoneNonfiber.Text = 'Done';
-
-            % Create PixelSizeumpixelLabel_2
-            app.PixelSizeumpixelLabel_2 = uilabel(app.NonfiberControlPanel);
-            app.PixelSizeumpixelLabel_2.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelLabel_2.Position = [52 247 58 28];
-            app.PixelSizeumpixelLabel_2.Text = {'Pixel Size'; '(um/pixel)'};
-
-            % Create PixelSizeNonfiber
-            app.PixelSizeNonfiber = uieditfield(app.NonfiberControlPanel, 'numeric');
-            app.PixelSizeNonfiber.Position = [125 253 100 22];
-
             % Create Toolbar
             app.Toolbar = uipanel(app.UIFigure);
             app.Toolbar.Position = [144 727 937 41];
@@ -2121,6 +2104,135 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Position = [823.5 9 105 22];
             app.NonfiberObjectsButton.Text = 'Nonfiber Objects';
 
+            % Create NonfiberClassificationControlPanel
+            app.NonfiberClassificationControlPanel = uipanel(app.UIFigure);
+            app.NonfiberClassificationControlPanel.TitlePosition = 'centertop';
+            app.NonfiberClassificationControlPanel.Title = 'Non-fiber Object Classification';
+            app.NonfiberClassificationControlPanel.Visible = 'off';
+            app.NonfiberClassificationControlPanel.FontWeight = 'bold';
+            app.NonfiberClassificationControlPanel.Position = [23 32 252 301];
+
+            % Create ClassificationColorChannelLabel
+            app.ClassificationColorChannelLabel = uilabel(app.NonfiberClassificationControlPanel);
+            app.ClassificationColorChannelLabel.HorizontalAlignment = 'right';
+            app.ClassificationColorChannelLabel.Position = [12 246 109 22];
+            app.ClassificationColorChannelLabel.Text = 'Classification Color';
+
+            % Create NonfiberObjectClassificationColorDropDown
+            app.NonfiberObjectClassificationColorDropDown = uidropdown(app.NonfiberClassificationControlPanel);
+            app.NonfiberObjectClassificationColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.NonfiberObjectClassificationColorDropDown.ItemsData = {'1', '2', '3'};
+            app.NonfiberObjectClassificationColorDropDown.Tag = 'NonfiberClassificationDropDown';
+            app.NonfiberObjectClassificationColorDropDown.Position = [136 246 100 22];
+            app.NonfiberObjectClassificationColorDropDown.Value = '1';
+
+            % Create DataOutputFolderEditField_3Label_3
+            app.DataOutputFolderEditField_3Label_3 = uilabel(app.NonfiberClassificationControlPanel);
+            app.DataOutputFolderEditField_3Label_3.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_3Label_3.Position = [17 121 108 22];
+            app.DataOutputFolderEditField_3Label_3.Text = 'Data Output Folder';
+
+            % Create NonfiberObjectsClassificationDataOutputFolder
+            app.NonfiberObjectsClassificationDataOutputFolder = uieditfield(app.NonfiberClassificationControlPanel, 'text');
+            app.NonfiberObjectsClassificationDataOutputFolder.Position = [140 121 100 22];
+
+            % Create ClassifyNonfiberObjects
+            app.ClassifyNonfiberObjects = uibutton(app.NonfiberClassificationControlPanel, 'push');
+            app.ClassifyNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @ClassifyNonfiberObjectsButtonPushed, true);
+            app.ClassifyNonfiberObjects.Position = [78 88 100 22];
+            app.ClassifyNonfiberObjects.Text = 'Calculate';
+
+            % Create NonfiberClassificationWritetoExcel
+            app.NonfiberClassificationWritetoExcel = uibutton(app.NonfiberClassificationControlPanel, 'push');
+            app.NonfiberClassificationWritetoExcel.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationWritetoExcelButtonPushed, true);
+            app.NonfiberClassificationWritetoExcel.Position = [17 37 100 22];
+            app.NonfiberClassificationWritetoExcel.Text = 'Write to Excel';
+
+            % Create NonfiberClassificationDone
+            app.NonfiberClassificationDone = uibutton(app.NonfiberClassificationControlPanel, 'push');
+            app.NonfiberClassificationDone.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationDoneButtonPushed, true);
+            app.NonfiberClassificationDone.Position = [141 38 100 22];
+            app.NonfiberClassificationDone.Text = 'Done';
+
+            % Create ThresholdEditField_2Label_3
+            app.ThresholdEditField_2Label_3 = uilabel(app.NonfiberClassificationControlPanel);
+            app.ThresholdEditField_2Label_3.HorizontalAlignment = 'right';
+            app.ThresholdEditField_2Label_3.Position = [17 211 59 22];
+            app.ThresholdEditField_2Label_3.Text = 'Threshold';
+
+            % Create NonfiberClassificationThreshold
+            app.NonfiberClassificationThreshold = uieditfield(app.NonfiberClassificationControlPanel, 'numeric');
+            app.NonfiberClassificationThreshold.Position = [91 211 100 22];
+
+            % Create NonfiberClassificationAdjust
+            app.NonfiberClassificationAdjust = uibutton(app.NonfiberClassificationControlPanel, 'push');
+            app.NonfiberClassificationAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAdjustButtonPushed, true);
+            app.NonfiberClassificationAdjust.Position = [13 180 100 22];
+            app.NonfiberClassificationAdjust.Text = 'Adjust';
+
+            % Create NonfiberClassificationAccept
+            app.NonfiberClassificationAccept = uibutton(app.NonfiberClassificationControlPanel, 'push');
+            app.NonfiberClassificationAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAcceptButtonPushed, true);
+            app.NonfiberClassificationAccept.Position = [136 180 100 22];
+            app.NonfiberClassificationAccept.Text = 'Accept';
+
+            % Create FiberTypingControlPanel
+            app.FiberTypingControlPanel = uipanel(app.UIFigure);
+            app.FiberTypingControlPanel.Visible = 'off';
+            app.FiberTypingControlPanel.Position = [26 360 256 293];
+
+            % Create PixelSizeumpixelEditField_3Label
+            app.PixelSizeumpixelEditField_3Label = uilabel(app.FiberTypingControlPanel);
+            app.PixelSizeumpixelEditField_3Label.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditField_3Label.Position = [45 236 58 28];
+            app.PixelSizeumpixelEditField_3Label.Text = {'Pixel Size'; '(um/pixel)'};
+
+            % Create PixelSizeFiberType
+            app.PixelSizeFiberType = uieditfield(app.FiberTypingControlPanel, 'numeric');
+            app.PixelSizeFiberType.Position = [118 242 100 22];
+
+            % Create DataOutputFolderEditField_3Label
+            app.DataOutputFolderEditField_3Label = uilabel(app.FiberTypingControlPanel);
+            app.DataOutputFolderEditField_3Label.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_3Label.Position = [19 144 108 22];
+            app.DataOutputFolderEditField_3Label.Text = 'Data Output Folder';
+
+            % Create FiberTypingDataOutputFolder
+            app.FiberTypingDataOutputFolder = uieditfield(app.FiberTypingControlPanel, 'text');
+            app.FiberTypingDataOutputFolder.Position = [142 144 100 22];
+
+            % Create FiberTypeColorDropDownLabel
+            app.FiberTypeColorDropDownLabel = uilabel(app.FiberTypingControlPanel);
+            app.FiberTypeColorDropDownLabel.HorizontalAlignment = 'right';
+            app.FiberTypeColorDropDownLabel.Position = [17 197 94 22];
+            app.FiberTypeColorDropDownLabel.Text = 'Fiber Type Color';
+
+            % Create FiberTypeColorDropDown
+            app.FiberTypeColorDropDown = uidropdown(app.FiberTypingControlPanel);
+            app.FiberTypeColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.FiberTypeColorDropDown.ItemsData = {'1', '2', '3'};
+            app.FiberTypeColorDropDown.Position = [126 197 100 22];
+            app.FiberTypeColorDropDown.Value = '1';
+
+            % Create CalculateFiberTyping
+            app.CalculateFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
+            app.CalculateFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberTypingButtonPushed, true);
+            app.CalculateFiberTyping.Position = [80 90 100 22];
+            app.CalculateFiberTyping.Text = 'Calculate';
+
+            % Create WritetoExcelFT
+            app.WritetoExcelFT = uibutton(app.FiberTypingControlPanel, 'push');
+            app.WritetoExcelFT.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelFTButtonPushed, true);
+            app.WritetoExcelFT.Enable = 'off';
+            app.WritetoExcelFT.Position = [26 45 100 22];
+            app.WritetoExcelFT.Text = 'Write to Excel';
+
+            % Create DoneFT
+            app.DoneFT = uibutton(app.FiberTypingControlPanel, 'push');
+            app.DoneFT.ButtonPushedFcn = createCallbackFcn(app, @DoneFTButtonPushed, true);
+            app.DoneFT.Position = [145 45 100 22];
+            app.DoneFT.Text = 'Done';
+
             % Create ManualSegmentationControls
             app.ManualSegmentationControls = uipanel(app.UIFigure);
             app.ManualSegmentationControls.Visible = 'off';
@@ -2168,6 +2280,82 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FinishDrawingButton.Enable = 'off';
             app.FinishDrawingButton.Position = [29 222 100 22];
             app.FinishDrawingButton.Text = 'Finish Drawing';
+
+            % Create PropertiesPanel
+            app.PropertiesPanel = uipanel(app.UIFigure);
+            app.PropertiesPanel.Visible = 'off';
+            app.PropertiesPanel.Position = [285 24 890 679];
+
+            % Create FeretAxes
+            app.FeretAxes = uiaxes(app.PropertiesPanel);
+            title(app.FeretAxes, 'Minimum Feret Diameter (um)')
+            app.FeretAxes.PlotBoxAspectRatio = [3.2695652173913 1 1];
+            app.FeretAxes.Position = [53 365 799 285];
+
+            % Create FiberSizeAxes
+            app.FiberSizeAxes = uiaxes(app.PropertiesPanel);
+            title(app.FiberSizeAxes, 'Fiber Area (um^2)')
+            app.FiberSizeAxes.PlotBoxAspectRatio = [3.29824561403509 1 1];
+            app.FiberSizeAxes.Position = [53 67 799 285];
+
+            % Create NonfiberPanel
+            app.NonfiberPanel = uipanel(app.UIFigure);
+            app.NonfiberPanel.Visible = 'off';
+            app.NonfiberPanel.Position = [281 24 886 679];
+
+            % Create NonfiberAxes
+            app.NonfiberAxes = uiaxes(app.NonfiberPanel);
+            xlabel(app.NonfiberAxes, 'X')
+            ylabel(app.NonfiberAxes, 'Y')
+            app.NonfiberAxes.PlotBoxAspectRatio = [1.35976789168279 1 1];
+            app.NonfiberAxes.XColor = 'none';
+            app.NonfiberAxes.YColor = 'none';
+            app.NonfiberAxes.Position = [22 117 844 553];
+
+            % Create ThresholdEditField_2Label_2
+            app.ThresholdEditField_2Label_2 = uilabel(app.NonfiberPanel);
+            app.ThresholdEditField_2Label_2.HorizontalAlignment = 'right';
+            app.ThresholdEditField_2Label_2.Position = [116 84 59 22];
+            app.ThresholdEditField_2Label_2.Text = 'Threshold';
+
+            % Create NonfiberAdjust
+            app.NonfiberAdjust = uibutton(app.NonfiberPanel, 'push');
+            app.NonfiberAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAdjustButtonPushed, true);
+            app.NonfiberAdjust.Position = [333 85 100 22];
+            app.NonfiberAdjust.Text = 'Adjust';
+
+            % Create NonfiberAccept
+            app.NonfiberAccept = uibutton(app.NonfiberPanel, 'push');
+            app.NonfiberAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAcceptButtonPushed, true);
+            app.NonfiberAccept.Position = [467 84 100 22];
+            app.NonfiberAccept.Text = 'Accept';
+
+            % Create NonfiberThreshold
+            app.NonfiberThreshold = uieditfield(app.NonfiberPanel, 'numeric');
+            app.NonfiberThreshold.Position = [190 84 100 22];
+
+            % Create NonfiberClassificationPanel
+            app.NonfiberClassificationPanel = uipanel(app.UIFigure);
+            app.NonfiberClassificationPanel.Visible = 'off';
+            app.NonfiberClassificationPanel.Position = [301 4 886 679];
+
+            % Create NonfiberClassificationAxes_R
+            app.NonfiberClassificationAxes_R = uiaxes(app.NonfiberClassificationPanel);
+            xlabel(app.NonfiberClassificationAxes_R, 'X')
+            ylabel(app.NonfiberClassificationAxes_R, 'Y')
+            app.NonfiberClassificationAxes_R.PlotBoxAspectRatio = [1.35976789168279 1 1];
+            app.NonfiberClassificationAxes_R.XColor = 'none';
+            app.NonfiberClassificationAxes_R.YColor = 'none';
+            app.NonfiberClassificationAxes_R.Position = [503 96 382 554];
+
+            % Create NonfiberClassificationAxes_L
+            app.NonfiberClassificationAxes_L = uiaxes(app.NonfiberClassificationPanel);
+            xlabel(app.NonfiberClassificationAxes_L, 'X')
+            ylabel(app.NonfiberClassificationAxes_L, 'Y')
+            app.NonfiberClassificationAxes_L.PlotBoxAspectRatio = [1.35976789168279 1 1];
+            app.NonfiberClassificationAxes_L.XColor = 'none';
+            app.NonfiberClassificationAxes_L.YColor = 'none';
+            app.NonfiberClassificationAxes_L.Position = [100 87 382 554];
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
