@@ -397,6 +397,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 ImageData = imread(FileName);
                 app.orig_img = ImageData;
                 app.orig_img_multispectral = ImageData;
+
+                % Append RGB color channels to channelRGB for RGB images
+                % Add red, green, and blue to channelRGB
+                RedValue = [1 0 0];
+                GreenValue = [0 1 0];
+                BlueValue = [0 0 1];
+                app.channelRGB = [RedValue; GreenValue; BlueValue];
+
             end
 
             imshow(app.orig_img,'Parent',app.UIAxes);
@@ -414,61 +422,26 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.InitialSegmentationButton.Enable = 'on';
             end
             
-            % Color Channel Box
-            if isMultilayerImage
-                % Nonfiber
-                % Get RGB values of color channel and convert to numeric matrix
-                NonfiberRGBValueOfChannel1 = app.channelRGB(str2double(app.NonfiberObjectColor.Value), :);
-                NonfiberRGBNumericalValue = NonfiberRGBValueOfChannel1;
+            % Color Channel Box   
+            % Get RGB values of color channel and convert to numeric matrix
+            % Update color on color box with appropriate RGB channel
 
-                % Update color on color box
-                app.NonfiberChannelColorBox.Color = NonfiberRGBNumericalValue;
+            % Nonfiber objects
+            NonfiberRGBChannel = app.channelRGB(str2double(app.NonfiberObjectColor.Value), :);
+            app.NonfiberChannelColorBox.Color = NonfiberRGBChannel;
 
+            % Central Nuclei
+            CNFRGBChannel = app.channelRGB(str2double(app.NucleiColorDropDown.Value), :);
+            app.CNFChannelColorBox.Color = CNFRGBChannel;
 
-                % CNF
-                % Get RGB values of color channel and convert to numeric matrix
-                CNFRGBValueOfChannel1 = app.channelRGB(str2double(app.NucleiColorDropDown.Value), :);
-                CNFRGBNumericalValue = CNFRGBValueOfChannel1;
+            % Fiber Typing
+            FiberTypingChannel = app.channelRGB(str2double(app.FiberTypeColorDropDown.Value), :);
+            app.FiberTypingChannelColorBox.Color = FiberTypingChannel;
 
-                % Update color on color box
-                app.CNFChannelColorBox.Color = CNFRGBNumericalValue;
-
-
-                % FiberTyping
-                % Get RGB values of color channel and convert to numeric matrix
-                FiberTypingRGBValueOfChannel1 = app.channelRGB(str2double(app.FiberTypeColorDropDown.Value), :);
-                FiberTypingRGBNumericalValue = FiberTypingRGBValueOfChannel1;
-            
-                % Update color on color box
-                app.FiberTypingChannelColorBox.Color = FiberTypingRGBNumericalValue;
-
-
-                % FiberOutline
-                % Get RGB values of color channel and convert to numeric matrix
-                FiberOutlineRGBValueOfChannel1 = app.channelRGB(str2double(app.FiberOutlineColorDropDown.Value), :);
-                FiberOutlineRGBNumericalValue = FiberOutlineRGBValueOfChannel1;
-            
-                % Update color on color box
-                app.FiberOutlineChannelColorBox.Color = FiberOutlineRGBNumericalValue;
-            else
-                % Add red, green, and blue to channelRGB
-                RedValue = [1 0 0];
-                GreenValue = [0 1 0];
-                BlueValue = [0 0 1];
-                app.channelRGB = [RedValue; GreenValue; BlueValue];
-
-                % Get RGB values of color channel and convert to numeric matrix
-                NonfiberRGBChannel = app.channelRGB(str2double(app.NonfiberObjectColor.Value), :);
-                CNFRGBChannel = app.channelRGB(str2double(app.NucleiColorDropDown.Value), :);
-                FiberTypingChannel = app.channelRGB(str2double(app.FiberTypeColorDropDown.Value), :);
-                FiberOutlineChannel = app.channelRGB(str2double(app.FiberOutlineColorDropDown.Value), :);
-            
-                % Update color on color box
-                app.NonfiberChannelColorBox.Color = NonfiberRGBChannel;
-                app.CNFChannelColorBox.Color = CNFRGBChannel;
-                app.FiberTypingChannelColorBox.Color = FiberTypingChannel;
-                app.FiberOutlineChannelColorBox.Color = FiberOutlineChannel;
-            end
+            % Fiber Outline
+            FiberOutlineChannel = app.channelRGB(str2double(app.FiberOutlineColorDropDown.Value), :);
+            app.FiberOutlineChannelColorBox.Color = FiberOutlineChannel;
+           
         end
 
         % Button pushed function: SegmentButton
@@ -1570,14 +1543,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Retreive the index of the color channel
             color_channel_index = str2double(app.NonfiberObjectColor.Value);
 
-            if app.is_multilayer_image
-                % Get RGB values of color channel and convert to numeric matrix
-                RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
-                RGB1DValue = RGBValueOfColorChannel;
-            else
-                RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
-                RGB1DValue = RGBValueOfColorChannel;
-            end
+            % Get RGB values of color channel and convert to numeric matrix
+            RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
+            RGB1DValue = RGBValueOfColorChannel;
 
             % Update color on color box
             app.NonfiberChannelColorBox.Color = RGB1DValue;
@@ -1589,14 +1557,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Retreive the index of the color channel
             color_channel_index = str2double(app.FiberTypeColorDropDown.Value);
 
-            if app.is_multilayer_image
-                % Get RGB values of color channel and convert to numeric matrix
-                RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
-                RGB1DValue = RGBValueOfColorChannel;
-            else
-                RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
-                RGB1DValue = RGBValueOfColorChannel;
-            end
+            % Get RGB values of color channel and convert to numeric matrix
+            RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
+            RGB1DValue = RGBValueOfColorChannel;
 
             % Update color on color box
             app.FiberTypingChannelColorBox.Color = RGB1DValue;
@@ -1608,14 +1571,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Retreive the index of the color channel
             color_channel_index = str2double(app.NucleiColorDropDown.Value);
 
-            if app.is_multilayer_image
-                % Get RGB values of color channel and convert to numeric matrix
-                RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
-                RGB1DValue = RGBValueOfColorChannel;
-            else
-                RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
-                RGB1DValue = RGBValueOfColorChannel;
-            end
+            % Get RGB values of color channel and convert to numeric matrix
+            RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
+            RGB1DValue = RGBValueOfColorChannel;
 
             % Update color on color box
             app.CNFChannelColorBox.Color = RGB1DValue;
@@ -1627,14 +1585,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Retreive the index of the color channel
             color_channel_index = str2double(app.FiberOutlineColorDropDown.Value);
 
-            if app.is_multilayer_image
-                % Get RGB values of color channel and convert to numeric matrix
-                RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
-                RGB1DValue = RGBValueOfColorChannel;
-            else
-                RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
-                RGB1DValue = RGBValueOfColorChannel;
-            end
+            % Get RGB values of color channel and convert to numeric matrix
+            RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
+            RGB1DValue = RGBValueOfColorChannel;
 
             % Update color on color box
             app.FiberOutlineChannelColorBox.Color = RGB1DValue;
