@@ -3,6 +3,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        BatchModeInitialSegmentationPanel  matlab.ui.container.Panel
+        BatchModeSelectFilesButton      matlab.ui.control.Button
         SegmentationParameters          matlab.ui.container.Panel
         DetectValueButton               matlab.ui.control.Button
         SegmentationThresholdSlider     matlab.ui.control.Slider
@@ -1257,6 +1259,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.SegmentationParameters.Visible = 'on';
             app.FiberOutlineChannelColorBox.Visible = 'on';
+            app.BatchModeInitialSegmentationPanel.Visible = 'on';
+            app.BatchModeSelectFilesButton.Enable = 'on';
+            app.BatchModeSelectFilesButton.Visible = 'on';
+            
         end
 
         % Button pushed function: ManualSegmentationButton
@@ -1592,6 +1598,51 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Update color on color box
             app.FiberOutlineChannelColorBox.Color = RGB1DValue;
             
+        end
+
+        % Button pushed function: BatchModeSelectFilesButton
+        function BatchModeSelectFilesButtonPushed(app, event)
+            [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi'},'File Selector - dont select mask', 'MultiSelect','on');
+            
+            numberOfFilesSelected = length(FileName);
+
+            for k=1:numberOfFilesSelected
+                currentFile =FileName{k};
+            end
+
+
+
+            go = 1;
+            app.pix_size = app.PixelSizeField.Value;
+               files = dir;
+               
+               % Warn the user if a mask file already exists
+               if find(strcmp({files.name},app.Files{2}),1) > 0
+                   warn = uiconfirm(app.UIFigure,'Overwrite existing mask?','Confirm mask overwrite','Icon','Warning');
+                   warn = convertCharsToStrings(warn);
+                   if strcmp(warn,'Cancel')
+                       go = 0;
+                   end
+               end
+               
+               if go
+                   %orig_img = imread(app.Files{1});
+                   foc = app.FiberOutlineColorDropDown.Value;
+                   foc = str2double(foc);
+                   lam = app.orig_img_multispectral(:,:,foc);  % fiber outline color
+                   
+                   % Image Segmentation
+                   lam_t = imhmin(lam,app.SegmentationThresholdSlider.Value);
+                   WS = watershed(lam_t);
+                   app.bw_obj = imcomplement(logical(WS));
+                   
+                   % Display segmented image
+                   flat_img =flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w');
+                   imshow(flat_img,'Parent',app.UIAxes);
+                   app.AcceptSegmentationButton.Enable = 'on';
+                   
+                   
+               end 
         end
     end
 
@@ -2328,6 +2379,21 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
             app.DetectValueButton.Position = [24 65 100 22];
             app.DetectValueButton.Text = 'Detect Value';
+
+            % Create BatchModeInitialSegmentationPanel
+            app.BatchModeInitialSegmentationPanel = uipanel(app.UIFigure);
+            app.BatchModeInitialSegmentationPanel.TitlePosition = 'centertop';
+            app.BatchModeInitialSegmentationPanel.Title = 'Batch Mode';
+            app.BatchModeInitialSegmentationPanel.Visible = 'off';
+            app.BatchModeInitialSegmentationPanel.Position = [18 296 286 70];
+
+            % Create BatchModeSelectFilesButton
+            app.BatchModeSelectFilesButton = uibutton(app.BatchModeInitialSegmentationPanel, 'push');
+            app.BatchModeSelectFilesButton.ButtonPushedFcn = createCallbackFcn(app, @BatchModeSelectFilesButtonPushed, true);
+            app.BatchModeSelectFilesButton.Enable = 'off';
+            app.BatchModeSelectFilesButton.Visible = 'off';
+            app.BatchModeSelectFilesButton.Position = [94 15 100 22];
+            app.BatchModeSelectFilesButton.Text = 'Select Files';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
