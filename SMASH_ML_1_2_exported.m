@@ -243,7 +243,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     fig = uifigure
                     uialert(fig, 'Image Selection Unsuccessful. Upload an image with the following extensions:.tif, .tiff, .jpg, .png, .bmp, .czi, .lif','Upload Error')
                     return
-                end   
+                end 
+                  
             end
  
     
@@ -303,13 +304,61 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 text(size(HEImage,2),size(HEImage,1)+15, ...
                 "Image containing H&E", ...
                 "FontSize",7,"HorizontalAlignment","right");
-                
+
                 %use k-means clustering to segment image in RGB color space
                 numColors = 3;
                 L = imsegkmeans(HEImage, numColors); %returns a label corresponding to each cluster
                 B = labeloverlay(HEImage,L);
                 imshow(B)
                 title("RGB")
+
+                %edge detection
+                HEImage=rgb2gray(HEImage);
+
+                %sobel operator for edge detection 
+                %create a binary gradient mask
+                [~,threshold] = edge(HEImage,'sobel'); %new
+                thresholdFactor = 0.5; %threshold value 
+
+                segmentedMask = edge(HEImage, 'sobel', threshold * thresholdFactor);
+                segmentedMask= edge(HEImage,'sobel');
+                figure,imshow(segmentedMask);
+                title('Binary Gradient Mask');
+
+                %Dilate mask image
+                se90 = strel('line',3,90);
+                se0 = strel('line',3,0);
+
+                segmentedMaskDilated = imdilate(segmentedMask,[se90 se0]);
+                imshow(segmentedMaskDilated)
+                title('Dilated Gradient Mask')
+
+                %fill in the holes in the interior of the cell
+                fillHoles = imfill(segmentedMaskDilated,'holes');
+                imshow(fillHoles)
+                title('Binary Image including Holes Filled')
+                
+                %Remove any connected objects on the image border 
+                removeConnectedObjects = imclearborder(fillHoles,4);
+                imshow(removeConnectedObjects)
+                title('Clear Borders')
+                
+                %Smooth the object
+                seD = strel('diamond',1);
+                smoothObject = imerode(removeConnectedObjects,seD);
+                smoothObject = imerode(smoothObject,seD);
+                imshow(smoothObject)
+                title('Segmented Image');
+
+                imshow(labeloverlay(HEImage,smoothObject))
+                title('Mask Over Original Image')
+                
+                %Display mask over the image
+                outline = bwperim(smoothObject);
+                Segout = HEImage; 
+                Segout(outline) = 255; 
+                imshow(Segout)
+                title('Outlined Original Image')
 
                 %convert rgb into L*a*b*
                 Lab_HEImage = rgb2lab(HEImage);
@@ -328,30 +377,30 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 imshow(cluster1)
                 title("Objects in Cluster 1");
 
-               mask2 = pixel_labels == 2;
-               cluster2 = HEImage.*uint8(mask2);    
-               imshow(cluster2)
-               title("Objects in Cluster 2");
+                mask2 = pixel_labels == 2;
+                cluster2 = HEImage.*uint8(mask2);    
+                imshow(cluster2)
+                title("Objects in Cluster 2");
              
-              mask3 = pixel_labels == 3;
-              cluster3 = HEImage.*uint8(mask3);
-              imshow(cluster3)
-              title("Objects in Cluster 3");
+                mask3 = pixel_labels == 3;
+                cluster3 = HEImage.*uint8(mask3);
+                imshow(cluster3)
+                title("Objects in Cluster 3");
 
-              %segment Nuclei
-              L = Lab_HEImage(:,:,1);
-              L_blue = L.*double(mask3);
-              L_blue = rescale(L_blue);
-              idx_light_blue = imbinarize(nonzeros(L_blue));
-              blue_idx = find(mask3);
-              mask_dark_blue = mask3;
-              mask_dark_blue(blue_idx(idx_light_blue)) = 0;
-              blue_nuclei = HEImage.*uint8(mask_dark_blue);
-              imshow(blue_nuclei)
-              title("Blue Nuclei");
+                %segment Nuclei
+                L = Lab_HEImage(:,:,1);
+                L_blue = L.*double(mask3);
+                L_blue = rescale(L_blue);
+                idx_light_blue = imbinarize(nonzeros(L_blue));
+                blue_idx = find(mask3);
+                mask_dark_blue = mask3;
+                mask_dark_blue(blue_idx(idx_light_blue)) = 0;
+                blue_nuclei = HEImage.*uint8(mask_dark_blue);
+                imshow(blue_nuclei)
+                title("Blue Nuclei");
                 
-
             end
+
 
             imshow(app.orig_img,'Parent',app.UIAxes);
             
