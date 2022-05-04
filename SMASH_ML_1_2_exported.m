@@ -885,7 +885,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             header{10,2} = 'Fiber Blue Center';
             header{10,3} = 'Fiber Positive CNF';
             
-            data = zeros(app.num_obj,3);
             farea = [app.fprop.Area]';
             farea = farea.*(app.pix_size^2);
             data = cat(2,farea,app.cen_pix.*app.pix_size^2,app.cen_nuc) ;
@@ -937,7 +936,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             rprop = regionprops(label,fti,'MeanIntensity','Centroid','Area','PixelIdxList');
             app.ave_g = [rprop.MeanIntensity];
             app.areas = [rprop.Area];
-            cents = cat(1,rprop.Centroid);
             
             app.ThresholdEditField.Enable = 'on';
             app.ThresholdEditFieldLabel.Enable = 'on';
