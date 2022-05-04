@@ -1,0 +1,75 @@
+<deployment-project plugin="plugin.apptool" plugin-version="1.0">
+  <configuration build-checksum="41829057" file="/home/ben/Documents/winter2022/ecs193a/SMASH-2.0/SMASH_ML_1_2.prj" location="/home/ben/Documents/winter2022/ecs193a/SMASH-2.0" name="SMASH_ML_1_2" target="target.mlapps" target-name="Package App">
+    <param.appname>SMASH_ML_1_2</param.appname>
+    <param.authnamewatermark />
+    <param.email />
+    <param.company />
+    <param.icon />
+    <param.icons />
+    <param.summary />
+    <param.description />
+    <param.screenshot />
+    <param.version>1.0</param.version>
+    <param.products.name />
+    <param.products.id />
+    <param.products.version />
+    <param.platforms />
+    <param.output>${PROJECT_ROOT}</param.output>
+    <param.guid>89060b8e-5182-4511-a666-33ebd329e9cf</param.guid>
+    <unset>
+      <param.authnamewatermark />
+      <param.email />
+      <param.company />
+      <param.icon />
+      <param.icons />
+      <param.summary />
+      <param.description />
+      <param.screenshot />
+      <param.version />
+      <param.products.name />
+      <param.products.id />
+      <param.products.version />
+      <param.platforms />
+      <param.output />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}/SMASH_ML_1_2.mlapp</file>
+    </fileset.main>
+    <fileset.depfun>
+      <file>${PROJECT_ROOT}/LabLogo.png</file>
+      <file>${PROJECT_ROOT}/MediumTreeModel.mat</file>
+      <file>${PROJECT_ROOT}/SegmentationModel.mat</file>
+      <file>${PROJECT_ROOT}/screenshot.png</file>
+      <file>/home/ben/MATLAB Add-Ons/Collections/Convert between RGB and Color Names/colornames.m</file>
+      <file>/home/ben/MATLAB Add-Ons/Collections/Convert between RGB and Color Names/colornames.mat</file>
+      <file>/home/ben/MATLAB Add-Ons/Collections/flattenMaskOverlay/flattenMaskOverlay.m</file>
+    </fileset.depfun>
+    <fileset.resources>
+      <file>/home/ben/Downloads/bfmatlab</file>
+    </fileset.resources>
+    <fileset.package />
+    <build-deliverables>
+      <file location="/home/ben/Documents/winter2022/ecs193a" name="SMASH-2.0" optional="false">/home/ben/Documents/winter2022/ecs193a/SMASH-2.0</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>/home/ben/MATLAB</root>
+      <toolboxes />
+    </matlab>
+    <platform>
+      <unix>true</unix>
+      <mac>false</mac>
+      <windows>false</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>true</linux>
+      <solaris>false</solaris>
+      <osver>5.4.0-109-generic</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>glnxa64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
