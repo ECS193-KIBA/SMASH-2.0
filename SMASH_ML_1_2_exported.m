@@ -30,7 +30,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         CalculateNonfiberObjects        matlab.ui.control.Button
         NonfiberObjectsDataOutputFolder  matlab.ui.control.EditField
         DataOutputFolderEditField_3Label_2  matlab.ui.control.Label
-        NonfiberObjectColor             matlab.ui.control.DropDown
+        NonfiberObjectsColorDropDown    matlab.ui.control.DropDown
         ObjectColorDropDownLabel        matlab.ui.control.Label
         NonfiberChannelColorBox         matlab.ui.control.UIAxes
         Toolbar                         matlab.ui.container.Panel
@@ -290,7 +290,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeFiberType.Value = app.default{2,2};
             app.FiberTypeColorDropDown.Value = num2str(app.default{5,2});
             app.PixelSizeNonfiber.Value = app.default{2,2};
-            app.NonfiberObjectColor.Value = num2str(app.default{6,2});
+            app.NonfiberObjectsColorDropDown.Value = num2str(app.default{6,2});
         end
 
         % Button pushed function: SelectFileButton
@@ -389,8 +389,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.NucleiColorDropDown.ItemsData = TotalColorDropDownItemsData;
                 app.FiberTypeColorDropDown.Items = TotalColorDropDownItems;
                 app.FiberTypeColorDropDown.ItemsData = TotalColorDropDownItemsData;
-                app.NonfiberObjectColor.Items = TotalColorDropDownItems;
-                app.NonfiberObjectColor.ItemsData = TotalColorDropDownItemsData;
+                app.NonfiberObjectsColorDropDown.Items = TotalColorDropDownItems;
+                app.NonfiberObjectsColorDropDown.ItemsData = TotalColorDropDownItemsData;
                 app.orig_img = TotalRGB;
                 app.orig_img_multispectral = TotalMultiSpectral;
             else
@@ -427,7 +427,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Update color on color box with appropriate RGB channel
 
             % Nonfiber objects
-            NonfiberRGBChannel = app.channelRGB(str2double(app.NonfiberObjectColor.Value), :);
+            NonfiberRGBChannel = app.channelRGB(str2double(app.NonfiberObjectsColorDropDown.Value), :);
             app.NonfiberChannelColorBox.Color = NonfiberRGBChannel;
 
             % Central Nuclei
@@ -1146,7 +1146,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CalculateNonfiberObjects.Enable = 'off';
             app.DoneNonfiber.Enable = 'off';
             app.pix_size = app.PixelSizeNonfiber.Value;
-            ch_obj = img_org(:,:,str2double(app.NonfiberObjectColor.Value));
+            ch_obj = img_org(:,:,str2double(app.NonfiberObjectsColorDropDown.Value));
             % smoothed image
             se = strel('disk',12);
             tophatFiltered = imtophat(ch_obj, se);
@@ -1538,10 +1538,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = '';
         end
 
-        % Value changed function: NonfiberObjectColor
-        function NonfiberObjectColorValueChanged(app, event)
+        % Value changed function: NonfiberObjectsColorDropDown
+        function NonfiberObjectsColorDropDownValueChanged(app, event)
             % Retreive the index of the color channel
-            color_channel_index = str2double(app.NonfiberObjectColor.Value);
+            color_channel_index = str2double(app.NonfiberObjectsColorDropDown.Value);
 
             % Get RGB values of color channel and convert to numeric matrix
             RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
@@ -2165,13 +2165,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ObjectColorDropDownLabel.Position = [38 197 72 22];
             app.ObjectColorDropDownLabel.Text = 'Object Color';
 
-            % Create NonfiberObjectColor
-            app.NonfiberObjectColor = uidropdown(app.NonfiberControlPanel);
-            app.NonfiberObjectColor.Items = {'Red', 'Green', 'Blue'};
-            app.NonfiberObjectColor.ItemsData = {'1', '2', '3'};
-            app.NonfiberObjectColor.ValueChangedFcn = createCallbackFcn(app, @NonfiberObjectColorValueChanged, true);
-            app.NonfiberObjectColor.Position = [125 197 100 22];
-            app.NonfiberObjectColor.Value = '1';
+            % Create NonfiberObjectsColorDropDown
+            app.NonfiberObjectsColorDropDown = uidropdown(app.NonfiberControlPanel);
+            app.NonfiberObjectsColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.NonfiberObjectsColorDropDown.ItemsData = {'1', '2', '3'};
+            app.NonfiberObjectsColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NonfiberObjectsColorDropDownValueChanged, true);
+            app.NonfiberObjectsColorDropDown.Position = [125 197 100 22];
+            app.NonfiberObjectsColorDropDown.Value = '1';
 
             % Create DataOutputFolderEditField_3Label_2
             app.DataOutputFolderEditField_3Label_2 = uilabel(app.NonfiberControlPanel);
