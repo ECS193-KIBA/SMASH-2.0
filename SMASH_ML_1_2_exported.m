@@ -198,6 +198,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 if FileName == 0
                     return
                 end
+           
         
                 C = strsplit(FileName,'.');
                 ExtName = C(end);
@@ -400,6 +401,71 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 title("Blue Nuclei");
                 
             end
+
+            %stain deconvolution    
+            function [H,E] = Deconvolution(HEImage)
+                He = [0.18; 0.20; 0.08]; %hematoxylin
+                Eo = [0.01; 0.13; 0.01]; %eosin
+                DAB = [0.10; 0.21; 0.29];
+        
+               % Normalization gives absorbtion factor of stains
+                 colorDecon= [He/norm(He) Eo/norm(Eo) DAB/norm(DAB)]';
+
+               % inverse matrix 
+                colorDeconInverse = inv(colorDecon) ; 
+
+               % Conversion to float
+                rgbimage = double(rgbimage)+1;
+                OpticalDensityMatrix = -log(rgbimage);
+        
+              % Separate stains
+                SeparateStains = reshape(OpticalDensityMatrix,[],3) *colorDeconInverse;
+                SeparateStains = reshape(SeparateStains, size(rgbimage));
+        
+              % Normalization
+                SeparateStains = normalize(SeparateStains);
+        
+              % Create RGB or each stain 
+                s = size(rgbimage);
+                A(:,:,1) = SeparateStains(:,:,1);A(:,:,2) = zeros(s(1),s(2));A(:,:,3) = zeros(s(1),s(2));
+                B(:,:,1) = zeros(s(1),s(2));B(:,:,2) = SeparateStains(:,:,2);B(:,:,3) = zeros(s(1),s(2));
+
+             % Convert to float
+               convertToFloat1 = double(A)+1;
+               OpticalDensityMatrix1 = -log(Dop1)+1;
+               convertToFloat2 = double(B)+1;
+               OpticalDensityMatrix2 = -log(Dop2)+1;
+        
+               % Reconstruct image through reshaping
+		       H = -reshape(OpticalDensityMatrix1,[],3) *colorDecon;
+               E = -reshape(OpticalDensityMatrix2,[],3) *colorDecon;
+               H = -exp(H);
+		       H = reshape(H, size(SeparateStains));
+               E = -exp(E);
+		       E = reshape(E, size(SeparateStains));
+        
+               % Normalize matrix
+		       H = normalize(H);
+		       E = normalize(E); 
+               imshow(rgbimage);
+           end
+
+           %Normalization 
+            function normalizeMatrix = normalize(Iin)
+                % Normalization Function
+	            normalizeMatrix = Iin;                   
+         
+	            for i=1:size(Iin,3)
+                    Channel = normalizeMatrix(:,:,i);
+
+                    % image intensities 
+		            normalizeMatrix(:,:,i) = (normalizeMatrix(:,:,i)-min(Channel(:)))/(max(Channel(:)-min(Channel(:))));
+
+                    % Invert image
+                    normalizeMatrix(:,:,i) = 1 - normalizeMatrix(:,:,i);
+                end
+            end
+            
 
 
             imshow(app.orig_img,'Parent',app.UIAxes);
