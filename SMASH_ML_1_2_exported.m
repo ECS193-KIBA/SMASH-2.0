@@ -161,6 +161,175 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     
     methods (Access = private)
 
+        function FileInitialization(app, FileName, PathName, FilterIndex)
+            drawnow limitrate;
+            figure(app.UIFigure)
+            if FilterIndex
+                if FileName == 0
+                    return
+                end
+                C = strsplit(FileName,'.');
+                ExtName = C(end);
+                FileNameS = (C(1:(end-1)));
+                FileNameS = FileNameS{1};
+                MaskName = strcat(FileNameS,'_mask.',ExtName);
+                MaskName = MaskName{1};
+            end
+            
+            app.FilenameLabel.Text = FileNameS;
+            app.Files{1} = FileName;
+            app.Files{2} = MaskName;
+            app.Files{3} = PathName;
+            app.Files{4} = FileNameS;
+            cd(PathName)
+    
+            % Change output directory to where image is located
+            app.FiberPropertiesDataOutputFolder.Value = pwd;
+            app.CentralNucleiDataOutputFolder.Value = pwd;
+            app.FiberTypingDataOutputFolder.Value = pwd;
+            app.NonfiberObjectsDataOutputFolder.Value = pwd;
+            
+            BioformatsData = bfopen(FileName);
+            PixelDataForAllLayers = BioformatsData{1,1};
+            ColorMapDataForAllLayers = BioformatsData{1, 3};
+            isMultilayerImage = ~isempty(ColorMapDataForAllLayers{1,1});
+
+            % Update global variable to set multilayer image
+            app.is_multilayer_image = false;
+
+            if isMultilayerImage
+                % Update global variable to set multilayer image
+                app.is_multilayer_image = true;
+
+                LayerOnePixelData = PixelDataForAllLayers{1,1};
+                LayerSize = size(LayerOnePixelData);
+                RGBSize = [LayerSize 3];
+
+                TotalRGB = zeros(RGBSize, 'uint8');
+                TotalMultiSpectral = [];
+                TotalColorDropDownItems = {};
+                TotalColorDropDownItemsData = {};
+                
+                % Channel RGB takes in all RGB values for the 
+                % different colors in the channels
+                app.channelRGB = [];
+
+                NumLayers = length(PixelDataForAllLayers);
+                for Layer = 1:NumLayers
+                    PixelsGrayscale = PixelDataForAllLayers{Layer, 1};
+                    ColorMap = ColorMapDataForAllLayers{1, Layer};
+                    PixelsRGBAsDouble = ind2rgb(PixelsGrayscale, ColorMap);
+                    PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
+                    PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
+
+                    % Retrieve color name from the RGB values
+                    RGBValues = ColorMap(end,:);
+                    ConvertedRGB = colornames('HTML4', RGBValues,'RGB');
+                    ColorName = char(ConvertedRGB);
+
+                    % Autoscaling - scale the pixel intensity for each channel
+                    MaxIntensity = max(PixelsGrayscaleUInt8,[],'all');
+                    MinIntensity = min(PixelsGrayscaleUInt8,[],'all');
+                    ActualRange = MaxIntensity - MinIntensity;
+                    UInt8Range = 255;
+                    ScalingFactor = UInt8Range / ActualRange;
+                    PixelsGrayscaleUInt8 = ScalingFactor * PixelsGrayscaleUInt8;
+                    PixelsRGBAsUInt8 = ScalingFactor * PixelsRGBAsUInt8;
+
+                    TotalMultiSpectral = cat(3, TotalMultiSpectral, PixelsGrayscaleUInt8);
+                    TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
+
+                    % Include only color name in the channel drop down menu
+                    TotalColorDropDownItems = cat(2, TotalColorDropDownItems, ColorName);
+                    TotalColorDropDownItemsData  = cat(2, TotalColorDropDownItemsData, {num2str(Layer)});
+
+                    % Add the RGB values of the channel color 
+                    % Convert from cell array to double matrix when
+                    % appending
+                    app.channelRGB = cat(1, app.channelRGB, RGBValues(1,:));
+                end
+
+                app.FiberOutlineColorDropDown.Items = TotalColorDropDownItems;
+                app.FiberOutlineColorDropDown.ItemsData = TotalColorDropDownItemsData;
+                app.NucleiColorDropDown.Items = TotalColorDropDownItems;
+                app.NucleiColorDropDown.ItemsData = TotalColorDropDownItemsData;
+                app.FiberTypeColorDropDown.Items = TotalColorDropDownItems;
+                app.FiberTypeColorDropDown.ItemsData = TotalColorDropDownItemsData;
+                app.NonfiberObjectsColorDropDown.Items = TotalColorDropDownItems;
+                app.NonfiberObjectsColorDropDown.ItemsData = TotalColorDropDownItemsData;
+                app.orig_img = TotalRGB;
+                app.orig_img_multispectral = TotalMultiSpectral;
+            else
+                ImageData = imread(FileName);
+                app.orig_img = ImageData;
+                app.orig_img_multispectral = ImageData;
+
+                % Append RGB color channels to channelRGB for RGB images
+                % Add red, green, and blue to channelRGB
+                RedValue = [1 0 0];
+                GreenValue = [0 1 0];
+                BlueValue = [0 0 1];
+                app.channelRGB = [RedValue; GreenValue; BlueValue];
+
+            end
+
+            % Display the image
+            imshow(app.orig_img,'Parent',app.UIAxes);
+            
+            if exist(MaskName,'file')
+                app.InitialSegmentationButton.Enable = 'on';
+                app.FiberPredictionButton.Enable = 'on';
+                app.ManualSegmentationButton.Enable = 'on';
+                app.ManualFiberFilterButton.Enable = 'on';
+                app.FiberPropertiesButton.Enable = 'on';
+                app.CentralNucleiButton.Enable = 'on';
+                app.FiberTypingButton.Enable = 'on';
+                app.NonfiberObjectsButton.Enable = 'on';
+            else
+                app.InitialSegmentationButton.Enable = 'on';
+            end
+            
+            % Color Channel Box   
+            % Get RGB values of color channel and convert to numeric matrix
+            % Update color on color box with appropriate RGB channel
+
+            % Nonfiber objects
+            NonfiberRGBChannel = app.channelRGB(str2double(app.NonfiberObjectsColorDropDown.Value), :);
+            app.NonfiberChannelColorBox.Color = NonfiberRGBChannel;
+
+            % Central Nuclei
+            CNFRGBChannel = app.channelRGB(str2double(app.NucleiColorDropDown.Value), :);
+            app.CNFChannelColorBox.Color = CNFRGBChannel;
+
+            % Fiber Typing
+            FiberTypingChannel = app.channelRGB(str2double(app.FiberTypeColorDropDown.Value), :);
+            app.FiberTypingChannelColorBox.Color = FiberTypingChannel;
+
+            % Fiber Outline
+            FiberOutlineChannel = app.channelRGB(str2double(app.FiberOutlineColorDropDown.Value), :);
+            app.FiberOutlineChannelColorBox.Color = FiberOutlineChannel;
+        end
+
+        function SegmentBatchMode(app)
+            app.pix_size = app.PixelSizeField.Value;
+            files = dir;
+               
+            %orig_img = imread(app.Files{1});
+            foc = app.FiberOutlineColorDropDown.Value;
+            foc = str2double(foc);
+            lam = app.orig_img_multispectral(:,:,foc);  % fiber outline color
+            
+            % Image Segmentation
+            lam_t = imhmin(lam,app.SegmentationThresholdSlider.Value);
+            WS = watershed(lam_t);
+            app.bw_obj = imcomplement(logical(WS));
+            
+            % Display segmented image
+            flat_img =flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w');
+            imshow(flat_img,'Parent',app.UIAxes);
+        end
+                   
+                   
         function CreateFolderIfDirectoryIsNonexistent(~, pathDirectory)
             if exist(pathDirectory,'dir') == 0
                 mkdir(pathDirectory)
@@ -1607,42 +1776,20 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             numberOfFilesSelected = length(FileName);
 
             for k=1:numberOfFilesSelected
-                currentFile =FileName{k};
+                % Retrieve the filename of the current file
+                currentFile = FileName{k};
+                % Go through file initilization
+                % In file initialization, it enables all the other buttons,
+                % so you need to change this button to the initial page and
+                % then continue
+                FileInitialization(app, currentFile, PathName, FilterIndex);
+                % Run segment button functionality
+                SegmentBatchMode(app);
+                % Accept segmentation
+                label = bwlabel(~logical(app.bw_obj),4);
+                SaveMaskToMaskFile(app, label);
             end
 
-
-
-            go = 1;
-            app.pix_size = app.PixelSizeField.Value;
-               files = dir;
-               
-               % Warn the user if a mask file already exists
-               if find(strcmp({files.name},app.Files{2}),1) > 0
-                   warn = uiconfirm(app.UIFigure,'Overwrite existing mask?','Confirm mask overwrite','Icon','Warning');
-                   warn = convertCharsToStrings(warn);
-                   if strcmp(warn,'Cancel')
-                       go = 0;
-                   end
-               end
-               
-               if go
-                   %orig_img = imread(app.Files{1});
-                   foc = app.FiberOutlineColorDropDown.Value;
-                   foc = str2double(foc);
-                   lam = app.orig_img_multispectral(:,:,foc);  % fiber outline color
-                   
-                   % Image Segmentation
-                   lam_t = imhmin(lam,app.SegmentationThresholdSlider.Value);
-                   WS = watershed(lam_t);
-                   app.bw_obj = imcomplement(logical(WS));
-                   
-                   % Display segmented image
-                   flat_img =flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w');
-                   imshow(flat_img,'Parent',app.UIAxes);
-                   app.AcceptSegmentationButton.Enable = 'on';
-                   
-                   
-               end 
         end
     end
 
