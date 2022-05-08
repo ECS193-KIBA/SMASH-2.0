@@ -3,20 +3,19 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
-        SelectFilesButton               matlab.ui.control.Button
         SegmentationParameters          matlab.ui.container.Panel
         DetectValueButton               matlab.ui.control.Button
         SegmentationThresholdSlider     matlab.ui.control.Slider
         SegmentationThresholdSliderLabel  matlab.ui.control.Label
         AcceptSegmentationButton        matlab.ui.control.Button
         FiberOutlineColorDropDown       matlab.ui.control.DropDown
-        BatchModeInitialSegmentationPanel  matlab.ui.container.Panel
-        RunBatchModeButton              matlab.ui.control.Button
         FiberOutlineColorDropDownLabel  matlab.ui.control.Label
         SegmentButton                   matlab.ui.control.Button
         PixelSizeField                  matlab.ui.control.NumericEditField
         PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
         FiberOutlineChannelColorBox     matlab.ui.control.UIAxes
+        BatchModeInitialSegmentationPanel  matlab.ui.container.Panel
+        RunBatchModeButton              matlab.ui.control.Button
         ManualSegmentationControls      matlab.ui.container.Panel
         FinishDrawingButton             matlab.ui.control.Button
         StartMergingButton              matlab.ui.control.Button
@@ -46,7 +45,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         ManualSegmentationButton        matlab.ui.control.Button
         InitialSegmentationButton       matlab.ui.control.Button
         NonfiberPanel                   matlab.ui.container.Panel
-        FilenameLabel                   matlab.ui.control.Label
         NonfiberAccept                  matlab.ui.control.Button
         NonfiberAdjust                  matlab.ui.control.Button
         NonfiberThreshold               matlab.ui.control.NumericEditField
@@ -122,6 +120,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         SMASHLabel                      matlab.ui.control.Label
         Image                           matlab.ui.control.Image
         Prompt                          matlab.ui.control.Label
+        FilenameLabel                   matlab.ui.control.Label
+        SelectFileButton                matlab.ui.control.Button
         UIAxes                          matlab.ui.control.UIAxes
     end
 
@@ -472,8 +472,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsColorDropDown.Value = num2str(app.default{6,2});
         end
 
-        % Button pushed function: SelectFilesButton
-        function SelectFilesButtonPushed(app, event)
+        % Button pushed function: SelectFileButton
+        function SelectFileButtonPushed(app, event)
             % Allow user to select multiple files
             [FileNames,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi'},'File Selector - dont select mask', 'MultiSelect','on');
             
@@ -481,11 +481,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.BatchModePathName = PathName;
             app.BatchModeFilterIndex = FilterIndex;
             app.BatchModeFileNames = FileNames;
-
-            what = length(FileNames)
-            if length(FileNames) == 1
-                FileName = app.BatchModeFileNames;
-            end
 
             % Return if there no filenames
             if FilterIndex
@@ -1302,13 +1297,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'on';
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
-            app.SelectFilesButton.Enable = 'on';
+            app.SelectFileButton.Enable = 'on';
             
         end
 
         % Button pushed function: InitialSegmentationButton
         function InitialSegmentationButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
+            app.SelectFileButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualSegmentationButton.Enable = 'off';
@@ -1325,7 +1320,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: ManualSegmentationButton
         function ManualSegmentationButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
+            app.SelectFileButton.Enable = 'off';
             app.ManualSegmentationButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
@@ -1335,13 +1330,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingButton.Enable = 'off';
             app.NonfiberObjectsButton.Enable = 'off';
             app.ManualSegmentationControls.Visible = 'on';
+            app.BatchModeInitialSegmentationPanel.Visible = 'off';
             app.bw_obj = ReadMaskFromMaskFile(app);
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w'),'Parent',app.UIAxes);
         end
 
         % Button pushed function: FiberPredictionButton
         function FiberPredictionButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
+            app.SelectFileButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualFiberFilterButton.Enable = 'off';
@@ -1351,6 +1347,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingButton.Enable = 'off';
             app.NonfiberObjectsButton.Enable = 'off';
             app.FiberPredictionControlPanel.Visible = 'on';
+            app.BatchModeInitialSegmentationPanel.Visible = 'off';
             % acquire mask and show over image
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             app.bw_obj = imclearborder(app.bw_obj,4);
@@ -1361,7 +1358,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: ManualFiberFilterButton
         function ManualFiberFilterButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
+            app.SelectFileButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualFiberFilterButton.Enable = 'off';
@@ -1373,13 +1370,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualFilterControls.Visible = 'on';
             app.RemoveObjectsButton.Enable = 'on';
             app.FinishManualFilteringButton.Enable = 'off';
+            app.BatchModeInitialSegmentationPanel.Visible = 'off';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
         end
 
         % Button pushed function: FiberPropertiesButton
         function FiberPropertiesButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
+            app.SelectFileButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualFiberFilterButton.Enable = 'off';
@@ -1390,6 +1388,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.PropertiesControlPanel.Visible = 'on';
             app.PropertiesPanel.Visible = 'on';
+            app.BatchModeInitialSegmentationPanel.Visible = 'off';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             app.bw_obj = imclearborder(app.bw_obj,4);
                
@@ -1397,7 +1396,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CentralNucleiButton
         function CentralNucleiButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
+            app.SelectFileButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualFiberFilterButton.Enable = 'off';
@@ -1413,12 +1412,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AcceptCNF.Enable = 'off';
             app.CNFExcelWrite.Enable = 'off';
             app.CNFChannelColorBox.Visible = 'on';
+            app.BatchModeInitialSegmentationPanel.Visible = 'off';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
         end
 
         % Button pushed function: FiberTypingButton
         function FiberTypingButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
+            app.SelectFileButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualFiberFilterButton.Enable = 'off';
@@ -1433,12 +1433,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypeColorDropDown.Enable = 'on';
             app.WritetoExcelFT.Enable = 'off';
             app.FiberTypingChannelColorBox.Visible = 'on';
+            app.BatchModeInitialSegmentationPanel.Visible = 'off';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
         end
 
         % Button pushed function: NonfiberObjectsButton
         function NonfiberObjectsButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
+            app.SelectFileButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualFiberFilterButton.Enable = 'off';
@@ -1454,6 +1455,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberAccept.Enable = 'off';
             app.WritetoExcelNonfiber.Enable = 'off';
             app.NonfiberChannelColorBox.Visible = 'on';
+            app.BatchModeInitialSegmentationPanel.Visible = 'off';
         end
 
         % Button pushed function: DetectValueButton
@@ -1699,6 +1701,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIAxes.GridColor = 'none';
             app.UIAxes.MinorGridColor = 'none';
             app.UIAxes.Position = [266 9 909 698];
+
+            % Create SelectFileButton
+            app.SelectFileButton = uibutton(app.UIFigure, 'push');
+            app.SelectFileButton.ButtonPushedFcn = createCallbackFcn(app, @SelectFileButtonPushed, true);
+            app.SelectFileButton.Position = [38 671 109 32];
+            app.SelectFileButton.Text = 'Select File';
+
+            % Create FilenameLabel
+            app.FilenameLabel = uilabel(app.UIFigure);
+            app.FilenameLabel.Position = [156 676 130 22];
+            app.FilenameLabel.Text = 'Filename';
 
             % Create Prompt
             app.Prompt = uilabel(app.UIFigure);
@@ -2156,11 +2169,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberAccept.Position = [467 84 100 22];
             app.NonfiberAccept.Text = 'Accept';
 
-            % Create FilenameLabel
-            app.FilenameLabel = uilabel(app.NonfiberPanel);
-            app.FilenameLabel.Position = [-115 643 130 22];
-            app.FilenameLabel.Text = 'Filename';
-
             % Create Toolbar
             app.Toolbar = uipanel(app.UIFigure);
             app.Toolbar.Position = [144 727 937 41];
@@ -2419,12 +2427,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
             app.DetectValueButton.Position = [24 65 100 22];
             app.DetectValueButton.Text = 'Detect Value';
-
-            % Create SelectFilesButton
-            app.SelectFilesButton = uibutton(app.UIFigure, 'push');
-            app.SelectFilesButton.ButtonPushedFcn = createCallbackFcn(app, @SelectFilesButtonPushed, true);
-            app.SelectFilesButton.Position = [47 662 109 32];
-            app.SelectFilesButton.Text = {'Select File(s)'; ''};
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
