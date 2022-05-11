@@ -5,6 +5,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         UIFigure                        matlab.ui.Figure
         BatchModeLabel                  matlab.ui.control.Label
         SegmentationParameters          matlab.ui.container.Panel
+        PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
         DetectValueButton               matlab.ui.control.Button
         SegmentationThresholdSlider     matlab.ui.control.Slider
         SegmentationThresholdSliderLabel  matlab.ui.control.Label
@@ -13,7 +14,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         FiberOutlineColorDropDownLabel  matlab.ui.control.Label
         SegmentButton                   matlab.ui.control.Button
         PixelSizeField                  matlab.ui.control.NumericEditField
-        PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
         FiberOutlineChannelColorBox     matlab.ui.control.UIAxes
         ManualSegmentationControls      matlab.ui.container.Panel
         FinishDrawingButton             matlab.ui.control.Button
@@ -1439,6 +1439,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CNFExcelWrite.Enable = 'off';
             app.CNFChannelColorBox.Visible = 'on';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+            
         end
 
         % Button pushed function: FiberTypingButton
@@ -1459,6 +1460,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.WritetoExcelFT.Enable = 'off';
             app.FiberTypingChannelColorBox.Visible = 'on';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+
         end
 
         % Button pushed function: NonfiberObjectsButton
@@ -1479,6 +1481,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberAccept.Enable = 'off';
             app.WritetoExcelNonfiber.Enable = 'off';
             app.NonfiberChannelColorBox.Visible = 'on';
+
         end
 
         % Button pushed function: DetectValueButton
@@ -1682,6 +1685,42 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberOutlineChannelColorBox.Color = RGB1DValue;
             
         end
+
+        % Value changed function: PixelSizeumpixelEditField
+        function PixelSizeFiberPropertiesValueChanged(app, event)
+            app.pix_size = app.PixelSizeumpixelEditField.Value;
+            app.PixelSizeumpixelEditField_2.Value = app.pix_size;
+            app.PixelSizeFiberType.Value = app.pix_size;
+            app.PixelSizeNonfiber.Value = app.pix_size;
+            
+        end
+
+        % Value changed function: PixelSizeumpixelEditField_2
+        function PixelSizeCNFValueChanged(app, event)
+            app.pix_size = app.PixelSizeumpixelEditField_2.Value;
+            app.PixelSizeumpixelEditField.Value = app.pix_size;
+            app.PixelSizeFiberType.Value = app.pix_size;
+            app.PixelSizeNonfiber.Value = app.pix_size;
+            
+        end
+
+        % Value changed function: PixelSizeFiberType
+        function PixelSizeFiberTypingValueChanged(app, event)
+            app.pix_size = app.PixelSizeFiberType.Value;
+            app.PixelSizeumpixelEditField.Value = app.pix_size;
+            app.PixelSizeumpixelEditField_2.Value = app.pix_size;
+            app.PixelSizeNonfiber.Value = app.pix_size;
+            
+        end
+
+        % Value changed function: PixelSizeNonfiber
+        function PixelSizeNonfiberValueChanged(app, event)
+            app.pix_size = app.PixelSizeNonfiber.Value;
+            app.PixelSizeumpixelEditField.Value = app.pix_size;
+            app.PixelSizeumpixelEditField_2.Value = app.pix_size;
+            app.PixelSizeFiberType.Value = app.pix_size;
+            
+        end
     end
 
     % Component initialization
@@ -1855,6 +1894,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeumpixelEditField
             app.PixelSizeumpixelEditField = uieditfield(app.PropertiesControlPanel, 'numeric');
+            app.PixelSizeumpixelEditField.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPropertiesValueChanged, true);
             app.PixelSizeumpixelEditField.Position = [139 218 100 22];
 
             % Create CalculateFiberProperties
@@ -1917,6 +1957,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeumpixelEditField_2
             app.PixelSizeumpixelEditField_2 = uieditfield(app.CNFControlPanel, 'numeric');
+            app.PixelSizeumpixelEditField_2.ValueChangedFcn = createCallbackFcn(app, @PixelSizeCNFValueChanged, true);
             app.PixelSizeumpixelEditField_2.Position = [121 261 100 22];
 
             % Create NucleiColorDropDownLabel
@@ -2002,6 +2043,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeFiberType
             app.PixelSizeFiberType = uieditfield(app.FiberTypingControlPanel, 'numeric');
+            app.PixelSizeFiberType.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberTypingValueChanged, true);
             app.PixelSizeFiberType.Position = [118 242 100 22];
 
             % Create DataOutputFolderEditField_3Label
@@ -2298,6 +2340,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeNonfiber
             app.PixelSizeNonfiber = uieditfield(app.NonfiberControlPanel, 'numeric');
+            app.PixelSizeNonfiber.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberValueChanged, true);
             app.PixelSizeNonfiber.Position = [125 253 100 22];
 
             % Create ManualSegmentationControls
@@ -2363,14 +2406,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberOutlineChannelColorBox.PickableParts = 'none';
             app.FiberOutlineChannelColorBox.Position = [250 154 30 30];
 
-            % Create PixelSizeumpixelEditFieldLabel
-            app.PixelSizeumpixelEditFieldLabel = uilabel(app.SegmentationParameters);
-            app.PixelSizeumpixelEditFieldLabel.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditFieldLabel.Position = [16 200 114 22];
-            app.PixelSizeumpixelEditFieldLabel.Text = 'Pixel Size (um/pixel)';
-
             % Create PixelSizeField
             app.PixelSizeField = uieditfield(app.SegmentationParameters, 'numeric');
+            app.PixelSizeField.Visible = 'off';
             app.PixelSizeField.Position = [145 200 100 22];
 
             % Create SegmentButton
@@ -2417,6 +2455,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
             app.DetectValueButton.Position = [24 65 100 22];
             app.DetectValueButton.Text = 'Detect Value';
+
+            % Create PixelSizeumpixelEditFieldLabel
+            app.PixelSizeumpixelEditFieldLabel = uilabel(app.SegmentationParameters);
+            app.PixelSizeumpixelEditFieldLabel.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditFieldLabel.Visible = 'off';
+            app.PixelSizeumpixelEditFieldLabel.Position = [16 200 114 22];
+            app.PixelSizeumpixelEditFieldLabel.Text = 'Pixel Size (um/pixel)';
 
             % Create BatchModeLabel
             app.BatchModeLabel = uilabel(app.UIFigure);
