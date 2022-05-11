@@ -3,6 +3,69 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        NonfiberPanel                   matlab.ui.container.Panel
+        NonfiberAccept                  matlab.ui.control.Button
+        NonfiberAdjust                  matlab.ui.control.Button
+        NonfiberThreshold               matlab.ui.control.NumericEditField
+        ThresholdEditField_2Label_2     matlab.ui.control.Label
+        NonfiberAxes                    matlab.ui.control.UIAxes
+        FiberTypingControlPanel         matlab.ui.container.Panel
+        DoneFT                          matlab.ui.control.Button
+        WritetoExcelFT                  matlab.ui.control.Button
+        CalculateFiberTyping            matlab.ui.control.Button
+        FiberTypeColorDropDown          matlab.ui.control.DropDown
+        FiberTypeColorDropDownLabel     matlab.ui.control.Label
+        FiberTypingDataOutputFolder     matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label  matlab.ui.control.Label
+        PixelSizeFiberType              matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
+        FiberTypingChannelColorBox      matlab.ui.control.UIAxes
+        PropertiesControlPanel          matlab.ui.container.Panel
+        CalculateFiberProperties        matlab.ui.control.Button
+        PixelSizeumpixelEditField       matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditFieldLabel_2  matlab.ui.control.Label
+        FiberPropertiesDataOutputFolder  matlab.ui.control.EditField
+        DataOutputFolderEditFieldLabel  matlab.ui.control.Label
+        DoneButton                      matlab.ui.control.Button
+        WritetoExcelButton              matlab.ui.control.Button
+        CNFControlPanel                 matlab.ui.container.Panel
+        CentralNucleiDataOutputFolder   matlab.ui.control.EditField
+        DataOutputFolderEditField_2Label  matlab.ui.control.Label
+        MinimumNucleusSizeum2EditField  matlab.ui.control.NumericEditField
+        MinimumNucleusSizeum2EditFieldLabel  matlab.ui.control.Label
+        DistancefromborderEditField     matlab.ui.control.NumericEditField
+        DistancefromborderEditFieldLabel  matlab.ui.control.Label
+        DoneButton_CNF                  matlab.ui.control.Button
+        CNFExcelWrite                   matlab.ui.control.Button
+        CalculateCentralNuclei          matlab.ui.control.Button
+        NucleiColorDropDown             matlab.ui.control.DropDown
+        NucleiColorDropDownLabel        matlab.ui.control.Label
+        PixelSizeumpixelEditField_2     matlab.ui.control.NumericEditField
+        PixelSizeumpixelLabel           matlab.ui.control.Label
+        CNFChannelColorBox              matlab.ui.control.UIAxes
+        NonfiberControlPanel            matlab.ui.container.Panel
+        PixelSizeNonfiber               matlab.ui.control.NumericEditField
+        PixelSizeumpixelLabel_2         matlab.ui.control.Label
+        DoneNonfiber                    matlab.ui.control.Button
+        WritetoExcelNonfiber            matlab.ui.control.Button
+        CalculateNonfiberObjects        matlab.ui.control.Button
+        NonfiberObjectsDataOutputFolder  matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label_2  matlab.ui.control.Label
+        NonfiberObjectsColorDropDown    matlab.ui.control.DropDown
+        ObjectColorDropDownLabel        matlab.ui.control.Label
+        NonfiberChannelColorBox         matlab.ui.control.UIAxes
+        FiberPredictionControlPanel     matlab.ui.container.Panel
+        SortingThresholdSlider          matlab.ui.control.Slider
+        SortingThresholdHigherrequiresmoremanualsortingLabel  matlab.ui.control.Label
+        ManualSortingButton             matlab.ui.control.Button
+        FilterButton                    matlab.ui.control.Button
+        Image                           matlab.ui.control.Image
+        Panel                           matlab.ui.container.Panel
+        Hyperlink_2                     matlab.ui.control.Hyperlink
+        Hyperlink                       matlab.ui.control.Hyperlink
+        Panel_2                         matlab.ui.container.Panel
+        Image2                          matlab.ui.control.Image
+        SMASHLabel                      matlab.ui.control.Label
         SegmentationParameters          matlab.ui.container.Panel
         DetectValueButton               matlab.ui.control.Button
         SegmentationThresholdSlider     matlab.ui.control.Slider
@@ -22,18 +85,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         CloseManualSegmentationButton   matlab.ui.control.Button
         AcceptLineButton                matlab.ui.control.Button
         StartDrawingButton              matlab.ui.control.Button
-        NonfiberControlPanel            matlab.ui.container.Panel
-        PixelSizeNonfiber               matlab.ui.control.NumericEditField
-        PixelSizeumpixelLabel_2         matlab.ui.control.Label
-        DoneNonfiber                    matlab.ui.control.Button
-        WritetoExcelNonfiber            matlab.ui.control.Button
-        CalculateNonfiberObjects        matlab.ui.control.Button
-        NonfiberObjectsDataOutputFolder  matlab.ui.control.EditField
-        DataOutputFolderEditField_3Label_2  matlab.ui.control.Label
-        NonfiberObjectsColorDropDown    matlab.ui.control.DropDown
-        ObjectColorDropDownLabel        matlab.ui.control.Label
-        NonfiberChannelColorBox         matlab.ui.control.UIAxes
         Toolbar                         matlab.ui.container.Panel
+        InitialSegmentationButton       matlab.ui.control.Button
         NonfiberObjectsButton           matlab.ui.control.Button
         FiberTypingButton               matlab.ui.control.Button
         CentralNucleiButton             matlab.ui.control.Button
@@ -41,19 +94,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         ManualFiberFilterButton         matlab.ui.control.Button
         FiberPredictionButton           matlab.ui.control.Button
         ManualSegmentationButton        matlab.ui.control.Button
-        InitialSegmentationButton       matlab.ui.control.Button
-        NonfiberPanel                   matlab.ui.container.Panel
-        NonfiberAccept                  matlab.ui.control.Button
-        NonfiberAdjust                  matlab.ui.control.Button
-        NonfiberThreshold               matlab.ui.control.NumericEditField
-        ThresholdEditField_2Label_2     matlab.ui.control.Label
-        NonfiberAxes                    matlab.ui.control.UIAxes
-        CNFPanel                        matlab.ui.container.Panel
-        AcceptCNF                       matlab.ui.control.Button
-        AdjustCNF                       matlab.ui.control.Button
-        ThresholdCNF                    matlab.ui.control.NumericEditField
-        ThresholdEditField_2Label       matlab.ui.control.Label
-        CNFAxes                         matlab.ui.control.UIAxes
         FiberTypingPanel                matlab.ui.container.Panel
         AcceptButton                    matlab.ui.control.Button
         AdjustButton                    matlab.ui.control.Button
@@ -63,48 +103,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         FThistL                         matlab.ui.control.UIAxes
         FTAxesR                         matlab.ui.control.UIAxes
         FTAxesL                         matlab.ui.control.UIAxes
-        FiberTypingControlPanel         matlab.ui.container.Panel
-        DoneFT                          matlab.ui.control.Button
-        WritetoExcelFT                  matlab.ui.control.Button
-        CalculateFiberTyping            matlab.ui.control.Button
-        FiberTypeColorDropDown          matlab.ui.control.DropDown
-        FiberTypeColorDropDownLabel     matlab.ui.control.Label
-        FiberTypingDataOutputFolder     matlab.ui.control.EditField
-        DataOutputFolderEditField_3Label  matlab.ui.control.Label
-        PixelSizeFiberType              matlab.ui.control.NumericEditField
-        PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
-        FiberTypingChannelColorBox      matlab.ui.control.UIAxes
-        CNFControlPanel                 matlab.ui.container.Panel
-        CentralNucleiDataOutputFolder   matlab.ui.control.EditField
-        DataOutputFolderEditField_2Label  matlab.ui.control.Label
-        MinimumNucleusSizeum2EditField  matlab.ui.control.NumericEditField
-        MinimumNucleusSizeum2EditFieldLabel  matlab.ui.control.Label
-        DistancefromborderEditField     matlab.ui.control.NumericEditField
-        DistancefromborderEditFieldLabel  matlab.ui.control.Label
-        DoneButton_CNF                  matlab.ui.control.Button
-        CNFExcelWrite                   matlab.ui.control.Button
-        CalculateCentralNuclei          matlab.ui.control.Button
-        NucleiColorDropDown             matlab.ui.control.DropDown
-        NucleiColorDropDownLabel        matlab.ui.control.Label
-        PixelSizeumpixelEditField_2     matlab.ui.control.NumericEditField
-        PixelSizeumpixelLabel           matlab.ui.control.Label
-        CNFChannelColorBox              matlab.ui.control.UIAxes
-        FiberPredictionControlPanel     matlab.ui.container.Panel
-        SortingThresholdSlider          matlab.ui.control.Slider
-        SortingThresholdHigherrequiresmoremanualsortingLabel  matlab.ui.control.Label
-        ManualSortingButton             matlab.ui.control.Button
-        FilterButton                    matlab.ui.control.Button
-        PropertiesControlPanel          matlab.ui.container.Panel
-        CalculateFiberProperties        matlab.ui.control.Button
-        PixelSizeumpixelEditField       matlab.ui.control.NumericEditField
-        PixelSizeumpixelEditFieldLabel_2  matlab.ui.control.Label
-        FiberPropertiesDataOutputFolder  matlab.ui.control.EditField
-        DataOutputFolderEditFieldLabel  matlab.ui.control.Label
-        DoneButton                      matlab.ui.control.Button
-        WritetoExcelButton              matlab.ui.control.Button
-        PropertiesPanel                 matlab.ui.container.Panel
-        FiberSizeAxes                   matlab.ui.control.UIAxes
-        FeretAxes                       matlab.ui.control.UIAxes
         ManualFilterControls            matlab.ui.container.Panel
         FinishManualFilteringButton     matlab.ui.control.Button
         RemoveObjectsButton             matlab.ui.control.Button
@@ -114,12 +112,18 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         YesButton                       matlab.ui.control.Button
         UIAxesR                         matlab.ui.control.UIAxes
         UIAxesL                         matlab.ui.control.UIAxes
-        Image2                          matlab.ui.control.Image
-        SMASHLabel                      matlab.ui.control.Label
-        Image                           matlab.ui.control.Image
         Prompt                          matlab.ui.control.Label
         FilenameLabel                   matlab.ui.control.Label
         SelectFileButton                matlab.ui.control.Button
+        PropertiesPanel                 matlab.ui.container.Panel
+        FiberSizeAxes                   matlab.ui.control.UIAxes
+        FeretAxes                       matlab.ui.control.UIAxes
+        CNFPanel                        matlab.ui.container.Panel
+        AcceptCNF                       matlab.ui.control.Button
+        AdjustCNF                       matlab.ui.control.Button
+        ThresholdCNF                    matlab.ui.control.NumericEditField
+        ThresholdEditField_2Label       matlab.ui.control.Label
+        CNFAxes                         matlab.ui.control.UIAxes
         UIAxes                          matlab.ui.control.UIAxes
     end
 
@@ -744,7 +748,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FinishManualFilteringButton
         function FinishManualFilteringButtonPushed(app, event)
-            app.Prompt.Text = 'Click anywhere to continue';
+            app.Prompt.Text = 'Click anywhere on the screen or esc to continue';
             app.FinishManualFilteringButton.Enable = 'off';
             app.done = 1;
         end
@@ -844,8 +848,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             min_nuc_pix = app.MinimumNucleusSizeum2EditField.Value/(app.pix_size^2);
             border = app.DistancefromborderEditField.Value;
             border_pix = border/app.pix_size;
-            label_org = bwlabel(app.bw_obj,4);
-            num_fib = max(max(label_org));
+            label_org = bwconncomp(app.bw_obj,4);
+            num_fib = label_org.NumObjects;
             
             % Create border region
             inv_img = imcomplement(app.bw_obj);
@@ -992,7 +996,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.cutoff_avg = threshes(2);
             
             % Fiber Properties
-            rprop = regionprops(label,fti,'MeanIntensity','Centroid','Area','PixelIdxList');
+            rprop = regionprops(bwconncomp(app.bw_obj,4),fti,'MeanIntensity','Centroid','Area','PixelIdxList');
             app.ave_g = [rprop.MeanIntensity];
             app.areas = [rprop.Area];
             cents = cat(1,rprop.Centroid);
@@ -1174,7 +1178,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 
             end
             
-            label = bwlabel(ch_bw,4);
+            label = bwconncomp(ch_bw,4);
             nfprops = regionprops(label,'Centroid','Area');
             area_nf = [nfprops.Area]'*app.pix_size^2;
             cents_nf = cat(1,nfprops.Centroid);
@@ -1603,6 +1607,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create UIFigure and hide until all components are created
             app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Color = [1 1 1];
             app.UIFigure.Position = [100 100 1199 779];
             app.UIFigure.Name = 'MATLAB App';
 
@@ -1610,192 +1615,524 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIAxes = uiaxes(app.UIFigure);
             xlabel(app.UIAxes, 'X')
             ylabel(app.UIAxes, 'Y')
+            app.UIAxes.FontName = 'Avenir';
             app.UIAxes.XColor = 'none';
             app.UIAxes.YColor = 'none';
             app.UIAxes.GridColor = 'none';
             app.UIAxes.MinorGridColor = 'none';
-            app.UIAxes.Position = [266 9 909 698];
+            app.UIAxes.Position = [285 28 897 633];
+
+            % Create CNFPanel
+            app.CNFPanel = uipanel(app.UIFigure);
+            app.CNFPanel.Visible = 'off';
+            app.CNFPanel.FontName = 'Avenir';
+            app.CNFPanel.Position = [285 28 882 634];
+
+            % Create CNFAxes
+            app.CNFAxes = uiaxes(app.CNFPanel);
+            app.CNFAxes.PlotBoxAspectRatio = [1.34971644612476 1 1];
+            app.CNFAxes.FontName = 'Avenir';
+            app.CNFAxes.XColor = 'none';
+            app.CNFAxes.YColor = 'none';
+            app.CNFAxes.Position = [72 70 743 555];
+
+            % Create ThresholdEditField_2Label
+            app.ThresholdEditField_2Label = uilabel(app.CNFPanel);
+            app.ThresholdEditField_2Label.HorizontalAlignment = 'right';
+            app.ThresholdEditField_2Label.FontName = 'Avenir';
+            app.ThresholdEditField_2Label.Position = [206 38 59 22];
+            app.ThresholdEditField_2Label.Text = 'Threshold';
+
+            % Create ThresholdCNF
+            app.ThresholdCNF = uieditfield(app.CNFPanel, 'numeric');
+            app.ThresholdCNF.FontName = 'Avenir';
+            app.ThresholdCNF.Position = [280 38 100 22];
+
+            % Create AdjustCNF
+            app.AdjustCNF = uibutton(app.CNFPanel, 'push');
+            app.AdjustCNF.ButtonPushedFcn = createCallbackFcn(app, @AdjustCNFButtonPushed, true);
+            app.AdjustCNF.FontName = 'Avenir';
+            app.AdjustCNF.Position = [424 37 100 24];
+            app.AdjustCNF.Text = 'Adjust';
+
+            % Create AcceptCNF
+            app.AcceptCNF = uibutton(app.CNFPanel, 'push');
+            app.AcceptCNF.ButtonPushedFcn = createCallbackFcn(app, @AcceptCNFButtonPushed, true);
+            app.AcceptCNF.FontName = 'Avenir';
+            app.AcceptCNF.Position = [555 37 100 24];
+            app.AcceptCNF.Text = 'Accept';
+
+            % Create PropertiesPanel
+            app.PropertiesPanel = uipanel(app.UIFigure);
+            app.PropertiesPanel.Visible = 'off';
+            app.PropertiesPanel.FontName = 'Avenir';
+            app.PropertiesPanel.Position = [285 28 890 637];
+
+            % Create FeretAxes
+            app.FeretAxes = uiaxes(app.PropertiesPanel);
+            title(app.FeretAxes, 'Minimum Feret Diameter (um)')
+            app.FeretAxes.PlotBoxAspectRatio = [3.2695652173913 1 1];
+            app.FeretAxes.FontName = 'Avenir';
+            app.FeretAxes.Position = [53 323 799 285];
+
+            % Create FiberSizeAxes
+            app.FiberSizeAxes = uiaxes(app.PropertiesPanel);
+            title(app.FiberSizeAxes, 'Fiber Area (um^2)')
+            app.FiberSizeAxes.PlotBoxAspectRatio = [3.29824561403509 1 1];
+            app.FiberSizeAxes.FontName = 'Avenir';
+            app.FiberSizeAxes.Position = [53 25 799 285];
 
             % Create SelectFileButton
             app.SelectFileButton = uibutton(app.UIFigure, 'push');
             app.SelectFileButton.ButtonPushedFcn = createCallbackFcn(app, @SelectFileButtonPushed, true);
-            app.SelectFileButton.Position = [38 671 109 32];
+            app.SelectFileButton.BackgroundColor = [1 1 1];
+            app.SelectFileButton.FontName = 'Avenir';
+            app.SelectFileButton.Position = [38 612 109 32];
             app.SelectFileButton.Text = 'Select File';
 
             % Create FilenameLabel
             app.FilenameLabel = uilabel(app.UIFigure);
-            app.FilenameLabel.Position = [156 676 130 22];
+            app.FilenameLabel.FontName = 'Avenir';
+            app.FilenameLabel.Position = [156 617 130 22];
             app.FilenameLabel.Text = 'Filename';
 
             % Create Prompt
             app.Prompt = uilabel(app.UIFigure);
             app.Prompt.HorizontalAlignment = 'center';
-            app.Prompt.Position = [257 702 824 22];
+            app.Prompt.FontName = 'Avenir';
+            app.Prompt.Position = [289 650 824 22];
             app.Prompt.Text = '';
-
-            % Create Image
-            app.Image = uiimage(app.UIFigure);
-            app.Image.HorizontalAlignment = 'left';
-            app.Image.Position = [8 706 52 74];
-            app.Image.ImageSource = 'screenshot.png';
-
-            % Create SMASHLabel
-            app.SMASHLabel = uilabel(app.UIFigure);
-            app.SMASHLabel.FontName = 'Century Gothic';
-            app.SMASHLabel.FontSize = 20;
-            app.SMASHLabel.Position = [72 733 72 26];
-            app.SMASHLabel.Text = 'SMASH';
-
-            % Create Image2
-            app.Image2 = uiimage(app.UIFigure);
-            app.Image2.HorizontalAlignment = 'right';
-            app.Image2.VerticalAlignment = 'top';
-            app.Image2.Position = [1088 723 122 45];
-            app.Image2.ImageSource = 'LabLogo.png';
 
             % Create SortingAxesPanel
             app.SortingAxesPanel = uipanel(app.UIFigure);
             app.SortingAxesPanel.Title = 'Panel4';
             app.SortingAxesPanel.Visible = 'off';
-            app.SortingAxesPanel.Position = [285 24 890 679];
+            app.SortingAxesPanel.FontName = 'Avenir';
+            app.SortingAxesPanel.Position = [285 28 890 633];
 
             % Create UIAxesL
             app.UIAxesL = uiaxes(app.SortingAxesPanel);
             xlabel(app.UIAxesL, 'X')
             ylabel(app.UIAxesL, 'Y')
             app.UIAxesL.PlotBoxAspectRatio = [1 1.04306220095694 1];
+            app.UIAxesL.FontName = 'Avenir';
             app.UIAxesL.XColor = 'none';
             app.UIAxesL.YColor = 'none';
-            app.UIAxesL.Position = [12 188 412 438];
+            app.UIAxesL.Position = [12 140 412 438];
 
             % Create UIAxesR
             app.UIAxesR = uiaxes(app.SortingAxesPanel);
             xlabel(app.UIAxesR, 'X')
             ylabel(app.UIAxesR, 'Y')
             app.UIAxesR.PlotBoxAspectRatio = [1 1.12082262210797 1];
+            app.UIAxesR.FontName = 'Avenir';
             app.UIAxesR.XColor = 'none';
             app.UIAxesR.YColor = 'none';
-            app.UIAxesR.Position = [467 188 412 438];
+            app.UIAxesR.Position = [467 140 412 438];
 
             % Create YesButton
             app.YesButton = uibutton(app.SortingAxesPanel, 'push');
             app.YesButton.ButtonPushedFcn = createCallbackFcn(app, @YesButtonPushed, true);
-            app.YesButton.Position = [178 108 100 22];
+            app.YesButton.FontName = 'Avenir';
+            app.YesButton.Position = [178 58 100 24];
             app.YesButton.Text = 'Yes';
 
             % Create NoButton
             app.NoButton = uibutton(app.SortingAxesPanel, 'push');
             app.NoButton.ButtonPushedFcn = createCallbackFcn(app, @NoButtonPushed, true);
-            app.NoButton.Position = [378 108 100 22];
+            app.NoButton.FontName = 'Avenir';
+            app.NoButton.Position = [378 58 100 24];
             app.NoButton.Text = 'No';
 
             % Create MarkasfiberLabel
             app.MarkasfiberLabel = uilabel(app.SortingAxesPanel);
             app.MarkasfiberLabel.HorizontalAlignment = 'center';
-            app.MarkasfiberLabel.Position = [188 143 290 22];
+            app.MarkasfiberLabel.FontName = 'Avenir';
+            app.MarkasfiberLabel.Position = [188 95 290 22];
             app.MarkasfiberLabel.Text = 'Mark as fiber?';
 
             % Create ManualFilterControls
             app.ManualFilterControls = uipanel(app.UIFigure);
             app.ManualFilterControls.Visible = 'off';
-            app.ManualFilterControls.Position = [35 523 245 137];
+            app.ManualFilterControls.BackgroundColor = [1 1 1];
+            app.ManualFilterControls.FontName = 'Avenir';
+            app.ManualFilterControls.Position = [31 443 245 137];
 
             % Create RemoveObjectsButton
             app.RemoveObjectsButton = uibutton(app.ManualFilterControls, 'push');
             app.RemoveObjectsButton.ButtonPushedFcn = createCallbackFcn(app, @RemoveObjectsButtonPushed, true);
-            app.RemoveObjectsButton.Position = [73 78 104 22];
+            app.RemoveObjectsButton.FontName = 'Avenir';
+            app.RemoveObjectsButton.Position = [73 76 104 24];
             app.RemoveObjectsButton.Text = 'Remove Objects';
 
             % Create FinishManualFilteringButton
             app.FinishManualFilteringButton = uibutton(app.ManualFilterControls, 'push');
             app.FinishManualFilteringButton.ButtonPushedFcn = createCallbackFcn(app, @FinishManualFilteringButtonPushed, true);
+            app.FinishManualFilteringButton.FontName = 'Avenir';
             app.FinishManualFilteringButton.Enable = 'off';
-            app.FinishManualFilteringButton.Position = [58 28 136 22];
+            app.FinishManualFilteringButton.Position = [58 26 136 24];
             app.FinishManualFilteringButton.Text = 'Finish Manual Filtering';
 
-            % Create PropertiesPanel
-            app.PropertiesPanel = uipanel(app.UIFigure);
-            app.PropertiesPanel.Visible = 'off';
-            app.PropertiesPanel.Position = [285 24 890 679];
+            % Create FiberTypingPanel
+            app.FiberTypingPanel = uipanel(app.UIFigure);
+            app.FiberTypingPanel.Visible = 'off';
+            app.FiberTypingPanel.FontName = 'Avenir';
+            app.FiberTypingPanel.Position = [285 28 882 637];
 
-            % Create FeretAxes
-            app.FeretAxes = uiaxes(app.PropertiesPanel);
-            title(app.FeretAxes, 'Minimum Feret Diameter (um)')
-            app.FeretAxes.PlotBoxAspectRatio = [3.2695652173913 1 1];
-            app.FeretAxes.Position = [53 365 799 285];
+            % Create FTAxesL
+            app.FTAxesL = uiaxes(app.FiberTypingPanel);
+            app.FTAxesL.PlotBoxAspectRatio = [1.06832298136646 1 1];
+            app.FTAxesL.FontName = 'Avenir';
+            app.FTAxesL.XColor = 'none';
+            app.FTAxesL.YColor = 'none';
+            app.FTAxesL.Position = [22 276 414 332];
 
-            % Create FiberSizeAxes
-            app.FiberSizeAxes = uiaxes(app.PropertiesPanel);
-            title(app.FiberSizeAxes, 'Fiber Area (um^2)')
-            app.FiberSizeAxes.PlotBoxAspectRatio = [3.29824561403509 1 1];
-            app.FiberSizeAxes.Position = [53 67 799 285];
+            % Create FTAxesR
+            app.FTAxesR = uiaxes(app.FiberTypingPanel);
+            app.FTAxesR.PlotBoxAspectRatio = [1.06832298136646 1 1];
+            app.FTAxesR.FontName = 'Avenir';
+            app.FTAxesR.XColor = 'none';
+            app.FTAxesR.YColor = 'none';
+            app.FTAxesR.Position = [450 276 416 335];
 
-            % Create PropertiesControlPanel
-            app.PropertiesControlPanel = uipanel(app.UIFigure);
-            app.PropertiesControlPanel.Visible = 'off';
-            app.PropertiesControlPanel.Position = [21 364 251 275];
+            % Create FThistL
+            app.FThistL = uiaxes(app.FiberTypingPanel);
+            app.FThistL.PlotBoxAspectRatio = [1.83030303030303 1 1];
+            app.FThistL.FontName = 'Avenir';
+            app.FThistL.Position = [22 70 402 207];
 
-            % Create WritetoExcelButton
-            app.WritetoExcelButton = uibutton(app.PropertiesControlPanel, 'push');
-            app.WritetoExcelButton.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelButtonPushed, true);
-            app.WritetoExcelButton.Enable = 'off';
-            app.WritetoExcelButton.Position = [27 65 100 22];
-            app.WritetoExcelButton.Text = 'Write to Excel';
+            % Create FThistR
+            app.FThistR = uiaxes(app.FiberTypingPanel);
+            app.FThistR.PlotBoxAspectRatio = [1.91358024691358 1 1];
+            app.FThistR.FontName = 'Avenir';
+            app.FThistR.Position = [450 73 402 204];
 
-            % Create DoneButton
-            app.DoneButton = uibutton(app.PropertiesControlPanel, 'push');
-            app.DoneButton.ButtonPushedFcn = createCallbackFcn(app, @DoneButtonPushed, true);
-            app.DoneButton.Position = [140 65 100 22];
-            app.DoneButton.Text = 'Done';
+            % Create ThresholdEditFieldLabel
+            app.ThresholdEditFieldLabel = uilabel(app.FiberTypingPanel);
+            app.ThresholdEditFieldLabel.HorizontalAlignment = 'right';
+            app.ThresholdEditFieldLabel.FontName = 'Avenir';
+            app.ThresholdEditFieldLabel.Enable = 'off';
+            app.ThresholdEditFieldLabel.Position = [210 39 59 22];
+            app.ThresholdEditFieldLabel.Text = 'Threshold';
 
-            % Create DataOutputFolderEditFieldLabel
-            app.DataOutputFolderEditFieldLabel = uilabel(app.PropertiesControlPanel);
-            app.DataOutputFolderEditFieldLabel.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditFieldLabel.Position = [16 169 108 22];
-            app.DataOutputFolderEditFieldLabel.Text = 'Data Output Folder';
+            % Create ThresholdEditField
+            app.ThresholdEditField = uieditfield(app.FiberTypingPanel, 'numeric');
+            app.ThresholdEditField.FontName = 'Avenir';
+            app.ThresholdEditField.Enable = 'off';
+            app.ThresholdEditField.Position = [284 39 100 22];
 
-            % Create FiberPropertiesDataOutputFolder
-            app.FiberPropertiesDataOutputFolder = uieditfield(app.PropertiesControlPanel, 'text');
-            app.FiberPropertiesDataOutputFolder.Position = [139 169 100 22];
+            % Create AdjustButton
+            app.AdjustButton = uibutton(app.FiberTypingPanel, 'push');
+            app.AdjustButton.ButtonPushedFcn = createCallbackFcn(app, @AdjustButtonPushed, true);
+            app.AdjustButton.FontName = 'Avenir';
+            app.AdjustButton.Enable = 'off';
+            app.AdjustButton.Position = [423 37 100 24];
+            app.AdjustButton.Text = 'Adjust';
 
-            % Create PixelSizeumpixelEditFieldLabel_2
-            app.PixelSizeumpixelEditFieldLabel_2 = uilabel(app.PropertiesControlPanel);
-            app.PixelSizeumpixelEditFieldLabel_2.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditFieldLabel_2.Position = [10 218 114 22];
-            app.PixelSizeumpixelEditFieldLabel_2.Text = 'Pixel Size (um/pixel)';
+            % Create AcceptButton
+            app.AcceptButton = uibutton(app.FiberTypingPanel, 'push');
+            app.AcceptButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptButtonPushed, true);
+            app.AcceptButton.FontName = 'Avenir';
+            app.AcceptButton.Enable = 'off';
+            app.AcceptButton.Position = [548 37 100 24];
+            app.AcceptButton.Text = 'Accept';
 
-            % Create PixelSizeumpixelEditField
-            app.PixelSizeumpixelEditField = uieditfield(app.PropertiesControlPanel, 'numeric');
-            app.PixelSizeumpixelEditField.Position = [139 218 100 22];
+            % Create Toolbar
+            app.Toolbar = uipanel(app.UIFigure);
+            app.Toolbar.ForegroundColor = [1 1 1];
+            app.Toolbar.BackgroundColor = [1 1 1];
+            app.Toolbar.FontName = 'Avenir';
+            app.Toolbar.Position = [95 675 1015 43];
 
-            % Create CalculateFiberProperties
-            app.CalculateFiberProperties = uibutton(app.PropertiesControlPanel, 'push');
-            app.CalculateFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberPropertiesPushed, true);
-            app.CalculateFiberProperties.Position = [81 119 100 22];
-            app.CalculateFiberProperties.Text = 'Calculate';
+            % Create ManualSegmentationButton
+            app.ManualSegmentationButton = uibutton(app.Toolbar, 'push');
+            app.ManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @ManualSegmentationButtonPushed, true);
+            app.ManualSegmentationButton.BackgroundColor = [0.9608 0.9608 0.9608];
+            app.ManualSegmentationButton.FontName = 'Avenir';
+            app.ManualSegmentationButton.Enable = 'off';
+            app.ManualSegmentationButton.Position = [130 6 128 33];
+            app.ManualSegmentationButton.Text = 'Manual Segmentation';
+
+            % Create FiberPredictionButton
+            app.FiberPredictionButton = uibutton(app.Toolbar, 'push');
+            app.FiberPredictionButton.ButtonPushedFcn = createCallbackFcn(app, @FiberPredictionButtonPushed, true);
+            app.FiberPredictionButton.BackgroundColor = [0.9608 0.9608 0.9608];
+            app.FiberPredictionButton.FontName = 'Avenir';
+            app.FiberPredictionButton.Enable = 'off';
+            app.FiberPredictionButton.Position = [262 6 120 33];
+            app.FiberPredictionButton.Text = 'Fiber Prediction';
+
+            % Create ManualFiberFilterButton
+            app.ManualFiberFilterButton = uibutton(app.Toolbar, 'push');
+            app.ManualFiberFilterButton.ButtonPushedFcn = createCallbackFcn(app, @ManualFiberFilterButtonPushed, true);
+            app.ManualFiberFilterButton.FontName = 'Avenir';
+            app.ManualFiberFilterButton.Enable = 'off';
+            app.ManualFiberFilterButton.Position = [387 6 120 33];
+            app.ManualFiberFilterButton.Text = 'Manual Fiber Filter';
+
+            % Create FiberPropertiesButton
+            app.FiberPropertiesButton = uibutton(app.Toolbar, 'push');
+            app.FiberPropertiesButton.ButtonPushedFcn = createCallbackFcn(app, @FiberPropertiesButtonPushed, true);
+            app.FiberPropertiesButton.FontName = 'Avenir';
+            app.FiberPropertiesButton.Enable = 'off';
+            app.FiberPropertiesButton.Position = [511 6 120 33];
+            app.FiberPropertiesButton.Text = 'Fiber Properties';
+
+            % Create CentralNucleiButton
+            app.CentralNucleiButton = uibutton(app.Toolbar, 'push');
+            app.CentralNucleiButton.ButtonPushedFcn = createCallbackFcn(app, @CentralNucleiButtonPushed, true);
+            app.CentralNucleiButton.FontName = 'Avenir';
+            app.CentralNucleiButton.Enable = 'off';
+            app.CentralNucleiButton.Position = [636 6 120 33];
+            app.CentralNucleiButton.Text = 'Central Nuclei';
+
+            % Create FiberTypingButton
+            app.FiberTypingButton = uibutton(app.Toolbar, 'push');
+            app.FiberTypingButton.ButtonPushedFcn = createCallbackFcn(app, @FiberTypingButtonPushed, true);
+            app.FiberTypingButton.FontName = 'Avenir';
+            app.FiberTypingButton.Enable = 'off';
+            app.FiberTypingButton.Position = [761 6 120 33];
+            app.FiberTypingButton.Text = 'Fiber Typing';
+
+            % Create NonfiberObjectsButton
+            app.NonfiberObjectsButton = uibutton(app.Toolbar, 'push');
+            app.NonfiberObjectsButton.ButtonPushedFcn = createCallbackFcn(app, @NonfiberObjectsButtonPushed, true);
+            app.NonfiberObjectsButton.FontName = 'Avenir';
+            app.NonfiberObjectsButton.Enable = 'off';
+            app.NonfiberObjectsButton.Position = [886 6 120 33];
+            app.NonfiberObjectsButton.Text = 'Nonfiber Objects';
+
+            % Create InitialSegmentationButton
+            app.InitialSegmentationButton = uibutton(app.Toolbar, 'push');
+            app.InitialSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @InitialSegmentationButtonPushed, true);
+            app.InitialSegmentationButton.BackgroundColor = [0.9608 0.9608 0.9608];
+            app.InitialSegmentationButton.FontName = 'Avenir';
+            app.InitialSegmentationButton.Enable = 'off';
+            app.InitialSegmentationButton.Position = [6 6 120 33];
+            app.InitialSegmentationButton.Text = 'Initial Segmentation';
+
+            % Create ManualSegmentationControls
+            app.ManualSegmentationControls = uipanel(app.UIFigure);
+            app.ManualSegmentationControls.Visible = 'off';
+            app.ManualSegmentationControls.FontName = 'Avenir';
+            app.ManualSegmentationControls.Position = [45 252 263 318];
+
+            % Create StartDrawingButton
+            app.StartDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
+            app.StartDrawingButton.FontName = 'Avenir';
+            app.StartDrawingButton.Position = [28 249 100 24];
+            app.StartDrawingButton.Text = 'Start Drawing';
+
+            % Create AcceptLineButton
+            app.AcceptLineButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
+            app.AcceptLineButton.BackgroundColor = [0.9608 0.9608 0.9608];
+            app.AcceptLineButton.FontName = 'Avenir';
+            app.AcceptLineButton.Enable = 'off';
+            app.AcceptLineButton.Position = [149 222 100 51];
+            app.AcceptLineButton.Text = 'Accept Line';
+
+            % Create CloseManualSegmentationButton
+            app.CloseManualSegmentationButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.CloseManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseManualSegmentationButtonPushed, true);
+            app.CloseManualSegmentationButton.FontName = 'Avenir';
+            app.CloseManualSegmentationButton.Position = [35 47 182 60];
+            app.CloseManualSegmentationButton.Text = 'Close Manual Segmentation';
+
+            % Create DrawingModeLabel
+            app.DrawingModeLabel = uilabel(app.ManualSegmentationControls);
+            app.DrawingModeLabel.FontName = 'Avenir';
+            app.DrawingModeLabel.Position = [30 283 85 22];
+            app.DrawingModeLabel.Text = 'Drawing Mode';
+
+            % Create MergeObjectsModeLabel
+            app.MergeObjectsModeLabel = uilabel(app.ManualSegmentationControls);
+            app.MergeObjectsModeLabel.FontName = 'Avenir';
+            app.MergeObjectsModeLabel.Position = [27 181 121 22];
+            app.MergeObjectsModeLabel.Text = 'Merge Objects Mode';
+
+            % Create StartMergingButton
+            app.StartMergingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.StartMergingButton.ButtonPushedFcn = createCallbackFcn(app, @StartMergingButtonPushed, true);
+            app.StartMergingButton.FontName = 'Avenir';
+            app.StartMergingButton.Position = [29 146 100 24];
+            app.StartMergingButton.Text = 'Start Merging';
+
+            % Create FinishDrawingButton
+            app.FinishDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.FinishDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishDrawingButtonPushed, true);
+            app.FinishDrawingButton.FontName = 'Avenir';
+            app.FinishDrawingButton.Enable = 'off';
+            app.FinishDrawingButton.Position = [29 220 100 24];
+            app.FinishDrawingButton.Text = 'Finish Drawing';
+
+            % Create SegmentationParameters
+            app.SegmentationParameters = uipanel(app.UIFigure);
+            app.SegmentationParameters.Visible = 'off';
+            app.SegmentationParameters.BackgroundColor = [1 1 1];
+            app.SegmentationParameters.FontName = 'Avenir';
+            app.SegmentationParameters.Position = [14 326 286 245];
+
+            % Create FiberOutlineChannelColorBox
+            app.FiberOutlineChannelColorBox = uiaxes(app.SegmentationParameters);
+            app.FiberOutlineChannelColorBox.Toolbar.Visible = 'off';
+            app.FiberOutlineChannelColorBox.FontName = 'Avenir';
+            app.FiberOutlineChannelColorBox.XTick = [];
+            app.FiberOutlineChannelColorBox.YTick = [];
+            app.FiberOutlineChannelColorBox.Color = [0 1 1];
+            app.FiberOutlineChannelColorBox.Box = 'on';
+            app.FiberOutlineChannelColorBox.PickableParts = 'none';
+            app.FiberOutlineChannelColorBox.Position = [250 154 30 30];
+
+            % Create PixelSizeumpixelEditFieldLabel
+            app.PixelSizeumpixelEditFieldLabel = uilabel(app.SegmentationParameters);
+            app.PixelSizeumpixelEditFieldLabel.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditFieldLabel.FontName = 'Avenir';
+            app.PixelSizeumpixelEditFieldLabel.Position = [16 200 114 22];
+            app.PixelSizeumpixelEditFieldLabel.Text = 'Pixel Size (um/pixel)';
+
+            % Create PixelSizeField
+            app.PixelSizeField = uieditfield(app.SegmentationParameters, 'numeric');
+            app.PixelSizeField.FontName = 'Avenir';
+            app.PixelSizeField.Position = [145 200 100 22];
+
+            % Create SegmentButton
+            app.SegmentButton = uibutton(app.SegmentationParameters, 'push');
+            app.SegmentButton.ButtonPushedFcn = createCallbackFcn(app, @SegmentButtonPushed, true);
+            app.SegmentButton.FontName = 'Avenir';
+            app.SegmentButton.Position = [144 63 100 24];
+            app.SegmentButton.Text = 'Segment';
+
+            % Create FiberOutlineColorDropDownLabel
+            app.FiberOutlineColorDropDownLabel = uilabel(app.SegmentationParameters);
+            app.FiberOutlineColorDropDownLabel.HorizontalAlignment = 'right';
+            app.FiberOutlineColorDropDownLabel.FontName = 'Avenir';
+            app.FiberOutlineColorDropDownLabel.Position = [21 158 109 22];
+            app.FiberOutlineColorDropDownLabel.Text = 'Fiber Outline Color';
+
+            % Create FiberOutlineColorDropDown
+            app.FiberOutlineColorDropDown = uidropdown(app.SegmentationParameters);
+            app.FiberOutlineColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.FiberOutlineColorDropDown.ItemsData = {'1', '2', '3'};
+            app.FiberOutlineColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberOutlineColorValueChanged, true);
+            app.FiberOutlineColorDropDown.FontName = 'Avenir';
+            app.FiberOutlineColorDropDown.Position = [145 158 100 22];
+            app.FiberOutlineColorDropDown.Value = '1';
+
+            % Create AcceptSegmentationButton
+            app.AcceptSegmentationButton = uibutton(app.SegmentationParameters, 'push');
+            app.AcceptSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptSegmentationButtonPushed, true);
+            app.AcceptSegmentationButton.FontName = 'Avenir';
+            app.AcceptSegmentationButton.Enable = 'off';
+            app.AcceptSegmentationButton.Position = [81 31 100 24];
+            app.AcceptSegmentationButton.Text = 'Accept';
+
+            % Create SegmentationThresholdSliderLabel
+            app.SegmentationThresholdSliderLabel = uilabel(app.SegmentationParameters);
+            app.SegmentationThresholdSliderLabel.HorizontalAlignment = 'center';
+            app.SegmentationThresholdSliderLabel.FontName = 'Avenir';
+            app.SegmentationThresholdSliderLabel.Position = [13 101 81 43];
+            app.SegmentationThresholdSliderLabel.Text = {'Segmentation'; 'Threshold'};
+
+            % Create SegmentationThresholdSlider
+            app.SegmentationThresholdSlider = uislider(app.SegmentationParameters);
+            app.SegmentationThresholdSlider.Limits = [0 50];
+            app.SegmentationThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SegmentationThresholdSliderValueChanged, true);
+            app.SegmentationThresholdSlider.FontName = 'Avenir';
+            app.SegmentationThresholdSlider.Position = [101 128 139 3];
+
+            % Create DetectValueButton
+            app.DetectValueButton = uibutton(app.SegmentationParameters, 'push');
+            app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
+            app.DetectValueButton.BackgroundColor = [0.902 0.902 0.902];
+            app.DetectValueButton.FontName = 'Avenir';
+            app.DetectValueButton.Position = [24 63 100 24];
+            app.DetectValueButton.Text = 'Detect Value';
+
+            % Create Panel
+            app.Panel = uipanel(app.UIFigure);
+            app.Panel.BackgroundColor = [0 0.2902 0.4784];
+            app.Panel.FontName = 'Avenir';
+            app.Panel.Position = [1 728 1199 52];
+
+            % Create SMASHLabel
+            app.SMASHLabel = uilabel(app.Panel);
+            app.SMASHLabel.FontName = 'Avenir';
+            app.SMASHLabel.FontSize = 24;
+            app.SMASHLabel.FontColor = [1 1 1];
+            app.SMASHLabel.Position = [56 10 87 35];
+            app.SMASHLabel.Text = 'SMASH';
+
+            % Create Panel_2
+            app.Panel_2 = uipanel(app.Panel);
+            app.Panel_2.ForegroundColor = [0 0.2784 0.4784];
+            app.Panel_2.BorderType = 'none';
+            app.Panel_2.BackgroundColor = [0.902 0.902 0.902];
+            app.Panel_2.Position = [1085 9 102 35];
+
+            % Create Image2
+            app.Image2 = uiimage(app.Panel_2);
+            app.Image2.HorizontalAlignment = 'right';
+            app.Image2.VerticalAlignment = 'top';
+            app.Image2.Position = [13 3 91 30];
+            app.Image2.ImageSource = 'LabLogo.png';
+
+            % Create Hyperlink
+            app.Hyperlink = uihyperlink(app.Panel);
+            app.Hyperlink.URL = 'https://sites.google.com/ucdavis.edu/myomatrixlab/home';
+            app.Hyperlink.VisitedColor = [1 1 1];
+            app.Hyperlink.FontName = 'Avenir';
+            app.Hyperlink.FontSize = 14;
+            app.Hyperlink.FontWeight = 'normal';
+            app.Hyperlink.FontColor = [1 1 1];
+            app.Hyperlink.Position = [1009 15 44 22];
+            app.Hyperlink.Text = 'About';
+
+            % Create Hyperlink_2
+            app.Hyperlink_2 = uihyperlink(app.Panel);
+            app.Hyperlink_2.URL = 'https://sites.google.com/ucdavis.edu/myomatrixlab/home';
+            app.Hyperlink_2.VisitedColor = [1 1 1];
+            app.Hyperlink_2.FontName = 'Avenir';
+            app.Hyperlink_2.FontSize = 14;
+            app.Hyperlink_2.FontWeight = 'normal';
+            app.Hyperlink_2.FontColor = [1 1 1];
+            app.Hyperlink_2.Position = [906 15 75 22];
+            app.Hyperlink_2.Text = 'User Guide';
+
+            % Create Image
+            app.Image = uiimage(app.UIFigure);
+            app.Image.HorizontalAlignment = 'left';
+            app.Image.Position = [10 728 36 55];
+            app.Image.ImageSource = 'screenshot.png';
 
             % Create FiberPredictionControlPanel
             app.FiberPredictionControlPanel = uipanel(app.UIFigure);
             app.FiberPredictionControlPanel.Visible = 'off';
-            app.FiberPredictionControlPanel.Position = [16 395 263 243];
+            app.FiberPredictionControlPanel.BackgroundColor = [1 1 1];
+            app.FiberPredictionControlPanel.FontName = 'Avenir';
+            app.FiberPredictionControlPanel.Position = [12 315 263 243];
 
             % Create FilterButton
             app.FilterButton = uibutton(app.FiberPredictionControlPanel, 'push');
             app.FilterButton.ButtonPushedFcn = createCallbackFcn(app, @FilterButtonPushed, true);
-            app.FilterButton.Position = [74 103 100 22];
+            app.FilterButton.FontName = 'Avenir';
+            app.FilterButton.Position = [74 101 100 24];
             app.FilterButton.Text = 'Filter';
 
             % Create ManualSortingButton
             app.ManualSortingButton = uibutton(app.FiberPredictionControlPanel, 'push');
             app.ManualSortingButton.ButtonPushedFcn = createCallbackFcn(app, @ManualSortingButtonPushed, true);
+            app.ManualSortingButton.FontName = 'Avenir';
             app.ManualSortingButton.Enable = 'off';
-            app.ManualSortingButton.Position = [75 54 100 22];
+            app.ManualSortingButton.Position = [75 52 100 24];
             app.ManualSortingButton.Text = 'Manual Sorting';
 
             % Create SortingThresholdHigherrequiresmoremanualsortingLabel
             app.SortingThresholdHigherrequiresmoremanualsortingLabel = uilabel(app.FiberPredictionControlPanel);
             app.SortingThresholdHigherrequiresmoremanualsortingLabel.HorizontalAlignment = 'center';
-            app.SortingThresholdHigherrequiresmoremanualsortingLabel.Position = [-28.5 165 209 43];
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel.FontName = 'Avenir';
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel.Position = [-28 160 209 48];
             app.SortingThresholdHigherrequiresmoremanualsortingLabel.Text = {'Sorting Threshold'; '(Higher requires'; ' more manual sorting)'; ''};
 
             % Create SortingThresholdSlider
@@ -1804,353 +2141,20 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SortingThresholdSlider.MajorTicks = [0 0.5 0.9];
             app.SortingThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SortingThresholdSliderValueChanged, true);
             app.SortingThresholdSlider.MinorTicks = [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9];
+            app.SortingThresholdSlider.FontName = 'Avenir';
             app.SortingThresholdSlider.Position = [150 195 92 3];
-
-            % Create CNFControlPanel
-            app.CNFControlPanel = uipanel(app.UIFigure);
-            app.CNFControlPanel.Visible = 'off';
-            app.CNFControlPanel.Position = [16 360 260 293];
-
-            % Create CNFChannelColorBox
-            app.CNFChannelColorBox = uiaxes(app.CNFControlPanel);
-            app.CNFChannelColorBox.XTick = [];
-            app.CNFChannelColorBox.YTick = [];
-            app.CNFChannelColorBox.Color = [0 1 1];
-            app.CNFChannelColorBox.Box = 'on';
-            app.CNFChannelColorBox.PickableParts = 'none';
-            app.CNFChannelColorBox.Position = [228 223 30 30];
-
-            % Create PixelSizeumpixelLabel
-            app.PixelSizeumpixelLabel = uilabel(app.CNFControlPanel);
-            app.PixelSizeumpixelLabel.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelLabel.Position = [48 255 58 28];
-            app.PixelSizeumpixelLabel.Text = {'Pixel Size'; 'um/pixel'};
-
-            % Create PixelSizeumpixelEditField_2
-            app.PixelSizeumpixelEditField_2 = uieditfield(app.CNFControlPanel, 'numeric');
-            app.PixelSizeumpixelEditField_2.Position = [121 261 100 22];
-
-            % Create NucleiColorDropDownLabel
-            app.NucleiColorDropDownLabel = uilabel(app.CNFControlPanel);
-            app.NucleiColorDropDownLabel.HorizontalAlignment = 'right';
-            app.NucleiColorDropDownLabel.Position = [39 226 71 22];
-            app.NucleiColorDropDownLabel.Text = 'Nuclei Color';
-
-            % Create NucleiColorDropDown
-            app.NucleiColorDropDown = uidropdown(app.CNFControlPanel);
-            app.NucleiColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.NucleiColorDropDown.ItemsData = {'1', '2', '3'};
-            app.NucleiColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NucleiColorValueChanged, true);
-            app.NucleiColorDropDown.Position = [125 226 100 22];
-            app.NucleiColorDropDown.Value = '1';
-
-            % Create CalculateCentralNuclei
-            app.CalculateCentralNuclei = uibutton(app.CNFControlPanel, 'push');
-            app.CalculateCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @CalculateCentralNucleiPushed, true);
-            app.CalculateCentralNuclei.Position = [85 66 100 22];
-            app.CalculateCentralNuclei.Text = 'Calculate';
-
-            % Create CNFExcelWrite
-            app.CNFExcelWrite = uibutton(app.CNFControlPanel, 'push');
-            app.CNFExcelWrite.ButtonPushedFcn = createCallbackFcn(app, @CNFExcelWriteButtonPushed, true);
-            app.CNFExcelWrite.Position = [24 33 100 22];
-            app.CNFExcelWrite.Text = 'Write To Excel';
-
-            % Create DoneButton_CNF
-            app.DoneButton_CNF = uibutton(app.CNFControlPanel, 'push');
-            app.DoneButton_CNF.ButtonPushedFcn = createCallbackFcn(app, @DoneButton_CNFPushed, true);
-            app.DoneButton_CNF.Position = [142 33 100 22];
-            app.DoneButton_CNF.Text = 'Done';
-
-            % Create DistancefromborderEditFieldLabel
-            app.DistancefromborderEditFieldLabel = uilabel(app.CNFControlPanel);
-            app.DistancefromborderEditFieldLabel.HorizontalAlignment = 'right';
-            app.DistancefromborderEditFieldLabel.Position = [15 194 118 22];
-            app.DistancefromborderEditFieldLabel.Text = 'Distance from border';
-
-            % Create DistancefromborderEditField
-            app.DistancefromborderEditField = uieditfield(app.CNFControlPanel, 'numeric');
-            app.DistancefromborderEditField.Position = [148 194 100 22];
-
-            % Create MinimumNucleusSizeum2EditFieldLabel
-            app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CNFControlPanel);
-            app.MinimumNucleusSizeum2EditFieldLabel.HorizontalAlignment = 'right';
-            app.MinimumNucleusSizeum2EditFieldLabel.Position = [7 157 128 28];
-            app.MinimumNucleusSizeum2EditFieldLabel.Text = {'Minimum Nucleus Size'; '(um^2)'};
-
-            % Create MinimumNucleusSizeum2EditField
-            app.MinimumNucleusSizeum2EditField = uieditfield(app.CNFControlPanel, 'numeric');
-            app.MinimumNucleusSizeum2EditField.Position = [150 163 100 22];
-
-            % Create DataOutputFolderEditField_2Label
-            app.DataOutputFolderEditField_2Label = uilabel(app.CNFControlPanel);
-            app.DataOutputFolderEditField_2Label.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_2Label.Position = [16 128 108 22];
-            app.DataOutputFolderEditField_2Label.Text = 'Data Output Folder';
-
-            % Create CentralNucleiDataOutputFolder
-            app.CentralNucleiDataOutputFolder = uieditfield(app.CNFControlPanel, 'text');
-            app.CentralNucleiDataOutputFolder.Position = [139 128 109 22];
-
-            % Create FiberTypingControlPanel
-            app.FiberTypingControlPanel = uipanel(app.UIFigure);
-            app.FiberTypingControlPanel.Visible = 'off';
-            app.FiberTypingControlPanel.Position = [16 367 260 293];
-
-            % Create FiberTypingChannelColorBox
-            app.FiberTypingChannelColorBox = uiaxes(app.FiberTypingControlPanel);
-            app.FiberTypingChannelColorBox.XTick = [];
-            app.FiberTypingChannelColorBox.YTick = [];
-            app.FiberTypingChannelColorBox.Color = [0 1 1];
-            app.FiberTypingChannelColorBox.Box = 'on';
-            app.FiberTypingChannelColorBox.Position = [229 193 30 30];
-
-            % Create PixelSizeumpixelEditField_3Label
-            app.PixelSizeumpixelEditField_3Label = uilabel(app.FiberTypingControlPanel);
-            app.PixelSizeumpixelEditField_3Label.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditField_3Label.Position = [45 236 58 28];
-            app.PixelSizeumpixelEditField_3Label.Text = {'Pixel Size'; '(um/pixel)'};
-
-            % Create PixelSizeFiberType
-            app.PixelSizeFiberType = uieditfield(app.FiberTypingControlPanel, 'numeric');
-            app.PixelSizeFiberType.Position = [118 242 100 22];
-
-            % Create DataOutputFolderEditField_3Label
-            app.DataOutputFolderEditField_3Label = uilabel(app.FiberTypingControlPanel);
-            app.DataOutputFolderEditField_3Label.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_3Label.Position = [19 144 108 22];
-            app.DataOutputFolderEditField_3Label.Text = 'Data Output Folder';
-
-            % Create FiberTypingDataOutputFolder
-            app.FiberTypingDataOutputFolder = uieditfield(app.FiberTypingControlPanel, 'text');
-            app.FiberTypingDataOutputFolder.Position = [142 144 100 22];
-
-            % Create FiberTypeColorDropDownLabel
-            app.FiberTypeColorDropDownLabel = uilabel(app.FiberTypingControlPanel);
-            app.FiberTypeColorDropDownLabel.HorizontalAlignment = 'right';
-            app.FiberTypeColorDropDownLabel.Position = [17 197 94 22];
-            app.FiberTypeColorDropDownLabel.Text = 'Fiber Type Color';
-
-            % Create FiberTypeColorDropDown
-            app.FiberTypeColorDropDown = uidropdown(app.FiberTypingControlPanel);
-            app.FiberTypeColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.FiberTypeColorDropDown.ItemsData = {'1', '2', '3'};
-            app.FiberTypeColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberTypeColorValueChanged, true);
-            app.FiberTypeColorDropDown.Position = [126 197 100 22];
-            app.FiberTypeColorDropDown.Value = '1';
-
-            % Create CalculateFiberTyping
-            app.CalculateFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
-            app.CalculateFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberTypingButtonPushed, true);
-            app.CalculateFiberTyping.Position = [80 90 100 22];
-            app.CalculateFiberTyping.Text = 'Calculate';
-
-            % Create WritetoExcelFT
-            app.WritetoExcelFT = uibutton(app.FiberTypingControlPanel, 'push');
-            app.WritetoExcelFT.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelFTButtonPushed, true);
-            app.WritetoExcelFT.Enable = 'off';
-            app.WritetoExcelFT.Position = [26 45 100 22];
-            app.WritetoExcelFT.Text = 'Write to Excel';
-
-            % Create DoneFT
-            app.DoneFT = uibutton(app.FiberTypingControlPanel, 'push');
-            app.DoneFT.ButtonPushedFcn = createCallbackFcn(app, @DoneFTButtonPushed, true);
-            app.DoneFT.Position = [145 45 100 22];
-            app.DoneFT.Text = 'Done';
-
-            % Create FiberTypingPanel
-            app.FiberTypingPanel = uipanel(app.UIFigure);
-            app.FiberTypingPanel.Visible = 'off';
-            app.FiberTypingPanel.Position = [285 24 882 679];
-
-            % Create FTAxesL
-            app.FTAxesL = uiaxes(app.FiberTypingPanel);
-            app.FTAxesL.PlotBoxAspectRatio = [1.06832298136646 1 1];
-            app.FTAxesL.XColor = 'none';
-            app.FTAxesL.YColor = 'none';
-            app.FTAxesL.Position = [22 318 414 332];
-
-            % Create FTAxesR
-            app.FTAxesR = uiaxes(app.FiberTypingPanel);
-            app.FTAxesR.PlotBoxAspectRatio = [1.06832298136646 1 1];
-            app.FTAxesR.XColor = 'none';
-            app.FTAxesR.YColor = 'none';
-            app.FTAxesR.Position = [450 318 416 335];
-
-            % Create FThistL
-            app.FThistL = uiaxes(app.FiberTypingPanel);
-            app.FThistL.PlotBoxAspectRatio = [1.83030303030303 1 1];
-            app.FThistL.Position = [22 112 402 207];
-
-            % Create FThistR
-            app.FThistR = uiaxes(app.FiberTypingPanel);
-            app.FThistR.PlotBoxAspectRatio = [1.91358024691358 1 1];
-            app.FThistR.Position = [450 115 402 204];
-
-            % Create ThresholdEditFieldLabel
-            app.ThresholdEditFieldLabel = uilabel(app.FiberTypingPanel);
-            app.ThresholdEditFieldLabel.HorizontalAlignment = 'right';
-            app.ThresholdEditFieldLabel.Enable = 'off';
-            app.ThresholdEditFieldLabel.Position = [123 70 59 22];
-            app.ThresholdEditFieldLabel.Text = 'Threshold';
-
-            % Create ThresholdEditField
-            app.ThresholdEditField = uieditfield(app.FiberTypingPanel, 'numeric');
-            app.ThresholdEditField.Enable = 'off';
-            app.ThresholdEditField.Position = [197 70 100 22];
-
-            % Create AdjustButton
-            app.AdjustButton = uibutton(app.FiberTypingPanel, 'push');
-            app.AdjustButton.ButtonPushedFcn = createCallbackFcn(app, @AdjustButtonPushed, true);
-            app.AdjustButton.Enable = 'off';
-            app.AdjustButton.Position = [336 70 100 22];
-            app.AdjustButton.Text = 'Adjust';
-
-            % Create AcceptButton
-            app.AcceptButton = uibutton(app.FiberTypingPanel, 'push');
-            app.AcceptButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptButtonPushed, true);
-            app.AcceptButton.Enable = 'off';
-            app.AcceptButton.Position = [467 70 100 22];
-            app.AcceptButton.Text = 'Accept';
-
-            % Create CNFPanel
-            app.CNFPanel = uipanel(app.UIFigure);
-            app.CNFPanel.Visible = 'off';
-            app.CNFPanel.Position = [285 24 882 679];
-
-            % Create CNFAxes
-            app.CNFAxes = uiaxes(app.CNFPanel);
-            app.CNFAxes.PlotBoxAspectRatio = [1.34971644612476 1 1];
-            app.CNFAxes.XColor = 'none';
-            app.CNFAxes.YColor = 'none';
-            app.CNFAxes.Position = [22 115 743 555];
-
-            % Create ThresholdEditField_2Label
-            app.ThresholdEditField_2Label = uilabel(app.CNFPanel);
-            app.ThresholdEditField_2Label.HorizontalAlignment = 'right';
-            app.ThresholdEditField_2Label.Position = [120 66 59 22];
-            app.ThresholdEditField_2Label.Text = 'Threshold';
-
-            % Create ThresholdCNF
-            app.ThresholdCNF = uieditfield(app.CNFPanel, 'numeric');
-            app.ThresholdCNF.Position = [194 66 100 22];
-
-            % Create AdjustCNF
-            app.AdjustCNF = uibutton(app.CNFPanel, 'push');
-            app.AdjustCNF.ButtonPushedFcn = createCallbackFcn(app, @AdjustCNFButtonPushed, true);
-            app.AdjustCNF.Position = [338 67 100 22];
-            app.AdjustCNF.Text = 'Adjust';
-
-            % Create AcceptCNF
-            app.AcceptCNF = uibutton(app.CNFPanel, 'push');
-            app.AcceptCNF.ButtonPushedFcn = createCallbackFcn(app, @AcceptCNFButtonPushed, true);
-            app.AcceptCNF.Position = [477 67 100 22];
-            app.AcceptCNF.Text = 'Accept';
-
-            % Create NonfiberPanel
-            app.NonfiberPanel = uipanel(app.UIFigure);
-            app.NonfiberPanel.Visible = 'off';
-            app.NonfiberPanel.Position = [281 24 886 679];
-
-            % Create NonfiberAxes
-            app.NonfiberAxes = uiaxes(app.NonfiberPanel);
-            xlabel(app.NonfiberAxes, 'X')
-            ylabel(app.NonfiberAxes, 'Y')
-            app.NonfiberAxes.PlotBoxAspectRatio = [1.35976789168279 1 1];
-            app.NonfiberAxes.XColor = 'none';
-            app.NonfiberAxes.YColor = 'none';
-            app.NonfiberAxes.Position = [22 117 844 553];
-
-            % Create ThresholdEditField_2Label_2
-            app.ThresholdEditField_2Label_2 = uilabel(app.NonfiberPanel);
-            app.ThresholdEditField_2Label_2.HorizontalAlignment = 'right';
-            app.ThresholdEditField_2Label_2.Position = [116 84 59 22];
-            app.ThresholdEditField_2Label_2.Text = 'Threshold';
-
-            % Create NonfiberThreshold
-            app.NonfiberThreshold = uieditfield(app.NonfiberPanel, 'numeric');
-            app.NonfiberThreshold.Position = [190 84 100 22];
-
-            % Create NonfiberAdjust
-            app.NonfiberAdjust = uibutton(app.NonfiberPanel, 'push');
-            app.NonfiberAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAdjustButtonPushed, true);
-            app.NonfiberAdjust.Position = [333 85 100 22];
-            app.NonfiberAdjust.Text = 'Adjust';
-
-            % Create NonfiberAccept
-            app.NonfiberAccept = uibutton(app.NonfiberPanel, 'push');
-            app.NonfiberAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAcceptButtonPushed, true);
-            app.NonfiberAccept.Position = [467 84 100 22];
-            app.NonfiberAccept.Text = 'Accept';
-
-            % Create Toolbar
-            app.Toolbar = uipanel(app.UIFigure);
-            app.Toolbar.Position = [144 727 937 41];
-
-            % Create InitialSegmentationButton
-            app.InitialSegmentationButton = uibutton(app.Toolbar, 'push');
-            app.InitialSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @InitialSegmentationButtonPushed, true);
-            app.InitialSegmentationButton.Enable = 'off';
-            app.InitialSegmentationButton.Position = [8 9 121 22];
-            app.InitialSegmentationButton.Text = 'Initial Segmentation';
-
-            % Create ManualSegmentationButton
-            app.ManualSegmentationButton = uibutton(app.Toolbar, 'push');
-            app.ManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @ManualSegmentationButtonPushed, true);
-            app.ManualSegmentationButton.Enable = 'off';
-            app.ManualSegmentationButton.Position = [136 9 132 22];
-            app.ManualSegmentationButton.Text = 'Manual Segmentation';
-
-            % Create FiberPredictionButton
-            app.FiberPredictionButton = uibutton(app.Toolbar, 'push');
-            app.FiberPredictionButton.ButtonPushedFcn = createCallbackFcn(app, @FiberPredictionButtonPushed, true);
-            app.FiberPredictionButton.Enable = 'off';
-            app.FiberPredictionButton.Position = [275 9 100 22];
-            app.FiberPredictionButton.Text = 'Fiber Prediction';
-
-            % Create ManualFiberFilterButton
-            app.ManualFiberFilterButton = uibutton(app.Toolbar, 'push');
-            app.ManualFiberFilterButton.ButtonPushedFcn = createCallbackFcn(app, @ManualFiberFilterButtonPushed, true);
-            app.ManualFiberFilterButton.Enable = 'off';
-            app.ManualFiberFilterButton.Position = [382 9 116 22];
-            app.ManualFiberFilterButton.Text = 'Manual Fiber Filter';
-
-            % Create FiberPropertiesButton
-            app.FiberPropertiesButton = uibutton(app.Toolbar, 'push');
-            app.FiberPropertiesButton.ButtonPushedFcn = createCallbackFcn(app, @FiberPropertiesButtonPushed, true);
-            app.FiberPropertiesButton.Enable = 'off';
-            app.FiberPropertiesButton.Position = [505 9 101 22];
-            app.FiberPropertiesButton.Text = 'Fiber Properties';
-
-            % Create CentralNucleiButton
-            app.CentralNucleiButton = uibutton(app.Toolbar, 'push');
-            app.CentralNucleiButton.ButtonPushedFcn = createCallbackFcn(app, @CentralNucleiButtonPushed, true);
-            app.CentralNucleiButton.Enable = 'off';
-            app.CentralNucleiButton.Position = [612 9 100 22];
-            app.CentralNucleiButton.Text = 'Central Nuclei';
-
-            % Create FiberTypingButton
-            app.FiberTypingButton = uibutton(app.Toolbar, 'push');
-            app.FiberTypingButton.ButtonPushedFcn = createCallbackFcn(app, @FiberTypingButtonPushed, true);
-            app.FiberTypingButton.Enable = 'off';
-            app.FiberTypingButton.Position = [718 9 100 22];
-            app.FiberTypingButton.Text = 'Fiber Typing';
-
-            % Create NonfiberObjectsButton
-            app.NonfiberObjectsButton = uibutton(app.Toolbar, 'push');
-            app.NonfiberObjectsButton.ButtonPushedFcn = createCallbackFcn(app, @NonfiberObjectsButtonPushed, true);
-            app.NonfiberObjectsButton.Enable = 'off';
-            app.NonfiberObjectsButton.Position = [823.5 9 105 22];
-            app.NonfiberObjectsButton.Text = 'Nonfiber Objects';
 
             % Create NonfiberControlPanel
             app.NonfiberControlPanel = uipanel(app.UIFigure);
             app.NonfiberControlPanel.Visible = 'off';
-            app.NonfiberControlPanel.Position = [20 359 258 301];
+            app.NonfiberControlPanel.BackgroundColor = [1 1 1];
+            app.NonfiberControlPanel.FontName = 'Avenir';
+            app.NonfiberControlPanel.Position = [16 279 258 301];
 
             % Create NonfiberChannelColorBox
             app.NonfiberChannelColorBox = uiaxes(app.NonfiberControlPanel);
             app.NonfiberChannelColorBox.Toolbar.Visible = 'off';
+            app.NonfiberChannelColorBox.FontName = 'Avenir';
             app.NonfiberChannelColorBox.XTick = [];
             app.NonfiberChannelColorBox.YTick = [];
             app.NonfiberChannelColorBox.Color = [0 1 1];
@@ -2162,7 +2166,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Create ObjectColorDropDownLabel
             app.ObjectColorDropDownLabel = uilabel(app.NonfiberControlPanel);
             app.ObjectColorDropDownLabel.HorizontalAlignment = 'right';
-            app.ObjectColorDropDownLabel.Position = [38 197 72 22];
+            app.ObjectColorDropDownLabel.FontName = 'Avenir';
+            app.ObjectColorDropDownLabel.Position = [35 197 75 22];
             app.ObjectColorDropDownLabel.Text = 'Object Color';
 
             % Create NonfiberObjectsColorDropDown
@@ -2170,164 +2175,330 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsColorDropDown.Items = {'Red', 'Green', 'Blue'};
             app.NonfiberObjectsColorDropDown.ItemsData = {'1', '2', '3'};
             app.NonfiberObjectsColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NonfiberObjectsColorDropDownValueChanged, true);
+            app.NonfiberObjectsColorDropDown.FontName = 'Avenir';
             app.NonfiberObjectsColorDropDown.Position = [125 197 100 22];
             app.NonfiberObjectsColorDropDown.Value = '1';
 
             % Create DataOutputFolderEditField_3Label_2
             app.DataOutputFolderEditField_3Label_2 = uilabel(app.NonfiberControlPanel);
             app.DataOutputFolderEditField_3Label_2.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_3Label_2.Position = [5 139 108 22];
+            app.DataOutputFolderEditField_3Label_2.FontName = 'Avenir';
+            app.DataOutputFolderEditField_3Label_2.Position = [2 139 111 22];
             app.DataOutputFolderEditField_3Label_2.Text = 'Data Output Folder';
 
             % Create NonfiberObjectsDataOutputFolder
             app.NonfiberObjectsDataOutputFolder = uieditfield(app.NonfiberControlPanel, 'text');
+            app.NonfiberObjectsDataOutputFolder.FontName = 'Avenir';
             app.NonfiberObjectsDataOutputFolder.Position = [128 139 100 22];
 
             % Create CalculateNonfiberObjects
             app.CalculateNonfiberObjects = uibutton(app.NonfiberControlPanel, 'push');
             app.CalculateNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @CalculateNonfiberObjectsButtonPushed, true);
-            app.CalculateNonfiberObjects.Position = [82 69 100 22];
+            app.CalculateNonfiberObjects.FontName = 'Avenir';
+            app.CalculateNonfiberObjects.Position = [82 67 100 24];
             app.CalculateNonfiberObjects.Text = 'Calculate';
 
             % Create WritetoExcelNonfiber
             app.WritetoExcelNonfiber = uibutton(app.NonfiberControlPanel, 'push');
             app.WritetoExcelNonfiber.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelNonfiberButtonPushed, true);
-            app.WritetoExcelNonfiber.Position = [20 26 100 22];
+            app.WritetoExcelNonfiber.FontName = 'Avenir';
+            app.WritetoExcelNonfiber.Position = [20 24 100 24];
             app.WritetoExcelNonfiber.Text = 'Write to Excel';
 
             % Create DoneNonfiber
             app.DoneNonfiber = uibutton(app.NonfiberControlPanel, 'push');
             app.DoneNonfiber.ButtonPushedFcn = createCallbackFcn(app, @DoneNonfiberButtonPushed, true);
-            app.DoneNonfiber.Position = [144 27 100 22];
+            app.DoneNonfiber.FontName = 'Avenir';
+            app.DoneNonfiber.Position = [144 25 100 24];
             app.DoneNonfiber.Text = 'Done';
 
             % Create PixelSizeumpixelLabel_2
             app.PixelSizeumpixelLabel_2 = uilabel(app.NonfiberControlPanel);
             app.PixelSizeumpixelLabel_2.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelLabel_2.Position = [52 247 58 28];
+            app.PixelSizeumpixelLabel_2.FontName = 'Avenir';
+            app.PixelSizeumpixelLabel_2.Position = [51 243 59 32];
             app.PixelSizeumpixelLabel_2.Text = {'Pixel Size'; '(um/pixel)'};
 
             % Create PixelSizeNonfiber
             app.PixelSizeNonfiber = uieditfield(app.NonfiberControlPanel, 'numeric');
+            app.PixelSizeNonfiber.FontName = 'Avenir';
             app.PixelSizeNonfiber.Position = [125 253 100 22];
 
-            % Create ManualSegmentationControls
-            app.ManualSegmentationControls = uipanel(app.UIFigure);
-            app.ManualSegmentationControls.Visible = 'off';
-            app.ManualSegmentationControls.Position = [49 332 263 318];
+            % Create CNFControlPanel
+            app.CNFControlPanel = uipanel(app.UIFigure);
+            app.CNFControlPanel.Visible = 'off';
+            app.CNFControlPanel.BackgroundColor = [1 1 1];
+            app.CNFControlPanel.FontName = 'Avenir';
+            app.CNFControlPanel.Position = [12 280 260 293];
 
-            % Create StartDrawingButton
-            app.StartDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
-            app.StartDrawingButton.Position = [28 251 100 22];
-            app.StartDrawingButton.Text = 'Start Drawing';
+            % Create CNFChannelColorBox
+            app.CNFChannelColorBox = uiaxes(app.CNFControlPanel);
+            app.CNFChannelColorBox.FontName = 'Avenir';
+            app.CNFChannelColorBox.XTick = [];
+            app.CNFChannelColorBox.YTick = [];
+            app.CNFChannelColorBox.Color = [0 1 1];
+            app.CNFChannelColorBox.Box = 'on';
+            app.CNFChannelColorBox.PickableParts = 'none';
+            app.CNFChannelColorBox.Position = [228 223 30 30];
 
-            % Create AcceptLineButton
-            app.AcceptLineButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
-            app.AcceptLineButton.BackgroundColor = [0.9608 0.9608 0.9608];
-            app.AcceptLineButton.Enable = 'off';
-            app.AcceptLineButton.Position = [149 222 100 51];
-            app.AcceptLineButton.Text = 'Accept Line';
+            % Create PixelSizeumpixelLabel
+            app.PixelSizeumpixelLabel = uilabel(app.CNFControlPanel);
+            app.PixelSizeumpixelLabel.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelLabel.FontName = 'Avenir';
+            app.PixelSizeumpixelLabel.Position = [48 251 58 32];
+            app.PixelSizeumpixelLabel.Text = {'Pixel Size'; 'um/pixel'};
 
-            % Create CloseManualSegmentationButton
-            app.CloseManualSegmentationButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.CloseManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseManualSegmentationButtonPushed, true);
-            app.CloseManualSegmentationButton.Position = [35 47 182 60];
-            app.CloseManualSegmentationButton.Text = 'Close Manual Segmentation';
+            % Create PixelSizeumpixelEditField_2
+            app.PixelSizeumpixelEditField_2 = uieditfield(app.CNFControlPanel, 'numeric');
+            app.PixelSizeumpixelEditField_2.FontName = 'Avenir';
+            app.PixelSizeumpixelEditField_2.Position = [121 261 100 22];
 
-            % Create DrawingModeLabel
-            app.DrawingModeLabel = uilabel(app.ManualSegmentationControls);
-            app.DrawingModeLabel.Position = [30 283 83 22];
-            app.DrawingModeLabel.Text = 'Drawing Mode';
+            % Create NucleiColorDropDownLabel
+            app.NucleiColorDropDownLabel = uilabel(app.CNFControlPanel);
+            app.NucleiColorDropDownLabel.HorizontalAlignment = 'right';
+            app.NucleiColorDropDownLabel.FontName = 'Avenir';
+            app.NucleiColorDropDownLabel.Position = [37 226 73 22];
+            app.NucleiColorDropDownLabel.Text = 'Nuclei Color';
 
-            % Create MergeObjectsModeLabel
-            app.MergeObjectsModeLabel = uilabel(app.ManualSegmentationControls);
-            app.MergeObjectsModeLabel.Position = [27 181 117 22];
-            app.MergeObjectsModeLabel.Text = 'Merge Objects Mode';
+            % Create NucleiColorDropDown
+            app.NucleiColorDropDown = uidropdown(app.CNFControlPanel);
+            app.NucleiColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.NucleiColorDropDown.ItemsData = {'1', '2', '3'};
+            app.NucleiColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NucleiColorValueChanged, true);
+            app.NucleiColorDropDown.FontName = 'Avenir';
+            app.NucleiColorDropDown.Position = [125 226 100 22];
+            app.NucleiColorDropDown.Value = '1';
 
-            % Create StartMergingButton
-            app.StartMergingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.StartMergingButton.ButtonPushedFcn = createCallbackFcn(app, @StartMergingButtonPushed, true);
-            app.StartMergingButton.Position = [29 148 100 22];
-            app.StartMergingButton.Text = 'Start Merging';
+            % Create CalculateCentralNuclei
+            app.CalculateCentralNuclei = uibutton(app.CNFControlPanel, 'push');
+            app.CalculateCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @CalculateCentralNucleiPushed, true);
+            app.CalculateCentralNuclei.FontName = 'Avenir';
+            app.CalculateCentralNuclei.Position = [85 64 100 24];
+            app.CalculateCentralNuclei.Text = 'Calculate';
 
-            % Create FinishDrawingButton
-            app.FinishDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.FinishDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishDrawingButtonPushed, true);
-            app.FinishDrawingButton.Enable = 'off';
-            app.FinishDrawingButton.Position = [29 222 100 22];
-            app.FinishDrawingButton.Text = 'Finish Drawing';
+            % Create CNFExcelWrite
+            app.CNFExcelWrite = uibutton(app.CNFControlPanel, 'push');
+            app.CNFExcelWrite.ButtonPushedFcn = createCallbackFcn(app, @CNFExcelWriteButtonPushed, true);
+            app.CNFExcelWrite.FontName = 'Avenir';
+            app.CNFExcelWrite.Position = [24 31 100 24];
+            app.CNFExcelWrite.Text = 'Write To Excel';
 
-            % Create SegmentationParameters
-            app.SegmentationParameters = uipanel(app.UIFigure);
-            app.SegmentationParameters.Visible = 'off';
-            app.SegmentationParameters.Position = [18 406 286 245];
+            % Create DoneButton_CNF
+            app.DoneButton_CNF = uibutton(app.CNFControlPanel, 'push');
+            app.DoneButton_CNF.ButtonPushedFcn = createCallbackFcn(app, @DoneButton_CNFPushed, true);
+            app.DoneButton_CNF.FontName = 'Avenir';
+            app.DoneButton_CNF.Position = [142 31 100 24];
+            app.DoneButton_CNF.Text = 'Done';
 
-            % Create FiberOutlineChannelColorBox
-            app.FiberOutlineChannelColorBox = uiaxes(app.SegmentationParameters);
-            app.FiberOutlineChannelColorBox.Toolbar.Visible = 'off';
-            app.FiberOutlineChannelColorBox.XTick = [];
-            app.FiberOutlineChannelColorBox.YTick = [];
-            app.FiberOutlineChannelColorBox.Color = [0 1 1];
-            app.FiberOutlineChannelColorBox.Box = 'on';
-            app.FiberOutlineChannelColorBox.PickableParts = 'none';
-            app.FiberOutlineChannelColorBox.Position = [250 154 30 30];
+            % Create DistancefromborderEditFieldLabel
+            app.DistancefromborderEditFieldLabel = uilabel(app.CNFControlPanel);
+            app.DistancefromborderEditFieldLabel.HorizontalAlignment = 'right';
+            app.DistancefromborderEditFieldLabel.FontName = 'Avenir';
+            app.DistancefromborderEditFieldLabel.Position = [14 194 119 22];
+            app.DistancefromborderEditFieldLabel.Text = 'Distance from border';
 
-            % Create PixelSizeumpixelEditFieldLabel
-            app.PixelSizeumpixelEditFieldLabel = uilabel(app.SegmentationParameters);
-            app.PixelSizeumpixelEditFieldLabel.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditFieldLabel.Position = [16 200 114 22];
-            app.PixelSizeumpixelEditFieldLabel.Text = 'Pixel Size (um/pixel)';
+            % Create DistancefromborderEditField
+            app.DistancefromborderEditField = uieditfield(app.CNFControlPanel, 'numeric');
+            app.DistancefromborderEditField.FontName = 'Avenir';
+            app.DistancefromborderEditField.Position = [148 194 100 22];
 
-            % Create PixelSizeField
-            app.PixelSizeField = uieditfield(app.SegmentationParameters, 'numeric');
-            app.PixelSizeField.Position = [145 200 100 22];
+            % Create MinimumNucleusSizeum2EditFieldLabel
+            app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CNFControlPanel);
+            app.MinimumNucleusSizeum2EditFieldLabel.HorizontalAlignment = 'right';
+            app.MinimumNucleusSizeum2EditFieldLabel.FontName = 'Avenir';
+            app.MinimumNucleusSizeum2EditFieldLabel.Position = [8 153 127 32];
+            app.MinimumNucleusSizeum2EditFieldLabel.Text = {'Minimum Nucleus Size'; '(um^2)'};
 
-            % Create SegmentButton
-            app.SegmentButton = uibutton(app.SegmentationParameters, 'push');
-            app.SegmentButton.ButtonPushedFcn = createCallbackFcn(app, @SegmentButtonPushed, true);
-            app.SegmentButton.Position = [144 65 100 22];
-            app.SegmentButton.Text = 'Segment';
+            % Create MinimumNucleusSizeum2EditField
+            app.MinimumNucleusSizeum2EditField = uieditfield(app.CNFControlPanel, 'numeric');
+            app.MinimumNucleusSizeum2EditField.FontName = 'Avenir';
+            app.MinimumNucleusSizeum2EditField.Position = [150 163 100 22];
 
-            % Create FiberOutlineColorDropDownLabel
-            app.FiberOutlineColorDropDownLabel = uilabel(app.SegmentationParameters);
-            app.FiberOutlineColorDropDownLabel.HorizontalAlignment = 'right';
-            app.FiberOutlineColorDropDownLabel.Position = [24 158 106 22];
-            app.FiberOutlineColorDropDownLabel.Text = 'Fiber Outline Color';
+            % Create DataOutputFolderEditField_2Label
+            app.DataOutputFolderEditField_2Label = uilabel(app.CNFControlPanel);
+            app.DataOutputFolderEditField_2Label.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_2Label.FontName = 'Avenir';
+            app.DataOutputFolderEditField_2Label.Position = [13 128 111 22];
+            app.DataOutputFolderEditField_2Label.Text = 'Data Output Folder';
 
-            % Create FiberOutlineColorDropDown
-            app.FiberOutlineColorDropDown = uidropdown(app.SegmentationParameters);
-            app.FiberOutlineColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.FiberOutlineColorDropDown.ItemsData = {'1', '2', '3'};
-            app.FiberOutlineColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberOutlineColorValueChanged, true);
-            app.FiberOutlineColorDropDown.Position = [145 158 100 22];
-            app.FiberOutlineColorDropDown.Value = '1';
+            % Create CentralNucleiDataOutputFolder
+            app.CentralNucleiDataOutputFolder = uieditfield(app.CNFControlPanel, 'text');
+            app.CentralNucleiDataOutputFolder.FontName = 'Avenir';
+            app.CentralNucleiDataOutputFolder.Position = [139 128 109 22];
 
-            % Create AcceptSegmentationButton
-            app.AcceptSegmentationButton = uibutton(app.SegmentationParameters, 'push');
-            app.AcceptSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptSegmentationButtonPushed, true);
-            app.AcceptSegmentationButton.Enable = 'off';
-            app.AcceptSegmentationButton.Position = [81 33 100 22];
-            app.AcceptSegmentationButton.Text = 'Accept';
+            % Create PropertiesControlPanel
+            app.PropertiesControlPanel = uipanel(app.UIFigure);
+            app.PropertiesControlPanel.Visible = 'off';
+            app.PropertiesControlPanel.BackgroundColor = [1 1 1];
+            app.PropertiesControlPanel.FontName = 'Avenir';
+            app.PropertiesControlPanel.Position = [17 284 251 275];
 
-            % Create SegmentationThresholdSliderLabel
-            app.SegmentationThresholdSliderLabel = uilabel(app.SegmentationParameters);
-            app.SegmentationThresholdSliderLabel.HorizontalAlignment = 'center';
-            app.SegmentationThresholdSliderLabel.Position = [13 101 80 43];
-            app.SegmentationThresholdSliderLabel.Text = {'Segmentation'; 'Threshold'};
+            % Create WritetoExcelButton
+            app.WritetoExcelButton = uibutton(app.PropertiesControlPanel, 'push');
+            app.WritetoExcelButton.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelButtonPushed, true);
+            app.WritetoExcelButton.FontName = 'Avenir';
+            app.WritetoExcelButton.Enable = 'off';
+            app.WritetoExcelButton.Position = [27 63 100 24];
+            app.WritetoExcelButton.Text = 'Write to Excel';
 
-            % Create SegmentationThresholdSlider
-            app.SegmentationThresholdSlider = uislider(app.SegmentationParameters);
-            app.SegmentationThresholdSlider.Limits = [0 50];
-            app.SegmentationThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SegmentationThresholdSliderValueChanged, true);
-            app.SegmentationThresholdSlider.Position = [101 128 139 3];
+            % Create DoneButton
+            app.DoneButton = uibutton(app.PropertiesControlPanel, 'push');
+            app.DoneButton.ButtonPushedFcn = createCallbackFcn(app, @DoneButtonPushed, true);
+            app.DoneButton.FontName = 'Avenir';
+            app.DoneButton.Position = [140 63 100 24];
+            app.DoneButton.Text = 'Done';
 
-            % Create DetectValueButton
-            app.DetectValueButton = uibutton(app.SegmentationParameters, 'push');
-            app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
-            app.DetectValueButton.Position = [24 65 100 22];
-            app.DetectValueButton.Text = 'Detect Value';
+            % Create DataOutputFolderEditFieldLabel
+            app.DataOutputFolderEditFieldLabel = uilabel(app.PropertiesControlPanel);
+            app.DataOutputFolderEditFieldLabel.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditFieldLabel.FontName = 'Avenir';
+            app.DataOutputFolderEditFieldLabel.Position = [13 169 111 22];
+            app.DataOutputFolderEditFieldLabel.Text = 'Data Output Folder';
+
+            % Create FiberPropertiesDataOutputFolder
+            app.FiberPropertiesDataOutputFolder = uieditfield(app.PropertiesControlPanel, 'text');
+            app.FiberPropertiesDataOutputFolder.FontName = 'Avenir';
+            app.FiberPropertiesDataOutputFolder.Position = [139 169 100 22];
+
+            % Create PixelSizeumpixelEditFieldLabel_2
+            app.PixelSizeumpixelEditFieldLabel_2 = uilabel(app.PropertiesControlPanel);
+            app.PixelSizeumpixelEditFieldLabel_2.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditFieldLabel_2.FontName = 'Avenir';
+            app.PixelSizeumpixelEditFieldLabel_2.Position = [10 218 114 22];
+            app.PixelSizeumpixelEditFieldLabel_2.Text = 'Pixel Size (um/pixel)';
+
+            % Create PixelSizeumpixelEditField
+            app.PixelSizeumpixelEditField = uieditfield(app.PropertiesControlPanel, 'numeric');
+            app.PixelSizeumpixelEditField.FontName = 'Avenir';
+            app.PixelSizeumpixelEditField.Position = [139 218 100 22];
+
+            % Create CalculateFiberProperties
+            app.CalculateFiberProperties = uibutton(app.PropertiesControlPanel, 'push');
+            app.CalculateFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberPropertiesPushed, true);
+            app.CalculateFiberProperties.FontName = 'Avenir';
+            app.CalculateFiberProperties.Position = [81 117 100 24];
+            app.CalculateFiberProperties.Text = 'Calculate';
+
+            % Create FiberTypingControlPanel
+            app.FiberTypingControlPanel = uipanel(app.UIFigure);
+            app.FiberTypingControlPanel.Visible = 'off';
+            app.FiberTypingControlPanel.BackgroundColor = [1 1 1];
+            app.FiberTypingControlPanel.FontName = 'Avenir';
+            app.FiberTypingControlPanel.Position = [12 287 260 293];
+
+            % Create FiberTypingChannelColorBox
+            app.FiberTypingChannelColorBox = uiaxes(app.FiberTypingControlPanel);
+            app.FiberTypingChannelColorBox.FontName = 'Avenir';
+            app.FiberTypingChannelColorBox.XTick = [];
+            app.FiberTypingChannelColorBox.YTick = [];
+            app.FiberTypingChannelColorBox.Color = [0 1 1];
+            app.FiberTypingChannelColorBox.Box = 'on';
+            app.FiberTypingChannelColorBox.Position = [229 193 30 30];
+
+            % Create PixelSizeumpixelEditField_3Label
+            app.PixelSizeumpixelEditField_3Label = uilabel(app.FiberTypingControlPanel);
+            app.PixelSizeumpixelEditField_3Label.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditField_3Label.FontName = 'Avenir';
+            app.PixelSizeumpixelEditField_3Label.Position = [44 232 59 32];
+            app.PixelSizeumpixelEditField_3Label.Text = {'Pixel Size'; '(um/pixel)'};
+
+            % Create PixelSizeFiberType
+            app.PixelSizeFiberType = uieditfield(app.FiberTypingControlPanel, 'numeric');
+            app.PixelSizeFiberType.FontName = 'Avenir';
+            app.PixelSizeFiberType.Position = [118 242 100 22];
+
+            % Create DataOutputFolderEditField_3Label
+            app.DataOutputFolderEditField_3Label = uilabel(app.FiberTypingControlPanel);
+            app.DataOutputFolderEditField_3Label.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_3Label.FontName = 'Avenir';
+            app.DataOutputFolderEditField_3Label.Position = [16 144 111 22];
+            app.DataOutputFolderEditField_3Label.Text = 'Data Output Folder';
+
+            % Create FiberTypingDataOutputFolder
+            app.FiberTypingDataOutputFolder = uieditfield(app.FiberTypingControlPanel, 'text');
+            app.FiberTypingDataOutputFolder.FontName = 'Avenir';
+            app.FiberTypingDataOutputFolder.Position = [142 144 100 22];
+
+            % Create FiberTypeColorDropDownLabel
+            app.FiberTypeColorDropDownLabel = uilabel(app.FiberTypingControlPanel);
+            app.FiberTypeColorDropDownLabel.HorizontalAlignment = 'right';
+            app.FiberTypeColorDropDownLabel.FontName = 'Avenir';
+            app.FiberTypeColorDropDownLabel.Position = [16 197 95 22];
+            app.FiberTypeColorDropDownLabel.Text = 'Fiber Type Color';
+
+            % Create FiberTypeColorDropDown
+            app.FiberTypeColorDropDown = uidropdown(app.FiberTypingControlPanel);
+            app.FiberTypeColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.FiberTypeColorDropDown.ItemsData = {'1', '2', '3'};
+            app.FiberTypeColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberTypeColorValueChanged, true);
+            app.FiberTypeColorDropDown.FontName = 'Avenir';
+            app.FiberTypeColorDropDown.Position = [126 197 100 22];
+            app.FiberTypeColorDropDown.Value = '1';
+
+            % Create CalculateFiberTyping
+            app.CalculateFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
+            app.CalculateFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberTypingButtonPushed, true);
+            app.CalculateFiberTyping.FontName = 'Avenir';
+            app.CalculateFiberTyping.Position = [80 88 100 24];
+            app.CalculateFiberTyping.Text = 'Calculate';
+
+            % Create WritetoExcelFT
+            app.WritetoExcelFT = uibutton(app.FiberTypingControlPanel, 'push');
+            app.WritetoExcelFT.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelFTButtonPushed, true);
+            app.WritetoExcelFT.FontName = 'Avenir';
+            app.WritetoExcelFT.Enable = 'off';
+            app.WritetoExcelFT.Position = [26 43 100 24];
+            app.WritetoExcelFT.Text = 'Write to Excel';
+
+            % Create DoneFT
+            app.DoneFT = uibutton(app.FiberTypingControlPanel, 'push');
+            app.DoneFT.ButtonPushedFcn = createCallbackFcn(app, @DoneFTButtonPushed, true);
+            app.DoneFT.FontName = 'Avenir';
+            app.DoneFT.Position = [145 43 100 24];
+            app.DoneFT.Text = 'Done';
+
+            % Create NonfiberPanel
+            app.NonfiberPanel = uipanel(app.UIFigure);
+            app.NonfiberPanel.Visible = 'off';
+            app.NonfiberPanel.BackgroundColor = [1 1 1];
+            app.NonfiberPanel.FontName = 'Avenir';
+            app.NonfiberPanel.Position = [293 53 876 605];
+
+            % Create NonfiberAxes
+            app.NonfiberAxes = uiaxes(app.NonfiberPanel);
+            xlabel(app.NonfiberAxes, 'X')
+            ylabel(app.NonfiberAxes, 'Y')
+            app.NonfiberAxes.PlotBoxAspectRatio = [1.35976789168279 1 1];
+            app.NonfiberAxes.FontName = 'Avenir';
+            app.NonfiberAxes.XColor = 'none';
+            app.NonfiberAxes.YColor = 'none';
+            app.NonfiberAxes.Position = [38 -20 844 553];
+
+            % Create ThresholdEditField_2Label_2
+            app.ThresholdEditField_2Label_2 = uilabel(app.NonfiberPanel);
+            app.ThresholdEditField_2Label_2.HorizontalAlignment = 'right';
+            app.ThresholdEditField_2Label_2.FontName = 'Avenir';
+            app.ThresholdEditField_2Label_2.Position = [204 10 59 22];
+            app.ThresholdEditField_2Label_2.Text = 'Threshold';
+
+            % Create NonfiberThreshold
+            app.NonfiberThreshold = uieditfield(app.NonfiberPanel, 'numeric');
+            app.NonfiberThreshold.FontName = 'Avenir';
+            app.NonfiberThreshold.Position = [278 10 100 22];
+
+            % Create NonfiberAdjust
+            app.NonfiberAdjust = uibutton(app.NonfiberPanel, 'push');
+            app.NonfiberAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAdjustButtonPushed, true);
+            app.NonfiberAdjust.FontName = 'Avenir';
+            app.NonfiberAdjust.Position = [418 9 100 24];
+            app.NonfiberAdjust.Text = 'Adjust';
+
+            % Create NonfiberAccept
+            app.NonfiberAccept = uibutton(app.NonfiberPanel, 'push');
+            app.NonfiberAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAcceptButtonPushed, true);
+            app.NonfiberAccept.FontName = 'Avenir';
+            app.NonfiberAccept.Position = [542 8 100 24];
+            app.NonfiberAccept.Text = 'Accept';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
