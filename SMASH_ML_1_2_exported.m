@@ -194,10 +194,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             drawnow limitrate;
             figure(app.UIFigure)
 
-            if FilterIndex
-                if FileName == 0
-                    return
-                end
+           
+             if FilterIndex==0
+                 %disp("Error opening file")
+                 return
+              
+               
+             end
            
         
                 C = strsplit(FileName,'.');
@@ -219,32 +222,32 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 e = '.bmp';
                 f = '.czi';
                 g = '.lif';
-                if isequal(ExtName, a)
-                    fig = uifigure
-                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-                elseif isequal(ExtName, b)
-                    fig = uifigure 
-                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-                elseif isequal(ExtName, c)
-                    fig = uifigure 
-                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-                elseif isequal(ExtName, d)
-                    fig = uifigure 
-                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-                elseif isequal(ExtName, e)
-                    fig = uifigure 
-                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-                elseif isequal(ExtName, f)
-                    fig = uifigure 
-                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-                elseif isequal(ExtName, g)
-                    fig = uifigure 
-                    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-                else
-                    fig = uifigure
-                    uialert(fig, 'Image Selection Unsuccessful. Upload an image with the following extensions:.tif, .tiff, .jpg, .png, .bmp, .czi, .lif','Upload Error')
-                    return
-                end 
+                %if isequal(ExtName, a)
+                %    fig = uifigure
+                %    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+               % elseif isequal(ExtName, b)
+               %     fig = uifigure 
+               %     uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+              %  elseif isequal(ExtName, c)
+                %    fig = uifigure 
+                %    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+               % elseif isequal(ExtName, d)
+               %     fig = uifigure 
+              %      uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+              %  elseif isequal(ExtName, e)
+              %      fig = uifigure 
+               %     uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+               % elseif isequal(ExtName, f)
+               %     fig = uifigure 
+                %    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+              %  elseif isequal(ExtName, g)
+               %     fig = uifigure 
+                %    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
+               % else
+                %    fig = uifigure
+                %    uialert(fig, 'Image Selection Unsuccessful. Upload an image with the following extensions:.tif, .tiff, .jpg, .png, .bmp, .czi, .lif','Upload Error')
+                %    return
+               % end 
                   
             end
  
@@ -330,6 +333,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 se90 = strel('line',3,90);
                 se0 = strel('line',3,0);
 
+
                 segmentedMaskDilated = imdilate(segmentedMask,[se90 se0]);
                 imshow(segmentedMaskDilated)
                 title('Dilated Gradient Mask')
@@ -343,7 +347,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 removeConnectedObjects = imclearborder(fillHoles,4);
                 imshow(removeConnectedObjects)
                 title('Clear Borders')
-                
+
+
                 %Smooth the object
                 seD = strel('diamond',1);
                 smoothObject = imerode(removeConnectedObjects,seD);
@@ -360,6 +365,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 Segout(outline) = 255; 
                 imshow(Segout)
                 title('Outlined Original Image')
+
 
                 %convert rgb into L*a*b*
                 Lab_HEImage = rgb2lab(HEImage);
@@ -388,6 +394,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 imshow(cluster3)
                 title("Objects in Cluster 3");
 
+
                 %segment Nuclei
                 L = Lab_HEImage(:,:,1);
                 L_blue = L.*double(mask3);
@@ -399,16 +406,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 blue_nuclei = HEImage.*uint8(mask_dark_blue);
                 imshow(blue_nuclei)
                 title("Blue Nuclei");
-                
             end
 
-            %stain deconvolution    
+             %stain deconvolution    
             function [H,E] = Deconvolution(HEImage)
                 He = [0.18; 0.20; 0.08]; %hematoxylin
                 Eo = [0.01; 0.13; 0.01]; %eosin
                 DAB = [0.10; 0.21; 0.29];
-        
-               % Normalization gives absorbtion factor of stains
+
+                % Normalization gives absorbtion factor of stains
                  colorDecon= [He/norm(He) Eo/norm(Eo) DAB/norm(DAB)]';
 
                % inverse matrix 
@@ -430,7 +436,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 A(:,:,1) = SeparateStains(:,:,1);A(:,:,2) = zeros(s(1),s(2));A(:,:,3) = zeros(s(1),s(2));
                 B(:,:,1) = zeros(s(1),s(2));B(:,:,2) = SeparateStains(:,:,2);B(:,:,3) = zeros(s(1),s(2));
 
-             % Convert to float
+                % Convert to float
                convertToFloat1 = double(A)+1;
                OpticalDensityMatrix1 = -log(Dop1)+1;
                convertToFloat2 = double(B)+1;
@@ -448,9 +454,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 		       H = normalize(H);
 		       E = normalize(E); 
                imshow(rgbimage);
-           end
+            end
 
-           %Normalization 
+             %Normalization 
             function normalizeMatrix = normalize(Iin)
                 % Normalization Function
 	            normalizeMatrix = Iin;                   
@@ -465,10 +471,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     normalizeMatrix(:,:,i) = 1 - normalizeMatrix(:,:,i);
                 end
             end
-            
 
 
-            imshow(app.orig_img,'Parent',app.UIAxes);
+
+                
             
             if exist(MaskName,'file')
                 app.InitialSegmentationButton.Enable = 'on';
