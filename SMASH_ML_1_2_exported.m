@@ -3,6 +3,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        BatchModeLabel                  matlab.ui.control.Label
         SegmentationParameters          matlab.ui.container.Panel
         DetectValueButton               matlab.ui.control.Button
         SegmentationThresholdSlider     matlab.ui.control.Slider
@@ -14,8 +15,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeField                  matlab.ui.control.NumericEditField
         PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
         FiberOutlineChannelColorBox     matlab.ui.control.UIAxes
-        BatchModeInitialSegmentationPanel  matlab.ui.container.Panel
-        RunBatchModeButton              matlab.ui.control.Button
         ManualSegmentationControls      matlab.ui.container.Panel
         FinishDrawingButton             matlab.ui.control.Button
         StartMergingButton              matlab.ui.control.Button
@@ -180,6 +179,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 MaskName = MaskName{1};
             end
             
+            if app.is_batch_mode == 1
+                numberOfFilesForBatchMode = length(app.BatchModeFileNames);
+                fileNameString = "Batch Mode (" + int2str(numberOfFilesForBatchMode) + " files)";
+                app.BatchModeLabel.Text = strcat(fileNameString);
+                app.BatchModeLabel.Visible = 'on';
+            end
+
             app.FilenameLabel.Text = FileNameS;
             app.Files{1} = FileName;
             app.Files{2} = MaskName;
@@ -321,7 +327,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         function SegmentBatchMode(app)
             app.pix_size = app.PixelSizeField.Value;
-            files = dir;
                
             %orig_img = imread(app.Files{1});
             foc = app.FiberOutlineColorDropDown.Value;
@@ -695,17 +700,43 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: AcceptSegmentationButton
         function AcceptSegmentationButtonPushed(app, event)
-            label = bwlabel(~logical(app.bw_obj),4);
-            SaveMaskToMaskFile(app, label);
-            app.SegmentationParameters.Visible = 'off';
-            app.InitialSegmentationButton.Enable = 'on';
-            app.FiberPredictionButton.Enable = 'on';
-            app.ManualSegmentationButton.Enable ='on';
-            app.ManualFiberFilterButton.Enable = 'on';
-            app.FiberPropertiesButton.Enable = 'on';
-            app.CentralNucleiButton.Enable = 'on';
-            app.FiberTypingButton.Enable = 'on';
-            app.NonfiberObjectsButton.Enable = 'on';
+            if app.is_batch_mode == 0
+                label = bwlabel(~logical(app.bw_obj),4);
+                SaveMaskToMaskFile(app, label);
+                app.SegmentationParameters.Visible = 'off';
+                app.InitialSegmentationButton.Enable = 'on';
+                app.FiberPredictionButton.Enable = 'on';
+                app.ManualSegmentationButton.Enable ='on';
+                app.ManualFiberFilterButton.Enable = 'on';
+                app.FiberPropertiesButton.Enable = 'on';
+                app.CentralNucleiButton.Enable = 'on';
+                app.FiberTypingButton.Enable = 'on';
+                app.NonfiberObjectsButton.Enable = 'on';
+            else 
+                numberOfFilesSelected = length(app.BatchModeFileNames);
+
+                for k=1:numberOfFilesSelected
+                    % Retrieve the filename of the current file
+                    currentFile = app.BatchModeFileNames{k};
+                    % Add the prompt at the top for indication that batch
+                    % mode is running on which file
+                    promptString = "Batch Mode - In Progress: " + int2str(k-1) + " out of " + int2str(numberOfFilesSelected) + " completed.";
+                    app.Prompt.Text = promptString;
+                    % Go through file initilization
+                    % In file initialization, it enables all the other buttons,
+                    % so you need to change this button to the initial page and
+                    % then continue
+                    FileInitialization(app, currentFile, app.BatchModePathName, app.BatchModeFilterIndex);
+                    % Run segment button functionality
+                    SegmentBatchMode(app);
+                    % Accept segmentation
+                    label = bwlabel(~logical(app.bw_obj),4);
+                    SaveMaskToMaskFile(app, label);
+                end
+
+                app.Prompt.Text = 'Batch Mode - Initial Segmentation Completed.';
+            end
+
         end
 
         % Value changed function: SegmentationThresholdSlider
@@ -1314,11 +1345,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.SegmentationParameters.Visible = 'on';
             app.FiberOutlineChannelColorBox.Visible = 'on';
-            if app.is_batch_mode
-                app.BatchModeInitialSegmentationPanel.Visible = 'on';
-                app.DetectValueButton.Enable = 'off';
-                app.SegmentButton.Enable = 'off';
-            end
             
         end
 
@@ -1334,7 +1360,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingButton.Enable = 'off';
             app.NonfiberObjectsButton.Enable = 'off';
             app.ManualSegmentationControls.Visible = 'on';
-            app.BatchModeInitialSegmentationPanel.Visible = 'off';
             app.bw_obj = ReadMaskFromMaskFile(app);
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w'),'Parent',app.UIAxes);
         end
@@ -1351,7 +1376,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingButton.Enable = 'off';
             app.NonfiberObjectsButton.Enable = 'off';
             app.FiberPredictionControlPanel.Visible = 'on';
-            app.BatchModeInitialSegmentationPanel.Visible = 'off';
             % acquire mask and show over image
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             app.bw_obj = imclearborder(app.bw_obj,4);
@@ -1374,7 +1398,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualFilterControls.Visible = 'on';
             app.RemoveObjectsButton.Enable = 'on';
             app.FinishManualFilteringButton.Enable = 'off';
-            app.BatchModeInitialSegmentationPanel.Visible = 'off';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
         end
@@ -1392,7 +1415,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.PropertiesControlPanel.Visible = 'on';
             app.PropertiesPanel.Visible = 'on';
-            app.BatchModeInitialSegmentationPanel.Visible = 'off';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             app.bw_obj = imclearborder(app.bw_obj,4);
                
@@ -1416,7 +1438,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AcceptCNF.Enable = 'off';
             app.CNFExcelWrite.Enable = 'off';
             app.CNFChannelColorBox.Visible = 'on';
-            app.BatchModeInitialSegmentationPanel.Visible = 'off';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
         end
 
@@ -1437,7 +1458,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypeColorDropDown.Enable = 'on';
             app.WritetoExcelFT.Enable = 'off';
             app.FiberTypingChannelColorBox.Visible = 'on';
-            app.BatchModeInitialSegmentationPanel.Visible = 'off';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
         end
 
@@ -1459,7 +1479,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberAccept.Enable = 'off';
             app.WritetoExcelNonfiber.Enable = 'off';
             app.NonfiberChannelColorBox.Visible = 'on';
-            app.BatchModeInitialSegmentationPanel.Visible = 'off';
         end
 
         % Button pushed function: DetectValueButton
@@ -1663,28 +1682,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberOutlineChannelColorBox.Color = RGB1DValue;
             
         end
-
-        % Button pushed function: RunBatchModeButton
-        function RunBatchModeButtonPushed(app, event)
-            numberOfFilesSelected = length(app.BatchModeFileNames);
-
-            for k=1:numberOfFilesSelected
-                % Retrieve the filename of the current file
-                currentFile = app.BatchModeFileNames{k};
-                % Go through file initilization
-                % In file initialization, it enables all the other buttons,
-                % so you need to change this button to the initial page and
-                % then continue
-                FileInitialization(app, currentFile, app.BatchModePathName, app.BatchModeFilterIndex);
-                % Run segment button functionality
-                SegmentBatchMode(app);
-                % Accept segmentation
-                label = bwlabel(~logical(app.bw_obj),4);
-                SaveMaskToMaskFile(app, label);
-            end
-
-            app.Prompt.Text = 'Batch Mode - Initial Segmentation Complete.';
-        end
     end
 
     % Component initialization
@@ -1716,7 +1713,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create FilenameLabel
             app.FilenameLabel = uilabel(app.UIFigure);
-            app.FilenameLabel.Position = [156 676 130 22];
+            app.FilenameLabel.Position = [155 675 138 22];
             app.FilenameLabel.Text = 'Filename';
 
             % Create Prompt
@@ -2351,19 +2348,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FinishDrawingButton.Position = [29 222 100 22];
             app.FinishDrawingButton.Text = 'Finish Drawing';
 
-            % Create BatchModeInitialSegmentationPanel
-            app.BatchModeInitialSegmentationPanel = uipanel(app.UIFigure);
-            app.BatchModeInitialSegmentationPanel.TitlePosition = 'centertop';
-            app.BatchModeInitialSegmentationPanel.Title = 'Batch Mode';
-            app.BatchModeInitialSegmentationPanel.Visible = 'off';
-            app.BatchModeInitialSegmentationPanel.Position = [29 263 264 70];
-
-            % Create RunBatchModeButton
-            app.RunBatchModeButton = uibutton(app.BatchModeInitialSegmentationPanel, 'push');
-            app.RunBatchModeButton.ButtonPushedFcn = createCallbackFcn(app, @RunBatchModeButtonPushed, true);
-            app.RunBatchModeButton.Position = [72 15 118 22];
-            app.RunBatchModeButton.Text = {'Run in Batch Mode'; ''};
-
             % Create SegmentationParameters
             app.SegmentationParameters = uipanel(app.UIFigure);
             app.SegmentationParameters.Visible = 'off';
@@ -2433,6 +2417,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
             app.DetectValueButton.Position = [24 65 100 22];
             app.DetectValueButton.Text = 'Detect Value';
+
+            % Create BatchModeLabel
+            app.BatchModeLabel = uilabel(app.UIFigure);
+            app.BatchModeLabel.Visible = 'off';
+            app.BatchModeLabel.Position = [155 652 138 22];
+            app.BatchModeLabel.Text = 'Batch Mode';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
