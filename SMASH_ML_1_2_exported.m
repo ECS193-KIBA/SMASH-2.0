@@ -195,33 +195,32 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             figure(app.UIFigure)
 
            
-             if FilterIndex==0
-                 %disp("Error opening file")
-                 return
-              
-               
-             end
+            if FilterIndex
+                if FileName ==0
+                    return
+                end
+                 
            
         
-                C = strsplit(FileName,'.');
-                ExtName = C(end);
-                FileNameS = (C(1:(end-1)));
-                FileNameS = FileNameS{1};
-                MaskName = strcat(FileNameS,'_mask.',ExtName);
-                MaskName = MaskName{1};
-                app.FilenameLabel.Text = FileNameS;
-                app.Files{1} = FileName;
-                app.Files{2} = MaskName;
-                app.Files{3} = PathName;
-                app.Files{4} = FileNameS;
-                cd(PathName)
-                a = '.tif';
-                b = '.tiff';
-                c = '.jpg';
-                d = '.png';
-                e = '.bmp';
-                f = '.czi';
-                g = '.lif';
+            C = strsplit(FileName,'.');
+            ExtName = C(end);
+            FileNameS = (C(1:(end-1)));
+            FileNameS = FileNameS{1};
+            MaskName = strcat(FileNameS,'_mask.',ExtName);
+            MaskName = MaskName{1};
+            app.FilenameLabel.Text = FileNameS;
+            app.Files{1} = FileName;
+            app.Files{2} = MaskName;
+            app.Files{3} = PathName;
+            app.Files{4} = FileNameS;
+            cd(PathName)
+            a = '.tif';
+            b = '.tiff';
+            c = '.jpg';
+            d = '.png';
+            e = '.bmp';
+            f = '.czi';
+            g = '.lif';
                 %if isequal(ExtName, a)
                 %    fig = uifigure
                 %    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
@@ -299,11 +298,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 ImageData = imread(FileName);
                 app.orig_img = ImageData;
                 app.orig_img_multispectral = ImageData;
-
-                %H&E image 
-
+                
                 %read image
-                HEImage = imread("example.jpg");
+                HEImage = imread("example.jpg")
+                subplot(3,3,2)
                 imshow(HEImage), title("H&E image");
                 text(size(HEImage,2),size(HEImage,1)+15, ...
                 "Image containing H&E", ...
@@ -313,6 +311,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 numColors = 3;
                 L = imsegkmeans(HEImage, numColors); %returns a label corresponding to each cluster
                 B = labeloverlay(HEImage,L);
+                subplot(3,3,4)
                 imshow(B)
                 title("RGB")
 
@@ -326,6 +325,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
                 segmentedMask = edge(HEImage, 'sobel', threshold * thresholdFactor);
                 segmentedMask= edge(HEImage,'sobel');
+                subplot(3,3,6)
                 figure,imshow(segmentedMask);
                 title('Binary Gradient Mask');
 
@@ -335,16 +335,19 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
 
                 segmentedMaskDilated = imdilate(segmentedMask,[se90 se0]);
+                subplot(3,3,8)
                 imshow(segmentedMaskDilated)
                 title('Dilated Gradient Mask')
 
                 %fill in the holes in the interior of the cell
                 fillHoles = imfill(segmentedMaskDilated,'holes');
+                subplot(3,4,2)
                 imshow(fillHoles)
                 title('Binary Image including Holes Filled')
                 
                 %Remove any connected objects on the image border 
                 removeConnectedObjects = imclearborder(fillHoles,4);
+                subplot(3,4,4)
                 imshow(removeConnectedObjects)
                 title('Clear Borders')
 
@@ -353,16 +356,19 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 seD = strel('diamond',1);
                 smoothObject = imerode(removeConnectedObjects,seD);
                 smoothObject = imerode(smoothObject,seD);
+                subplot(3,4,6)
                 imshow(smoothObject)
                 title('Segmented Image');
 
+                subplot(3,4,8)
                 imshow(labeloverlay(HEImage,smoothObject))
                 title('Mask Over Original Image')
                 
                 %Display mask over the image
                 outline = bwperim(smoothObject);
                 Segout = HEImage; 
-                Segout(outline) = 255; 
+                Segout(outline) = 255;
+                subplot(3,5,2)
                 imshow(Segout)
                 title('Outlined Original Image')
 
@@ -375,24 +381,38 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 ab = im2single(ab);
                 pixel_labels = imsegkmeans(ab,numColors, "NumAttempts",3)
                 B2 = labeloverlay(HEImage, pixel_labels);
+                subplot(3,5,4)
                 imshow(B2)
                 title("Labeled Image a*b*")
 
                 %create images that segment H&E by color
                 mask1 = pixel_labels == 1;
                 cluster1 = HEImage.*uint8(mask1);
+                subplot(3,5,6)
                 imshow(cluster1)
                 title("Objects in Cluster 1");
 
                 mask2 = pixel_labels == 2;
-                cluster2 = HEImage.*uint8(mask2);    
+                cluster2 = HEImage.*uint8(mask2);
+                subplot(3,5,8)
                 imshow(cluster2)
                 title("Objects in Cluster 2");
              
                 mask3 = pixel_labels == 3;
                 cluster3 = HEImage.*uint8(mask3);
+                subplot(3,6,2)
                 imshow(cluster3)
                 title("Objects in Cluster 3");
+                
+                %separating into red,blue,green channels
+                blackChannel = zeros(size(HEImage, 1), size(HEImage, 2), 'uint8');
+                redmask1 = cat(3,mask1, blackChannel, blackChannel);
+                greenmask2 = cat(3,blackChannel, mask2, blackChannel);
+                bluemask3 = cat(3, blackChannel, blackChannel, mask3);
+
+                %recreate original rgb image
+                recreateOriginalrgb = cat(3, redmask1, greenmask2,bluemask3);
+                %imshow(redmask1)
 
 
                 %segment Nuclei
@@ -404,8 +424,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 mask_dark_blue = mask3;
                 mask_dark_blue(blue_idx(idx_light_blue)) = 0;
                 blue_nuclei = HEImage.*uint8(mask_dark_blue);
-                imshow(blue_nuclei)
-                title("Blue Nuclei");
+                %imshow(blue_nuclei)
+                %title("Blue Nuclei");
+                %figure, imshow(HEImage(:,:,:,14))
             end
 
              %stain deconvolution    
@@ -473,8 +494,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             end
 
 
-
-                
+           
             
             if exist(MaskName,'file')
                 app.InitialSegmentationButton.Enable = 'on';
