@@ -1,5 +1,6 @@
 function test()
-    bw_obj = imcomplement(ReadMaskFromMaskFile('RGB Images/Copy_of_5001_L_10x_mask_only_segmented.tif'));
+    bw_segmentation_outline = ReadMaskFromMaskFile('RGB Images/Copy_of_5001_L_10x_mask_only_segmented.tif');
+    bw_obj = imcomplement(bw_segmentation_outline);
     pix_size = 0.65;
 
     % bw_obj = imcomplement(ReadMaskFromMaskFile('RGB Images/AAV21_L_EDL_mhc2a_merged_mask.tif'));
@@ -38,7 +39,7 @@ function test()
     writetable(data,'TestOutput/test.xlsx')
 
     for i = 1:num_obj
-        imwrite(label == i, ['TestOutput/Region', int2str(i), '.png']);
+        imwrite(label == i | bw_segmentation_outline, ['TestOutput/Region', int2str(i), '.png']);
     end
 end
 
