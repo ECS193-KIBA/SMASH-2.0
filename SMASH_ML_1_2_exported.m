@@ -186,22 +186,18 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 [FileName,PathName,FilterIndex] = uigetfile({'*'},'File Selector - dont select mask');
                 
             else
-                [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi';'*.lif'},'File Selector - dont select mask');
-                
-                
-            
+                [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi';'*.lif'},'File Selector - dont select mask');    
             end
+
             drawnow limitrate;
             figure(app.UIFigure)
 
            
-            if FilterIndex
-                if FileName ==0
-                    return
-                end
-                 
-           
-        
+            if FilterIndex == 0
+                return
+            else
+            
+            
             C = strsplit(FileName,'.');
             ExtName = C(end);
             FileNameS = (C(1:(end-1)));
@@ -213,44 +209,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Files{2} = MaskName;
             app.Files{3} = PathName;
             app.Files{4} = FileNameS;
-            cd(PathName)
-            a = '.tif';
-            b = '.tiff';
-            c = '.jpg';
-            d = '.png';
-            e = '.bmp';
-            f = '.czi';
-            g = '.lif';
-                %if isequal(ExtName, a)
-                %    fig = uifigure
-                %    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-               % elseif isequal(ExtName, b)
-               %     fig = uifigure 
-               %     uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-              %  elseif isequal(ExtName, c)
-                %    fig = uifigure 
-                %    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-               % elseif isequal(ExtName, d)
-               %     fig = uifigure 
-              %      uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-              %  elseif isequal(ExtName, e)
-              %      fig = uifigure 
-               %     uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-               % elseif isequal(ExtName, f)
-               %     fig = uifigure 
-                %    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-              %  elseif isequal(ExtName, g)
-               %     fig = uifigure 
-                %    uialert(fig,'Successfully uploaded Image','Upload Success')    %display image
-               % else
-                %    fig = uifigure
-                %    uialert(fig, 'Image Selection Unsuccessful. Upload an image with the following extensions:.tif, .tiff, .jpg, .png, .bmp, .czi, .lif','Upload Error')
-                %    return
-               % end 
-                  
+            cd(PathName)   
             end
  
-    
             % Change output directory to where image is located
             app.FiberPropertiesDataOutputFolder.Value = pwd;
             app.CentralNucleiDataOutputFolder.Value = pwd;
@@ -298,203 +259,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 ImageData = imread(FileName);
                 app.orig_img = ImageData;
                 app.orig_img_multispectral = ImageData;
-                
-                %read image
-                HEImage = imread("example.jpg")
-                subplot(3,3,2)
-                imshow(HEImage), title("H&E image");
-                text(size(HEImage,2),size(HEImage,1)+15, ...
-                "Image containing H&E", ...
-                "FontSize",7,"HorizontalAlignment","right");
-
-                %use k-means clustering to segment image in RGB color space
-                numColors = 3;
-                L = imsegkmeans(HEImage, numColors); %returns a label corresponding to each cluster
-                B = labeloverlay(HEImage,L);
-                subplot(3,3,4)
-                imshow(B)
-                title("RGB")
-
-                %edge detection
-                HEImage=rgb2gray(HEImage);
-
-                %sobel operator for edge detection 
-                %create a binary gradient mask
-                [~,threshold] = edge(HEImage,'sobel'); %new
-                thresholdFactor = 0.5; %threshold value 
-
-                segmentedMask = edge(HEImage, 'sobel', threshold * thresholdFactor);
-                segmentedMask= edge(HEImage,'sobel');
-                subplot(3,3,6)
-                figure,imshow(segmentedMask);
-                title('Binary Gradient Mask');
-
-                %Dilate mask image
-                se90 = strel('line',3,90);
-                se0 = strel('line',3,0);
-
-
-                segmentedMaskDilated = imdilate(segmentedMask,[se90 se0]);
-                subplot(3,3,8)
-                imshow(segmentedMaskDilated)
-                title('Dilated Gradient Mask')
-
-                %fill in the holes in the interior of the cell
-                fillHoles = imfill(segmentedMaskDilated,'holes');
-                subplot(3,4,2)
-                imshow(fillHoles)
-                title('Binary Image including Holes Filled')
-                
-                %Remove any connected objects on the image border 
-                removeConnectedObjects = imclearborder(fillHoles,4);
-                subplot(3,4,4)
-                imshow(removeConnectedObjects)
-                title('Clear Borders')
-
-
-                %Smooth the object
-                seD = strel('diamond',1);
-                smoothObject = imerode(removeConnectedObjects,seD);
-                smoothObject = imerode(smoothObject,seD);
-                subplot(3,4,6)
-                imshow(smoothObject)
-                title('Segmented Image');
-
-                subplot(3,4,8)
-                imshow(labeloverlay(HEImage,smoothObject))
-                title('Mask Over Original Image')
-                
-                %Display mask over the image
-                outline = bwperim(smoothObject);
-                Segout = HEImage; 
-                Segout(outline) = 255;
-                subplot(3,5,2)
-                imshow(Segout)
-                title('Outlined Original Image')
-
-
-                %convert rgb into L*a*b*
-                Lab_HEImage = rgb2lab(HEImage);
-
-                %use k-means clustering to classify in a*b* space
-                ab = Lab_HEImage(:,:,2:3);
-                ab = im2single(ab);
-                pixel_labels = imsegkmeans(ab,numColors, "NumAttempts",3)
-                B2 = labeloverlay(HEImage, pixel_labels);
-                subplot(3,5,4)
-                imshow(B2)
-                title("Labeled Image a*b*")
-
-                %create images that segment H&E by color
-                mask1 = pixel_labels == 1;
-                cluster1 = HEImage.*uint8(mask1);
-                subplot(3,5,6)
-                imshow(cluster1)
-                title("Objects in Cluster 1");
-
-                mask2 = pixel_labels == 2;
-                cluster2 = HEImage.*uint8(mask2);
-                subplot(3,5,8)
-                imshow(cluster2)
-                title("Objects in Cluster 2");
-             
-                mask3 = pixel_labels == 3;
-                cluster3 = HEImage.*uint8(mask3);
-                subplot(3,6,2)
-                imshow(cluster3)
-                title("Objects in Cluster 3");
-                
-                %separating into red,blue,green channels
-                blackChannel = zeros(size(HEImage, 1), size(HEImage, 2), 'uint8');
-                redmask1 = cat(3,mask1, blackChannel, blackChannel);
-                greenmask2 = cat(3,blackChannel, mask2, blackChannel);
-                bluemask3 = cat(3, blackChannel, blackChannel, mask3);
-
-                %recreate original rgb image
-                recreateOriginalrgb = cat(3, redmask1, greenmask2,bluemask3);
-                %imshow(redmask1)
-
-
-                %segment Nuclei
-                L = Lab_HEImage(:,:,1);
-                L_blue = L.*double(mask3);
-                L_blue = rescale(L_blue);
-                idx_light_blue = imbinarize(nonzeros(L_blue));
-                blue_idx = find(mask3);
-                mask_dark_blue = mask3;
-                mask_dark_blue(blue_idx(idx_light_blue)) = 0;
-                blue_nuclei = HEImage.*uint8(mask_dark_blue);
-                %imshow(blue_nuclei)
-                %title("Blue Nuclei");
-                %figure, imshow(HEImage(:,:,:,14))
+                     
             end
-
-             %stain deconvolution    
-            function [H,E] = Deconvolution(HEImage)
-                He = [0.18; 0.20; 0.08]; %hematoxylin
-                Eo = [0.01; 0.13; 0.01]; %eosin
-                DAB = [0.10; 0.21; 0.29];
-
-                % Normalization gives absorbtion factor of stains
-                 colorDecon= [He/norm(He) Eo/norm(Eo) DAB/norm(DAB)]';
-
-               % inverse matrix 
-                colorDeconInverse = inv(colorDecon) ; 
-
-               % Conversion to float
-                rgbimage = double(rgbimage)+1;
-                OpticalDensityMatrix = -log(rgbimage);
-        
-              % Separate stains
-                SeparateStains = reshape(OpticalDensityMatrix,[],3) *colorDeconInverse;
-                SeparateStains = reshape(SeparateStains, size(rgbimage));
-        
-              % Normalization
-                SeparateStains = normalize(SeparateStains);
-        
-              % Create RGB or each stain 
-                s = size(rgbimage);
-                A(:,:,1) = SeparateStains(:,:,1);A(:,:,2) = zeros(s(1),s(2));A(:,:,3) = zeros(s(1),s(2));
-                B(:,:,1) = zeros(s(1),s(2));B(:,:,2) = SeparateStains(:,:,2);B(:,:,3) = zeros(s(1),s(2));
-
-                % Convert to float
-               convertToFloat1 = double(A)+1;
-               OpticalDensityMatrix1 = -log(Dop1)+1;
-               convertToFloat2 = double(B)+1;
-               OpticalDensityMatrix2 = -log(Dop2)+1;
-        
-               % Reconstruct image through reshaping
-		       H = -reshape(OpticalDensityMatrix1,[],3) *colorDecon;
-               E = -reshape(OpticalDensityMatrix2,[],3) *colorDecon;
-               H = -exp(H);
-		       H = reshape(H, size(SeparateStains));
-               E = -exp(E);
-		       E = reshape(E, size(SeparateStains));
-        
-               % Normalize matrix
-		       H = normalize(H);
-		       E = normalize(E); 
-               imshow(rgbimage);
-            end
-
-             %Normalization 
-            function normalizeMatrix = normalize(Iin)
-                % Normalization Function
-	            normalizeMatrix = Iin;                   
-         
-	            for i=1:size(Iin,3)
-                    Channel = normalizeMatrix(:,:,i);
-
-                    % image intensities 
-		            normalizeMatrix(:,:,i) = (normalizeMatrix(:,:,i)-min(Channel(:)))/(max(Channel(:)-min(Channel(:))));
-
-                    % Invert image
-                    normalizeMatrix(:,:,i) = 1 - normalizeMatrix(:,:,i);
-                end
-            end
-
-
-           
             
             if exist(MaskName,'file')
                 app.InitialSegmentationButton.Enable = 'on';
