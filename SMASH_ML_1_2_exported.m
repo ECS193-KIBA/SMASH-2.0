@@ -157,8 +157,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         nf_data
         segmodel
         channelRGB % Contains all the RGB values of the channel colors
-        is_multilayer_image % Boolean to store whether image is a multilayer
-        is_batch_mode % Boolean to store whether running in batch mode
+        IsBatchMode % Boolean to store whether running in batch mode
         BatchModeFileNames % Store batch mode file names
         BatchModePathName % Store batch mode path name
         BatchModeFilterIndex % Store batch mode filter index
@@ -181,7 +180,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 MaskName = MaskName{1};
             end
             
-            if app.is_batch_mode == 1
+            if app.IsBatchMode == 1
                 numberOfFilesForBatchMode = length(app.BatchModeFileNames);
                 fileNameString = "Batch Mode (" + int2str(numberOfFilesForBatchMode) + " files)";
                 app.BatchModeLabel.Text = strcat(fileNameString);
@@ -206,13 +205,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             ColorMapDataForAllLayers = BioformatsData{1, 3};
             isMultilayerImage = ~isempty(ColorMapDataForAllLayers{1,1});
 
-            % Update global variable to set multilayer image
-            app.is_multilayer_image = false;
-
             if isMultilayerImage
-                % Update global variable to set multilayer image
-                app.is_multilayer_image = true;
-
                 LayerOnePixelData = PixelDataForAllLayers{1,1};
                 LayerSize = size(LayerOnePixelData);
                 RGBSize = [LayerSize 3];
@@ -287,8 +280,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Display the image
             imshow(app.orig_img,'Parent',app.UIAxes);
-                       
-            if exist(MaskName,'file') && app.is_batch_mode == 0
+
+            if exist(MaskName,'file') && app.IsBatchMode == 0
                 app.InitialSegmentationButton.Enable = 'on';
                 app.FiberPredictionButton.Enable = 'on';
                 app.ManualSegmentationButton.Enable = 'on';
@@ -327,8 +320,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberOutlineChannelColorBox.Color = FiberOutlineChannel;
         end
 
-        function SegmentBatchMode(app)
-            %orig_img = imread(app.Files{1});
+        function SegmentAndDisplayImage(app)
             foc = app.FiberOutlineColorDropDown.Value;
             foc = str2double(foc);
             lam = app.orig_img_multispectral(:,:,foc);  % fiber outline color
@@ -341,6 +333,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Display segmented image
             flat_img =flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w');
             imshow(flat_img,'Parent',app.UIAxes);
+        end
+
+        function SegmentBatchMode(app)
+            SegmentAndDisplayImage(app);
         end
                    
         function CreateFolderIfDirectoryIsNonexistent(~, pathDirectory)
@@ -489,10 +485,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Return if there no filenames
             if FilterIndex
                 if iscell(FileNames) % If there are multiple FileNames, batch mode
-                    app.is_batch_mode = 1;
+                    app.IsBatchMode = 1;
                     FileName = FileNames{1};
                 else
-                    app.is_batch_mode = 0;
+                    app.IsBatchMode = 0;
                     FileName = FileNames;
                 end
                 if FileName == 0
@@ -521,20 +517,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                
                if go
                    %orig_img = imread(app.Files{1});
-                   foc = app.FiberOutlineColorDropDown.Value;
-                   foc = str2double(foc);
-                   lam = app.orig_img_multispectral(:,:,foc);  % fiber outline color
-                   
-                   % Image Segmentation
-                   lam_t = imhmin(lam,app.SegmentationThresholdSlider.Value);
-                   WS = watershed(lam_t);
-                   app.bw_obj = imcomplement(logical(WS));
-                   
-                   % Display segmented image
-                   flat_img =flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w');
-                   imshow(flat_img,'Parent',app.UIAxes);
+                   SegmentAndDisplayImage(app);
                    app.AcceptSegmentationButton.Enable = 'on';
-                   
                    
                end 
         end
@@ -697,7 +681,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: AcceptSegmentationButton
         function AcceptSegmentationButtonPushed(app, event)
-            if app.is_batch_mode == 0
+            if app.IsBatchMode == 0
                 label = bwlabel(~logical(app.bw_obj),4);
                 SaveMaskToMaskFile(app, label);
                 app.SegmentationParameters.Visible = 'off';
