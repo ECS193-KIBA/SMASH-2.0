@@ -55,13 +55,28 @@ function isSuccess = CheckAddOnInstallation(requiredAddon)
 end
 
 function isSuccess = CheckIfAddOnIsInstalledAndEnabled(addonName)
+% CheckIfAddOnIsInstalledAndEnabled Checks if add-on is installed and enabled.
+%   CheckIfAddOnIsInstalledAndEnabled checks if add-on is installed and
+%   enabled and prints to standard error any detected errors.
+%
+%   CheckIfAddOnIsInstalledAndEnabled(addonName) returns:
+%     0 if addonName is not the name of an installed add-on or if
+%       addonName is the name of an installed add-on, but the add-on is
+%       disabled.
+%     1 if addonName is the name of an installed add-on and that add-on is
+%       enabled.
+%
+%   CheckIfAddOnIsInstalledAndEnabled uses matlab.addons.installedAddons to
+%   lookup add-ons.
+%
+%   See also matlab.addons.installedAddons.
     info = GetAddOnInformation(addonName);
-   if IsInstalled(info)
+    if IsInstalled(info)
        isSuccess = CheckIfAddOnIsEnabled(info);
-   else
+    else
        fprintf(2, " No%c    Add-On ""%s"" is not installed. Please install it.%c", newline, addonName, newline)
        isSuccess = 0;
-   end
+    end
 end
 
 function info = GetAddOnInformation(addonName)
