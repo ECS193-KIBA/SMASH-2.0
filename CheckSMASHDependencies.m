@@ -13,37 +13,32 @@ function CheckSMASHDependencies
 %   See also SMASHAddons.
 
     disp("Checking Add-Ons Required for SMASH...");
-    installedAddons = matlab.addons.installedAddons;
-    requiredAddons = SMASHAddons();
-    successCount = CheckIfInstalledAddOnsContainAllRequiredAddons(installedAddons, requiredAddons);
-    isBioformatsInstalled = CheckIfBioformatsIsInstalled();
-    printSeparator();
-    if successCount == size(requiredAddons, 2) && isBioformatsInstalled
-        disp("You're all set! All required Add-Ons have been installed!");
-    else
-        fprintf(2, "Please install the missing Add-On(s) before running SMASH.%c", newline)
-    end
-    
+    isAddonsCheckSuccessful = CheckIfInstalledAddOnsContainAllRequiredAddons();
+    isBioformatsCheckSuccessful = CheckIfBioformatsIsInstalled();
+    areAllDependenciesInstalled = isAddonsCheckSuccessful && isBioformatsCheckSuccessful;
+    PrintSummary(areAllDependenciesInstalled);
 end
 
-function successCount = CheckIfInstalledAddOnsContainAllRequiredAddons(installedAddons, requiredAddons)
+function isSuccess = CheckIfInstalledAddOnsContainAllRequiredAddons()
     successCount = 0;
-    for addon = requiredAddons
-        successCount = successCount + CheckIfInstalledAddOnsContainRequiredAddon(installedAddons, addon);
+    for addon = SMASHAddons()
+        successCount = successCount + CheckIfInstalledAddOnsContainRequiredAddon(addon);
     end
+    isSuccess = successCount == size(SMASHAddons(), 2);
 end
 
-function isSuccess = CheckIfInstalledAddOnsContainRequiredAddon(installedAddOns, requiredAddon)
+function isSuccess = CheckIfInstalledAddOnsContainRequiredAddon(requiredAddon)
     fprintf("  Checking if Add-On ""%s"" is installed and enable...", requiredAddon);
-    info = GetAddOnInformation(installedAddOns, requiredAddon);
+    info = GetAddOnInformation(requiredAddon);
     isSuccess = CheckIfAddOnIsInstalledAndEnabled(info, requiredAddon);
     if isSuccess
         disp('Yes!');
     end
 end
 
-function info = GetAddOnInformation(installedAddOns, addonName)
-    info = installedAddOns(strcmp(installedAddOns.Name, addonName), :);
+function info = GetAddOnInformation(addonName)
+    installedAddons = matlab.addons.installedAddons;
+    info = installedAddons(strcmp(installedAddons.Name, addonName), :);
 end
 
 function isSuccess = CheckIfAddOnIsInstalledAndEnabled(info, addonName)
@@ -87,4 +82,13 @@ end
 function isInstalled = IsBioformatsInstalled()
     NAME_IS_M_FILE = 2;
     isInstalled = exist("bfopen", "file") == NAME_IS_M_FILE;
+end
+
+function PrintSummary(areAllDependenciesInstalled)
+    printSeparator();
+    if areAllDependenciesInstalled
+        disp("You're all set! All required dependencies have been installed!");
+    else
+        fprintf(2, "Please install the missing dependencies before running SMASH.%c", newline)
+    end
 end
