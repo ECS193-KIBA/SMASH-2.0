@@ -21,7 +21,7 @@ function successCount = CheckIfInstalledAddOnsContainAllRequiredDependencies(ins
 end
 
 function isSuccess = CheckIfInstalledAddOnsContainRequiredDependency(installedAddOns, requiredDependency)
-    fprintf("  Checking if Add-On ''%s'' is installed and enable...", requiredDependency);
+    fprintf("  Checking if Add-On ""%s"" is installed and enable...", requiredDependency);
     info = GetAddOnInformation(installedAddOns, requiredDependency);
     isSuccess = CheckIfAddOnIsInstalledAndEnabled(info, requiredDependency);
     if isSuccess
@@ -37,7 +37,7 @@ function isSuccess = CheckIfAddOnIsInstalledAndEnabled(info, addonName)
    if IsInstalled(info)
        isSuccess = CheckIfAddOnIsEnabled(info);
    else
-       fprintf(2, " No%c    Add-On ''%s'' is not installed. Please install it.%c", newline, addonName, newline)
+       fprintf(2, " No%c    Add-On ""%s"" is not installed. Please install it.%c", newline, addonName, newline)
        isSuccess = 0;
    end
 end
@@ -46,7 +46,7 @@ function isSuccess = CheckIfAddOnIsEnabled(info)
     if info.Enabled
         isSuccess = 1;
     else
-       fprintf(2, " No%c    Add-On ''%s'' is installed but not enabled. Please enable it.%c",newline, info.Name, newline)
+       fprintf(2, " No%c    Add-On ""%s"" is installed but not enabled. Please enable it.%c",newline, info.Name, newline)
         isSuccess = 0;
     end
 end
