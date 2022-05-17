@@ -13,18 +13,18 @@ function CheckSMASHDependencies
 %   See also SMASHAddons.
 
     disp("Checking Add-Ons Required for SMASH...");
-    isAddonsCheckSuccessful = CheckIfInstalledAddOnsContainAllRequiredAddons();
+    isAddonsCheckSuccessful = CheckAddOnInstallations();
     isBioformatsCheckSuccessful = CheckIfBioformatsIsInstalled();
     areAllDependenciesInstalled = isAddonsCheckSuccessful && isBioformatsCheckSuccessful;
     PrintSummary(areAllDependenciesInstalled);
 end
 
-function isSuccess = CheckIfInstalledAddOnsContainAllRequiredAddons()
-% CheckIfInstalledAddOnsContainAllRequiredAddons  Checks add-on installations.
-%   For each add-on listed in SMASHAddons, CheckIfInstalledAddOnsContainAllRequiredAddons
+function isSuccess = CheckAddOnInstallations()
+% CheckAddOnInstallations  Checks add-on installations.
+%   For each add-on listed in SMASHAddons, CheckAddOnInstallations
 %   outputs whether or not that add-on is installed and enabled.
 %
-%   CheckIfInstalledAddOnsContainAllRequiredAddons() returns:
+%   CheckAddOnInstallations() returns:
 %     0 if any add-on listed in SMASHAddons is not installed or is not
 %       enabled.
 %     1 if all add-ons listed in SMASHAddons are installed and enabled.
@@ -33,17 +33,17 @@ function isSuccess = CheckIfInstalledAddOnsContainAllRequiredAddons()
 
     successCount = 0;
     for addon = SMASHAddons()
-        successCount = successCount + CheckIfInstalledAddOnsContainRequiredAddon(addon);
+        successCount = successCount + CheckAddOnInstallation(addon);
     end
     isSuccess = successCount == size(SMASHAddons(), 2);
 end
 
-function isSuccess = CheckIfInstalledAddOnsContainRequiredAddon(requiredAddon)
-% CheckIfInstalledAddOnsContainRequiredAddon Checks add-on installation.
-%   CheckIfInstalledAddOnsContainRequiredAddon checks if requiredAddon is
+function isSuccess = CheckAddOnInstallation(requiredAddon)
+% CheckAddOnInstallation Checks add-on installation.
+%   CheckAddOnInstallation checks if requiredAddon is
 %   installed and enabled.
 %
-%   CheckIfInstalledAddOnsContainRequiredAddon(requiredAddon) returns:
+%   CheckAddOnInstallation(requiredAddon) returns:
 %     0 if requiredAddon is not installed or not enabled.
 %     1 if requiredAddon is both installed and enabled.
 
@@ -54,11 +54,6 @@ function isSuccess = CheckIfInstalledAddOnsContainRequiredAddon(requiredAddon)
     end
 end
 
-function info = GetAddOnInformation(addonName)
-    installedAddons = matlab.addons.installedAddons;
-    info = installedAddons(strcmp(installedAddons.Name, addonName), :);
-end
-
 function isSuccess = CheckIfAddOnIsInstalledAndEnabled(addonName)
     info = GetAddOnInformation(addonName);
    if IsInstalled(info)
@@ -67,6 +62,11 @@ function isSuccess = CheckIfAddOnIsInstalledAndEnabled(addonName)
        fprintf(2, " No%c    Add-On ""%s"" is not installed. Please install it.%c", newline, addonName, newline)
        isSuccess = 0;
    end
+end
+
+function info = GetAddOnInformation(addonName)
+    installedAddons = matlab.addons.installedAddons;
+    info = installedAddons(strcmp(installedAddons.Name, addonName), :);
 end
 
 function isSuccess = CheckIfAddOnIsEnabled(info)
