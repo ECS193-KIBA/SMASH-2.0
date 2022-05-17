@@ -20,6 +20,17 @@ function CheckSMASHDependencies
 end
 
 function isSuccess = CheckIfInstalledAddOnsContainAllRequiredAddons()
+% CheckIfInstalledAddOnsContainAllRequiredAddons  Checks add-on installation.
+%   For each add-on listed in SMASHAddons, CheckIfInstalledAddOnsContainAllRequiredAddons
+%   outputs whether or not that add-on is installed and enabled.
+%
+%   CheckIfInstalledAddOnsContainAllRequiredAddons() returns:
+%     0 if any add-on listed in SMASHAddons is not installed or is not
+%       enabled.
+%     1 if all add-ons listed in SMASHAddons are installed and enabled.
+%
+%   See also SMASHAddons.
+
     successCount = 0;
     for addon = SMASHAddons()
         successCount = successCount + CheckIfInstalledAddOnsContainRequiredAddon(addon);
