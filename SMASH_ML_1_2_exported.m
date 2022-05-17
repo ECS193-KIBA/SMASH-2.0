@@ -3,6 +3,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        SegmentationParameters          matlab.ui.container.Panel
+        DetectValueButton               matlab.ui.control.Button
+        SegmentationThresholdSlider     matlab.ui.control.Slider
+        SegmentationThresholdSliderLabel  matlab.ui.control.Label
+        AcceptSegmentationButton        matlab.ui.control.Button
+        FiberOutlineColorDropDown       matlab.ui.control.DropDown
+        FiberOutlineColorDropDownLabel  matlab.ui.control.Label
+        SegmentButton                   matlab.ui.control.Button
+        FiberOutlineChannelColorBox     matlab.ui.control.UIAxes
+        BatchModeLabel                  matlab.ui.control.Label
         NonfiberPanel                   matlab.ui.container.Panel
         NonfiberAccept                  matlab.ui.control.Button
         NonfiberAdjust                  matlab.ui.control.Button
@@ -17,12 +27,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         FiberTypeColorDropDownLabel     matlab.ui.control.Label
         FiberTypingDataOutputFolder     matlab.ui.control.EditField
         DataOutputFolderEditField_3Label  matlab.ui.control.Label
-        PixelSizeFiberType              matlab.ui.control.NumericEditField
+        PixelSizeFiberTyping            matlab.ui.control.NumericEditField
         PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
         FiberTypingChannelColorBox      matlab.ui.control.UIAxes
         PropertiesControlPanel          matlab.ui.container.Panel
         CalculateFiberProperties        matlab.ui.control.Button
-        PixelSizeumpixelEditField       matlab.ui.control.NumericEditField
+        PixelSizeFiberProperties        matlab.ui.control.NumericEditField
         PixelSizeumpixelEditFieldLabel_2  matlab.ui.control.Label
         FiberPropertiesDataOutputFolder  matlab.ui.control.EditField
         DataOutputFolderEditFieldLabel  matlab.ui.control.Label
@@ -40,11 +50,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         CalculateCentralNuclei          matlab.ui.control.Button
         NucleiColorDropDown             matlab.ui.control.DropDown
         NucleiColorDropDownLabel        matlab.ui.control.Label
-        PixelSizeumpixelEditField_2     matlab.ui.control.NumericEditField
+        PixelSizeCentralNuclei          matlab.ui.control.NumericEditField
         PixelSizeumpixelLabel           matlab.ui.control.Label
         CNFChannelColorBox              matlab.ui.control.UIAxes
         NonfiberControlPanel            matlab.ui.container.Panel
-        PixelSizeNonfiber               matlab.ui.control.NumericEditField
+        PixelSizeNonfiberObjects        matlab.ui.control.NumericEditField
         PixelSizeumpixelLabel_2         matlab.ui.control.Label
         DoneNonfiber                    matlab.ui.control.Button
         WritetoExcelNonfiber            matlab.ui.control.Button
@@ -66,17 +76,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         Panel_2                         matlab.ui.container.Panel
         Image2                          matlab.ui.control.Image
         SMASHLabel                      matlab.ui.control.Label
-        SegmentationParameters          matlab.ui.container.Panel
-        DetectValueButton               matlab.ui.control.Button
-        SegmentationThresholdSlider     matlab.ui.control.Slider
-        SegmentationThresholdSliderLabel  matlab.ui.control.Label
-        AcceptSegmentationButton        matlab.ui.control.Button
-        FiberOutlineColorDropDown       matlab.ui.control.DropDown
-        FiberOutlineColorDropDownLabel  matlab.ui.control.Label
-        SegmentButton                   matlab.ui.control.Button
-        PixelSizeField                  matlab.ui.control.NumericEditField
-        PixelSizeumpixelEditFieldLabel  matlab.ui.control.Label
-        FiberOutlineChannelColorBox     matlab.ui.control.UIAxes
         ManualSegmentationControls      matlab.ui.container.Panel
         FinishDrawingButton             matlab.ui.control.Button
         StartMergingButton              matlab.ui.control.Button
@@ -114,7 +113,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         UIAxesL                         matlab.ui.control.UIAxes
         Prompt                          matlab.ui.control.Label
         FilenameLabel                   matlab.ui.control.Label
-        SelectFileButton                matlab.ui.control.Button
+        SelectFilesButton               matlab.ui.control.Button
         PropertiesPanel                 matlab.ui.container.Panel
         FiberSizeAxes                   matlab.ui.control.UIAxes
         FeretAxes                       matlab.ui.control.UIAxes
@@ -158,11 +157,184 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         nf_data
         segmodel
         channelRGB % Contains all the RGB values of the channel colors
-        is_multilayer_image % Boolean to store where image is a multilayer
+        IsBatchMode % Boolean to store whether running in batch mode
+        BatchModeFileNames % Store batch mode file names
+        BatchModePathName % Store batch mode path name
+        BatchModeFilterIndex % Store batch mode filter index
     end
     
     methods (Access = private)
 
+        function FileInitialization(app, FileName, PathName, FilterIndex)
+            drawnow limitrate;
+            figure(app.UIFigure)
+            if FilterIndex
+                if FileName == 0
+                    return
+                end
+                C = strsplit(FileName,'.');
+                ExtName = C(end);
+                FileNameS = (C(1:(end-1)));
+                FileNameS = FileNameS{1};
+                MaskName = strcat(FileNameS,'_mask.',ExtName);
+                MaskName = MaskName{1};
+            end
+            
+            if app.IsBatchMode == 1
+                numberOfFilesForBatchMode = length(app.BatchModeFileNames);
+                fileNameString = "Batch Mode (" + int2str(numberOfFilesForBatchMode) + " files)";
+                app.BatchModeLabel.Text = strcat(fileNameString);
+                app.BatchModeLabel.Visible = 'on';
+            end
+
+            app.FilenameLabel.Text = FileNameS;
+            app.Files{1} = FileName;
+            app.Files{2} = MaskName;
+            app.Files{3} = PathName;
+            app.Files{4} = FileNameS;
+            cd(PathName)
+    
+            % Change output directory to where image is located
+            app.FiberPropertiesDataOutputFolder.Value = pwd;
+            app.CentralNucleiDataOutputFolder.Value = pwd;
+            app.FiberTypingDataOutputFolder.Value = pwd;
+            app.NonfiberObjectsDataOutputFolder.Value = pwd;
+            
+            BioformatsData = bfopen(FileName);
+            PixelDataForAllLayers = BioformatsData{1,1};
+            ColorMapDataForAllLayers = BioformatsData{1, 3};
+            isMultilayerImage = ~isempty(ColorMapDataForAllLayers{1,1});
+
+            if isMultilayerImage
+                LayerOnePixelData = PixelDataForAllLayers{1,1};
+                LayerSize = size(LayerOnePixelData);
+                RGBSize = [LayerSize 3];
+
+                TotalRGB = zeros(RGBSize, 'uint8');
+                TotalMultiSpectral = [];
+                TotalColorDropDownItems = {};
+                TotalColorDropDownItemsData = {};
+                
+                % Channel RGB takes in all RGB values for the 
+                % different colors in the channels
+                app.channelRGB = [];
+
+                NumLayers = length(PixelDataForAllLayers);
+                for Layer = 1:NumLayers
+                    PixelsGrayscale = PixelDataForAllLayers{Layer, 1};
+                    ColorMap = ColorMapDataForAllLayers{1, Layer};
+                    PixelsRGBAsDouble = ind2rgb(PixelsGrayscale, ColorMap);
+                    PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
+                    PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
+
+                    % Retrieve color name from the RGB values
+                    RGBValues = ColorMap(end,:);
+                    ConvertedRGB = colornames('HTML4', RGBValues,'RGB');
+                    ColorName = char(ConvertedRGB);
+
+                    % Autoscaling - scale the pixel intensity for each channel
+                    MaxIntensity = max(PixelsGrayscaleUInt8,[],'all');
+                    MinIntensity = min(PixelsGrayscaleUInt8,[],'all');
+                    ActualRange = MaxIntensity - MinIntensity;
+                    UInt8Range = 255;
+                    ScalingFactor = UInt8Range / ActualRange;
+                    PixelsGrayscaleUInt8 = ScalingFactor * PixelsGrayscaleUInt8;
+                    PixelsRGBAsUInt8 = ScalingFactor * PixelsRGBAsUInt8;
+
+                    TotalMultiSpectral = cat(3, TotalMultiSpectral, PixelsGrayscaleUInt8);
+                    TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
+
+                    % Include only color name in the channel drop down menu
+                    TotalColorDropDownItems = cat(2, TotalColorDropDownItems, ColorName);
+                    TotalColorDropDownItemsData  = cat(2, TotalColorDropDownItemsData, {num2str(Layer)});
+
+                    % Add the RGB values of the channel color 
+                    % Convert from cell array to double matrix when
+                    % appending
+                    app.channelRGB = cat(1, app.channelRGB, RGBValues(1,:));
+                end
+
+                app.FiberOutlineColorDropDown.Items = TotalColorDropDownItems;
+                app.FiberOutlineColorDropDown.ItemsData = TotalColorDropDownItemsData;
+                app.NucleiColorDropDown.Items = TotalColorDropDownItems;
+                app.NucleiColorDropDown.ItemsData = TotalColorDropDownItemsData;
+                app.FiberTypeColorDropDown.Items = TotalColorDropDownItems;
+                app.FiberTypeColorDropDown.ItemsData = TotalColorDropDownItemsData;
+                app.NonfiberObjectsColorDropDown.Items = TotalColorDropDownItems;
+                app.NonfiberObjectsColorDropDown.ItemsData = TotalColorDropDownItemsData;
+                app.orig_img = TotalRGB;
+                app.orig_img_multispectral = TotalMultiSpectral;
+            else
+                ImageData = imread(FileName);
+                app.orig_img = ImageData;
+                app.orig_img_multispectral = ImageData;
+
+                % Append RGB color channels to channelRGB for RGB images
+                % Add red, green, and blue to channelRGB
+                RedValue = [1 0 0];
+                GreenValue = [0 1 0];
+                BlueValue = [0 0 1];
+                app.channelRGB = [RedValue; GreenValue; BlueValue];
+
+            end
+
+            % Display the image
+            imshow(app.orig_img,'Parent',app.UIAxes);
+
+            if exist(MaskName,'file') && app.IsBatchMode == 0
+                app.InitialSegmentationButton.Enable = 'on';
+                app.FiberPredictionButton.Enable = 'on';
+                app.ManualSegmentationButton.Enable = 'on';
+                app.ManualFiberFilterButton.Enable = 'on';
+                app.FiberPropertiesButton.Enable = 'on';
+                app.CentralNucleiButton.Enable = 'on';
+                app.FiberTypingButton.Enable = 'on';
+                app.NonfiberObjectsButton.Enable = 'on';
+            else
+                % Enable all the buttons to be used in batch mode
+                app.InitialSegmentationButton.Enable = 'on';
+            end
+            
+            UpdateColorChannelBox(app)
+        end
+
+        function UpdateColorChannelBox(app)
+            % Color Channel Box   
+            % Get RGB values of color channel and convert to numeric matrix
+            % Update color on color box with appropriate RGB channel
+
+            % Nonfiber objects
+            NonfiberRGBChannel = app.channelRGB(str2double(app.NonfiberObjectsColorDropDown.Value), :);
+            app.NonfiberChannelColorBox.Color = NonfiberRGBChannel;
+
+            % Central Nuclei
+            CNFRGBChannel = app.channelRGB(str2double(app.NucleiColorDropDown.Value), :);
+            app.CNFChannelColorBox.Color = CNFRGBChannel;
+
+            % Fiber Typing
+            FiberTypingChannel = app.channelRGB(str2double(app.FiberTypeColorDropDown.Value), :);
+            app.FiberTypingChannelColorBox.Color = FiberTypingChannel;
+
+            % Fiber Outline
+            FiberOutlineChannel = app.channelRGB(str2double(app.FiberOutlineColorDropDown.Value), :);
+            app.FiberOutlineChannelColorBox.Color = FiberOutlineChannel;
+        end
+
+        function SegmentAndDisplayImage(app)
+            foc = app.FiberOutlineColorDropDown.Value;
+            foc = str2double(foc);
+            lam = app.orig_img_multispectral(:,:,foc);  % fiber outline color
+            
+            % Image Segmentation
+            lam_t = imhmin(lam,app.SegmentationThresholdSlider.Value);
+            WS = watershed(lam_t);
+            app.bw_obj = imcomplement(logical(WS));
+            
+            % Display segmented image
+            flat_img =flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w');
+            imshow(flat_img,'Parent',app.UIAxes);
+        end
+                   
         function CreateFolderIfDirectoryIsNonexistent(~, pathDirectory)
             if exist(pathDirectory,'dir') == 0
                 mkdir(pathDirectory)
@@ -283,175 +455,52 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.model = load('MediumTreeModel.mat','MediumTree');
             app.segmodel = load('SegmentationModel.mat','segModel');
             % Apply defaults
-            app.PixelSizeField.Value = app.default{2,2};
-            app.PixelSizeumpixelEditField.Value = app.default{2,2};
+            app.pix_size = app.default{2,2};
+            app.PixelSizeFiberProperties.Value = app.pix_size;
             %app.SegmentationThresholdSlider.Value = app.default{7,2};
             app.FiberOutlineColorDropDown.Value = num2str(app.default{3,2});
             app.NucleiColorDropDown.Value = num2str(app.default{4,2});
-            app.PixelSizeumpixelEditField_2.Value = app.default{2,2};
+            app.PixelSizeCentralNuclei.Value = app.pix_size;
             app.DistancefromborderEditField.Value = app.default{14,2};
             app.MinimumNucleusSizeum2EditField.Value = app.default{15,2};
-            app.PixelSizeFiberType.Value = app.default{2,2};
+            app.PixelSizeFiberTyping.Value = app.pix_size;
             app.FiberTypeColorDropDown.Value = num2str(app.default{5,2});
-            app.PixelSizeNonfiber.Value = app.default{2,2};
+            app.PixelSizeNonfiberObjects.Value = app.pix_size;
             app.NonfiberObjectsColorDropDown.Value = num2str(app.default{6,2});
         end
 
-        % Button pushed function: SelectFileButton
-        function SelectFileButtonPushed(app, event)
-            [FileName,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi'},'File Selector - dont select mask');
-            drawnow limitrate;
-            figure(app.UIFigure)
+        % Button pushed function: SelectFilesButton
+        function SelectFilesButtonPushed(app, event)
+            % Allow user to select multiple files
+            [FileNames,PathName,FilterIndex] = uigetfile({'*.tif';'*.tiff';'*.jpg';'*.png';'*.bmp';'*.czi'},'File Selector - dont select mask', 'MultiSelect','on');
+            
+            % Set pathname and filter index, 
+            app.BatchModePathName = PathName;
+            app.BatchModeFilterIndex = FilterIndex;
+            app.BatchModeFileNames = FileNames;
+
+            % Return if there no filenames
             if FilterIndex
+                if iscell(FileNames) % If there are multiple FileNames, batch mode
+                    app.IsBatchMode = 1;
+                    FileName = FileNames{1};
+                else
+                    app.IsBatchMode = 0;
+                    FileName = FileNames;
+                end
                 if FileName == 0
                     return
                 end
-                C = strsplit(FileName,'.');
-                ExtName = C(end);
-                FileNameS = (C(1:(end-1)));
-                FileNameS = FileNameS{1};
-                MaskName = strcat(FileNameS,'_mask.',ExtName);
-                MaskName = MaskName{1};
-            end
-            
-            app.FilenameLabel.Text = FileNameS;
-            app.Files{1} = FileName;
-            app.Files{2} = MaskName;
-            app.Files{3} = PathName;
-            app.Files{4} = FileNameS;
-            cd(PathName)
-    
-            % Change output directory to where image is located
-            app.FiberPropertiesDataOutputFolder.Value = pwd;
-            app.CentralNucleiDataOutputFolder.Value = pwd;
-            app.FiberTypingDataOutputFolder.Value = pwd;
-            app.NonfiberObjectsDataOutputFolder.Value = pwd;
-            
-            BioformatsData = bfopen(FileName);
-            PixelDataForAllLayers = BioformatsData{1,1};
-            ColorMapDataForAllLayers = BioformatsData{1, 3};
-            isMultilayerImage = ~isempty(ColorMapDataForAllLayers{1,1});
-
-            % Update global variable to set multilayer image
-            app.is_multilayer_image = false;
-
-            if isMultilayerImage
-                % Update global variable to set multilayer image
-                app.is_multilayer_image = true;
-
-                LayerOnePixelData = PixelDataForAllLayers{1,1};
-                LayerSize = size(LayerOnePixelData);
-                RGBSize = [LayerSize 3];
-
-                TotalRGB = zeros(RGBSize, 'uint8');
-                TotalMultiSpectral = [];
-                TotalColorDropDownItems = {};
-                TotalColorDropDownItemsData = {};
-                
-                % Channel RGB takes in all RGB values for the 
-                % different colors in the channels
-                app.channelRGB = [];
-
-                NumLayers = length(PixelDataForAllLayers);
-                for Layer = 1:NumLayers
-                    PixelsGrayscale = PixelDataForAllLayers{Layer, 1};
-                    ColorMap = ColorMapDataForAllLayers{1, Layer};
-                    PixelsRGBAsDouble = ind2rgb(PixelsGrayscale, ColorMap);
-                    PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
-                    PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
-
-                    % Retrieve color name from the RGB values
-                    RGBValues = ColorMap(end,:);
-                    ConvertedRGB = colornames('HTML4', RGBValues,'RGB');
-                    ColorName = char(ConvertedRGB);
-
-                    % Autoscaling - scale the pixel intensity for each channel
-                    MaxIntensity = max(PixelsGrayscaleUInt8,[],'all');
-                    MinIntensity = min(PixelsGrayscaleUInt8,[],'all');
-                    ActualRange = MaxIntensity - MinIntensity;
-                    UInt8Range = 255;
-                    ScalingFactor = UInt8Range / ActualRange;
-                    PixelsGrayscaleUInt8 = ScalingFactor * PixelsGrayscaleUInt8;
-                    PixelsRGBAsUInt8 = ScalingFactor * PixelsRGBAsUInt8;
-
-                    TotalMultiSpectral = cat(3, TotalMultiSpectral, PixelsGrayscaleUInt8);
-                    TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
-
-                    % Include only color name in the channel drop down menu
-                    TotalColorDropDownItems = cat(2, TotalColorDropDownItems, ColorName);
-                    TotalColorDropDownItemsData  = cat(2, TotalColorDropDownItemsData, {num2str(Layer)});
-
-                    % Add the RGB values of the channel color 
-                    % Convert from cell array to double matrix when
-                    % appending
-                    app.channelRGB = cat(1, app.channelRGB, RGBValues(1,:));
-                end
-
-                app.FiberOutlineColorDropDown.Items = TotalColorDropDownItems;
-                app.FiberOutlineColorDropDown.ItemsData = TotalColorDropDownItemsData;
-                app.NucleiColorDropDown.Items = TotalColorDropDownItems;
-                app.NucleiColorDropDown.ItemsData = TotalColorDropDownItemsData;
-                app.FiberTypeColorDropDown.Items = TotalColorDropDownItems;
-                app.FiberTypeColorDropDown.ItemsData = TotalColorDropDownItemsData;
-                app.NonfiberObjectsColorDropDown.Items = TotalColorDropDownItems;
-                app.NonfiberObjectsColorDropDown.ItemsData = TotalColorDropDownItemsData;
-                app.orig_img = TotalRGB;
-                app.orig_img_multispectral = TotalMultiSpectral;
-            else
-                ImageData = imread(FileName);
-                app.orig_img = ImageData;
-                app.orig_img_multispectral = ImageData;
-
-                % Append RGB color channels to channelRGB for RGB images
-                % Add red, green, and blue to channelRGB
-                RedValue = [1 0 0];
-                GreenValue = [0 1 0];
-                BlueValue = [0 0 1];
-                app.channelRGB = [RedValue; GreenValue; BlueValue];
-
             end
 
-            imshow(app.orig_img,'Parent',app.UIAxes);
-            
-            if exist(MaskName,'file')
-                app.InitialSegmentationButton.Enable = 'on';
-                app.FiberPredictionButton.Enable = 'on';
-                app.ManualSegmentationButton.Enable = 'on';
-                app.ManualFiberFilterButton.Enable = 'on';
-                app.FiberPropertiesButton.Enable = 'on';
-                app.CentralNucleiButton.Enable = 'on';
-                app.FiberTypingButton.Enable = 'on';
-                app.NonfiberObjectsButton.Enable = 'on';
-            else
-                app.InitialSegmentationButton.Enable = 'on';
-            end
-            
-            % Color Channel Box   
-            % Get RGB values of color channel and convert to numeric matrix
-            % Update color on color box with appropriate RGB channel
-
-            % Nonfiber objects
-            NonfiberRGBChannel = app.channelRGB(str2double(app.NonfiberObjectsColorDropDown.Value), :);
-            app.NonfiberChannelColorBox.Color = NonfiberRGBChannel;
-
-            % Central Nuclei
-            CNFRGBChannel = app.channelRGB(str2double(app.NucleiColorDropDown.Value), :);
-            app.CNFChannelColorBox.Color = CNFRGBChannel;
-
-            % Fiber Typing
-            FiberTypingChannel = app.channelRGB(str2double(app.FiberTypeColorDropDown.Value), :);
-            app.FiberTypingChannelColorBox.Color = FiberTypingChannel;
-
-            % Fiber Outline
-            FiberOutlineChannel = app.channelRGB(str2double(app.FiberOutlineColorDropDown.Value), :);
-            app.FiberOutlineChannelColorBox.Color = FiberOutlineChannel;
+            % Run file initialization
+            FileInitialization(app, FileName, PathName, FilterIndex);
            
         end
 
         % Button pushed function: SegmentButton
         function SegmentButtonPushed(app, event)
             go = 1;
-            app.pix_size = app.PixelSizeField.Value;
                files = dir;
                
                % Warn the user if a mask file already exists
@@ -465,20 +514,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                
                if go
                    %orig_img = imread(app.Files{1});
-                   foc = app.FiberOutlineColorDropDown.Value;
-                   foc = str2double(foc);
-                   lam = app.orig_img_multispectral(:,:,foc);  % fiber outline color
-                   
-                   % Image Segmentation
-                   lam_t = imhmin(lam,app.SegmentationThresholdSlider.Value);
-                   WS = watershed(lam_t);
-                   app.bw_obj = imcomplement(logical(WS));
-                   
-                   % Display segmented image
-                   flat_img =flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w');
-                   imshow(flat_img,'Parent',app.UIAxes);
+                   SegmentAndDisplayImage(app);
                    app.AcceptSegmentationButton.Enable = 'on';
-                   
                    
                end 
         end
@@ -539,7 +576,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = 'Filtering, please wait.';
             
             drawnow limitrate
-            app.pix_size = app.PixelSizeField.Value;
             pix_area = app.pix_size^2;
             label = bwlabel(app.bw_obj,4);
             %num_obj = max(max(label));
@@ -642,17 +678,42 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: AcceptSegmentationButton
         function AcceptSegmentationButtonPushed(app, event)
-            label = bwlabel(~logical(app.bw_obj),4);
-            SaveMaskToMaskFile(app, label);
-            app.SegmentationParameters.Visible = 'off';
-            app.InitialSegmentationButton.Enable = 'on';
-            app.FiberPredictionButton.Enable = 'on';
-            app.ManualSegmentationButton.Enable ='on';
-            app.ManualFiberFilterButton.Enable = 'on';
-            app.FiberPropertiesButton.Enable = 'on';
-            app.CentralNucleiButton.Enable = 'on';
-            app.FiberTypingButton.Enable = 'on';
-            app.NonfiberObjectsButton.Enable = 'on';
+            if app.IsBatchMode == 0
+                label = bwlabel(~logical(app.bw_obj),4);
+                SaveMaskToMaskFile(app, label);
+                app.SegmentationParameters.Visible = 'off';
+                app.InitialSegmentationButton.Enable = 'on';
+                app.FiberPredictionButton.Enable = 'on';
+                app.ManualSegmentationButton.Enable ='on';
+                app.ManualFiberFilterButton.Enable = 'on';
+                app.FiberPropertiesButton.Enable = 'on';
+                app.CentralNucleiButton.Enable = 'on';
+                app.FiberTypingButton.Enable = 'on';
+                app.NonfiberObjectsButton.Enable = 'on';
+            else 
+                numberOfFilesSelected = length(app.BatchModeFileNames);
+
+                for k=1:numberOfFilesSelected
+                    % Retrieve the filename of the current file
+                    currentFile = app.BatchModeFileNames{k};
+                    % Add the prompt at the top for indication that batch
+                    % mode is running on which file
+                    promptString = "Batch Mode - In Progress: " + int2str(k-1) + " out of " + int2str(numberOfFilesSelected) + " completed.";
+                    app.Prompt.Text = promptString;
+                    % Go through file initilization
+                    % In file initialization, it enables all the other buttons,
+                    % so you need to change this button to the initial page and
+                    % then continue
+                    FileInitialization(app, currentFile, app.BatchModePathName, app.BatchModeFilterIndex);
+                    % Run segment button functionality
+                    SegmentAndDisplayImage(app);
+                    % Accept segmentation
+                    label = bwlabel(~logical(app.bw_obj),4);
+                    SaveMaskToMaskFile(app, label);
+                end
+
+                app.Prompt.Text = 'Batch Mode - Initial Segmentation Completed.';
+            end
         end
 
         % Value changed function: SegmentationThresholdSlider
@@ -756,7 +817,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: CalculateFiberProperties
         function CalculateFiberPropertiesPushed(app, event)
             app.WritetoExcelButton.Enable = 'on';
-            app.pix_size = app.PixelSizeumpixelEditField.Value;
+            app.pix_size = app.PixelSizeFiberProperties.Value;
             app.output_path = app.FiberPropertiesDataOutputFolder.Value;
             pix_area = app.pix_size^2;
             label = bwlabel(app.bw_obj,4);
@@ -844,7 +905,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = '';
             app.CalculateCentralNuclei.Enable = 'off';
             app.DoneButton_CNF.Enable = 'off';
-            app.pix_size = app.PixelSizeumpixelEditField_2.Value;
+            app.pix_size = app.PixelSizeCentralNuclei.Value;
             min_nuc_pix = app.MinimumNucleusSizeum2EditField.Value/(app.pix_size^2);
             border = app.DistancefromborderEditField.Value;
             border_pix = border/app.pix_size;
@@ -979,11 +1040,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: CalculateFiberTyping
         function CalculateFiberTypingButtonPushed(app, event)
             app.CalculateFiberTyping.Enable = 'off';
-            app.PixelSizeFiberType.Enable = 'off';
+            app.PixelSizeFiberTyping.Enable = 'off';
             app.FiberTypeColorDropDown.Enable = 'off';
             app.DoneFT.Enable = 'off';
             app.WritetoExcelFT.Enable = 'off';
-            app.pix_size = app.PixelSizeFiberType.Value;
+            app.pix_size = app.PixelSizeFiberTyping.Value;
             pix_area = app.pix_size^2;
             
             % Create Labelled Fibers
@@ -1149,7 +1210,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             img_org = app.orig_img_multispectral;
             app.CalculateNonfiberObjects.Enable = 'off';
             app.DoneNonfiber.Enable = 'off';
-            app.pix_size = app.PixelSizeNonfiber.Value;
+            app.pix_size = app.PixelSizeNonfiberObjects.Value;
             ch_obj = img_org(:,:,str2double(app.NonfiberObjectsColorDropDown.Value));
             % smoothed image
             se = strel('disk',12);
@@ -1244,13 +1305,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'on';
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
-            app.SelectFileButton.Enable = 'on';
+            app.SelectFilesButton.Enable = 'on';
             
         end
 
         % Button pushed function: InitialSegmentationButton
         function InitialSegmentationButtonPushed(app, event)
-            app.SelectFileButton.Enable = 'off';
+            app.SelectFilesButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualSegmentationButton.Enable = 'off';
@@ -1261,11 +1322,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.SegmentationParameters.Visible = 'on';
             app.FiberOutlineChannelColorBox.Visible = 'on';
+            
         end
 
         % Button pushed function: ManualSegmentationButton
         function ManualSegmentationButtonPushed(app, event)
-            app.SelectFileButton.Enable = 'off';
+            app.SelectFilesButton.Enable = 'off';
             app.ManualSegmentationButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
@@ -1281,7 +1343,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FiberPredictionButton
         function FiberPredictionButtonPushed(app, event)
-            app.SelectFileButton.Enable = 'off';
+            app.SelectFilesButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualFiberFilterButton.Enable = 'off';
@@ -1301,7 +1363,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: ManualFiberFilterButton
         function ManualFiberFilterButtonPushed(app, event)
-            app.SelectFileButton.Enable = 'off';
+            app.SelectFilesButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualFiberFilterButton.Enable = 'off';
@@ -1319,7 +1381,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FiberPropertiesButton
         function FiberPropertiesButtonPushed(app, event)
-            app.SelectFileButton.Enable = 'off';
+            app.SelectFilesButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualFiberFilterButton.Enable = 'off';
@@ -1337,7 +1399,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CentralNucleiButton
         function CentralNucleiButtonPushed(app, event)
-            app.SelectFileButton.Enable = 'off';
+            app.SelectFilesButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualFiberFilterButton.Enable = 'off';
@@ -1354,11 +1416,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CNFExcelWrite.Enable = 'off';
             app.CNFChannelColorBox.Visible = 'on';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+            
         end
 
         % Button pushed function: FiberTypingButton
         function FiberTypingButtonPushed(app, event)
-            app.SelectFileButton.Enable = 'off';
+            app.SelectFilesButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualFiberFilterButton.Enable = 'off';
@@ -1369,16 +1432,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.FiberTypingPanel.Visible = 'on';
             app.FiberTypingControlPanel.Visible = 'on';
-            app.PixelSizeFiberType.Enable = 'on';
+            app.PixelSizeFiberTyping.Enable = 'on';
             app.FiberTypeColorDropDown.Enable = 'on';
             app.WritetoExcelFT.Enable = 'off';
             app.FiberTypingChannelColorBox.Visible = 'on';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+
         end
 
         % Button pushed function: NonfiberObjectsButton
         function NonfiberObjectsButtonPushed(app, event)
-            app.SelectFileButton.Enable = 'off';
+            app.SelectFilesButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
             app.ManualFiberFilterButton.Enable = 'off';
@@ -1394,6 +1458,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberAccept.Enable = 'off';
             app.WritetoExcelNonfiber.Enable = 'off';
             app.NonfiberChannelColorBox.Visible = 'on';
+
         end
 
         % Button pushed function: DetectValueButton
@@ -1597,6 +1662,42 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberOutlineChannelColorBox.Color = RGB1DValue;
             
         end
+
+        % Value changed function: PixelSizeNonfiberObjects
+        function PixelSizeNonfiberObjectsValueChanged(app, event)
+            app.pix_size = app.PixelSizeNonfiberObjects.Value;
+            app.PixelSizeFiberProperties.Value = app.pix_size;
+            app.PixelSizeCentralNuclei.Value = app.pix_size;
+            app.PixelSizeFiberTyping.Value = app.pix_size;
+            
+        end
+
+        % Value changed function: PixelSizeFiberTyping
+        function PixelSizeFiberTypingValueChanged(app, event)
+            app.pix_size = app.PixelSizeFiberTyping.Value;
+            app.PixelSizeFiberProperties.Value = app.pix_size;
+            app.PixelSizeCentralNuclei.Value = app.pix_size;
+            app.PixelSizeNonfiberObjects.Value = app.pix_size;
+            
+        end
+
+        % Value changed function: PixelSizeCentralNuclei
+        function PixelSizeCNFValueChanged(app, event)
+            app.pix_size = app.PixelSizeCentralNuclei.Value;
+            app.PixelSizeFiberProperties.Value = app.pix_size;
+            app.PixelSizeFiberTyping.Value = app.pix_size;
+            app.PixelSizeNonfiberObjects.Value = app.pix_size;
+            
+        end
+
+        % Value changed function: PixelSizeFiberProperties
+        function PixelSizeFiberPropertiesValueChanged(app, event)
+            app.pix_size = app.PixelSizeFiberProperties.Value;
+            app.PixelSizeCentralNuclei.Value = app.pix_size;
+            app.PixelSizeFiberTyping.Value = app.pix_size;
+            app.PixelSizeNonfiberObjects.Value = app.pix_size;
+            
+        end
     end
 
     % Component initialization
@@ -1682,13 +1783,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberSizeAxes.FontName = 'Avenir';
             app.FiberSizeAxes.Position = [53 25 799 285];
 
-            % Create SelectFileButton
-            app.SelectFileButton = uibutton(app.UIFigure, 'push');
-            app.SelectFileButton.ButtonPushedFcn = createCallbackFcn(app, @SelectFileButtonPushed, true);
-            app.SelectFileButton.BackgroundColor = [1 1 1];
-            app.SelectFileButton.FontName = 'Avenir';
-            app.SelectFileButton.Position = [38 612 109 32];
-            app.SelectFileButton.Text = 'Select File';
+            % Create SelectFilesButton
+            app.SelectFilesButton = uibutton(app.UIFigure, 'push');
+            app.SelectFilesButton.ButtonPushedFcn = createCallbackFcn(app, @SelectFilesButtonPushed, true);
+            app.SelectFilesButton.BackgroundColor = [1 1 1];
+            app.SelectFilesButton.FontName = 'Avenir';
+            app.SelectFilesButton.Position = [38 612 109 32];
+            app.SelectFilesButton.Text = 'Select File(s)';
 
             % Create FilenameLabel
             app.FilenameLabel = uilabel(app.UIFigure);
@@ -1967,89 +2068,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FinishDrawingButton.Position = [29 220 100 24];
             app.FinishDrawingButton.Text = 'Finish Drawing';
 
-            % Create SegmentationParameters
-            app.SegmentationParameters = uipanel(app.UIFigure);
-            app.SegmentationParameters.Visible = 'off';
-            app.SegmentationParameters.BackgroundColor = [1 1 1];
-            app.SegmentationParameters.FontName = 'Avenir';
-            app.SegmentationParameters.Position = [14 326 286 245];
-
-            % Create FiberOutlineChannelColorBox
-            app.FiberOutlineChannelColorBox = uiaxes(app.SegmentationParameters);
-            app.FiberOutlineChannelColorBox.Toolbar.Visible = 'off';
-            app.FiberOutlineChannelColorBox.FontName = 'Avenir';
-            app.FiberOutlineChannelColorBox.XTick = [];
-            app.FiberOutlineChannelColorBox.YTick = [];
-            app.FiberOutlineChannelColorBox.Color = [0 1 1];
-            app.FiberOutlineChannelColorBox.Box = 'on';
-            app.FiberOutlineChannelColorBox.PickableParts = 'none';
-            app.FiberOutlineChannelColorBox.Position = [250 154 30 30];
-
-            % Create PixelSizeumpixelEditFieldLabel
-            app.PixelSizeumpixelEditFieldLabel = uilabel(app.SegmentationParameters);
-            app.PixelSizeumpixelEditFieldLabel.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditFieldLabel.FontName = 'Avenir';
-            app.PixelSizeumpixelEditFieldLabel.Position = [16 200 114 22];
-            app.PixelSizeumpixelEditFieldLabel.Text = 'Pixel Size (um/pixel)';
-
-            % Create PixelSizeField
-            app.PixelSizeField = uieditfield(app.SegmentationParameters, 'numeric');
-            app.PixelSizeField.FontName = 'Avenir';
-            app.PixelSizeField.Position = [145 200 100 22];
-
-            % Create SegmentButton
-            app.SegmentButton = uibutton(app.SegmentationParameters, 'push');
-            app.SegmentButton.ButtonPushedFcn = createCallbackFcn(app, @SegmentButtonPushed, true);
-            app.SegmentButton.FontName = 'Avenir';
-            app.SegmentButton.Position = [144 63 100 24];
-            app.SegmentButton.Text = 'Segment';
-
-            % Create FiberOutlineColorDropDownLabel
-            app.FiberOutlineColorDropDownLabel = uilabel(app.SegmentationParameters);
-            app.FiberOutlineColorDropDownLabel.HorizontalAlignment = 'right';
-            app.FiberOutlineColorDropDownLabel.FontName = 'Avenir';
-            app.FiberOutlineColorDropDownLabel.Position = [21 158 109 22];
-            app.FiberOutlineColorDropDownLabel.Text = 'Fiber Outline Color';
-
-            % Create FiberOutlineColorDropDown
-            app.FiberOutlineColorDropDown = uidropdown(app.SegmentationParameters);
-            app.FiberOutlineColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.FiberOutlineColorDropDown.ItemsData = {'1', '2', '3'};
-            app.FiberOutlineColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberOutlineColorValueChanged, true);
-            app.FiberOutlineColorDropDown.FontName = 'Avenir';
-            app.FiberOutlineColorDropDown.Position = [145 158 100 22];
-            app.FiberOutlineColorDropDown.Value = '1';
-
-            % Create AcceptSegmentationButton
-            app.AcceptSegmentationButton = uibutton(app.SegmentationParameters, 'push');
-            app.AcceptSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptSegmentationButtonPushed, true);
-            app.AcceptSegmentationButton.FontName = 'Avenir';
-            app.AcceptSegmentationButton.Enable = 'off';
-            app.AcceptSegmentationButton.Position = [81 31 100 24];
-            app.AcceptSegmentationButton.Text = 'Accept';
-
-            % Create SegmentationThresholdSliderLabel
-            app.SegmentationThresholdSliderLabel = uilabel(app.SegmentationParameters);
-            app.SegmentationThresholdSliderLabel.HorizontalAlignment = 'center';
-            app.SegmentationThresholdSliderLabel.FontName = 'Avenir';
-            app.SegmentationThresholdSliderLabel.Position = [13 101 81 43];
-            app.SegmentationThresholdSliderLabel.Text = {'Segmentation'; 'Threshold'};
-
-            % Create SegmentationThresholdSlider
-            app.SegmentationThresholdSlider = uislider(app.SegmentationParameters);
-            app.SegmentationThresholdSlider.Limits = [0 50];
-            app.SegmentationThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SegmentationThresholdSliderValueChanged, true);
-            app.SegmentationThresholdSlider.FontName = 'Avenir';
-            app.SegmentationThresholdSlider.Position = [101 128 139 3];
-
-            % Create DetectValueButton
-            app.DetectValueButton = uibutton(app.SegmentationParameters, 'push');
-            app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
-            app.DetectValueButton.BackgroundColor = [0.902 0.902 0.902];
-            app.DetectValueButton.FontName = 'Avenir';
-            app.DetectValueButton.Position = [24 63 100 24];
-            app.DetectValueButton.Text = 'Detect Value';
-
             % Create Panel
             app.Panel = uipanel(app.UIFigure);
             app.Panel.BackgroundColor = [0 0.2902 0.4784];
@@ -2219,10 +2237,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeumpixelLabel_2.Position = [51 243 59 32];
             app.PixelSizeumpixelLabel_2.Text = {'Pixel Size'; '(um/pixel)'};
 
-            % Create PixelSizeNonfiber
-            app.PixelSizeNonfiber = uieditfield(app.NonfiberControlPanel, 'numeric');
-            app.PixelSizeNonfiber.FontName = 'Avenir';
-            app.PixelSizeNonfiber.Position = [125 253 100 22];
+            % Create PixelSizeNonfiberObjects
+            app.PixelSizeNonfiberObjects = uieditfield(app.NonfiberControlPanel, 'numeric');
+            app.PixelSizeNonfiberObjects.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberObjectsValueChanged, true);
+            app.PixelSizeNonfiberObjects.FontName = 'Avenir';
+            app.PixelSizeNonfiberObjects.Position = [125 253 100 22];
 
             % Create CNFControlPanel
             app.CNFControlPanel = uipanel(app.UIFigure);
@@ -2233,6 +2252,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create CNFChannelColorBox
             app.CNFChannelColorBox = uiaxes(app.CNFControlPanel);
+            app.CNFChannelColorBox.Toolbar.Visible = 'off';
             app.CNFChannelColorBox.FontName = 'Avenir';
             app.CNFChannelColorBox.XTick = [];
             app.CNFChannelColorBox.YTick = [];
@@ -2248,10 +2268,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeumpixelLabel.Position = [48 251 58 32];
             app.PixelSizeumpixelLabel.Text = {'Pixel Size'; 'um/pixel'};
 
-            % Create PixelSizeumpixelEditField_2
-            app.PixelSizeumpixelEditField_2 = uieditfield(app.CNFControlPanel, 'numeric');
-            app.PixelSizeumpixelEditField_2.FontName = 'Avenir';
-            app.PixelSizeumpixelEditField_2.Position = [121 261 100 22];
+            % Create PixelSizeCentralNuclei
+            app.PixelSizeCentralNuclei = uieditfield(app.CNFControlPanel, 'numeric');
+            app.PixelSizeCentralNuclei.ValueChangedFcn = createCallbackFcn(app, @PixelSizeCNFValueChanged, true);
+            app.PixelSizeCentralNuclei.FontName = 'Avenir';
+            app.PixelSizeCentralNuclei.Position = [121 261 100 22];
 
             % Create NucleiColorDropDownLabel
             app.NucleiColorDropDownLabel = uilabel(app.CNFControlPanel);
@@ -2367,10 +2388,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeumpixelEditFieldLabel_2.Position = [10 218 114 22];
             app.PixelSizeumpixelEditFieldLabel_2.Text = 'Pixel Size (um/pixel)';
 
-            % Create PixelSizeumpixelEditField
-            app.PixelSizeumpixelEditField = uieditfield(app.PropertiesControlPanel, 'numeric');
-            app.PixelSizeumpixelEditField.FontName = 'Avenir';
-            app.PixelSizeumpixelEditField.Position = [139 218 100 22];
+            % Create PixelSizeFiberProperties
+            app.PixelSizeFiberProperties = uieditfield(app.PropertiesControlPanel, 'numeric');
+            app.PixelSizeFiberProperties.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPropertiesValueChanged, true);
+            app.PixelSizeFiberProperties.FontName = 'Avenir';
+            app.PixelSizeFiberProperties.Position = [139 218 100 22];
 
             % Create CalculateFiberProperties
             app.CalculateFiberProperties = uibutton(app.PropertiesControlPanel, 'push');
@@ -2388,6 +2410,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create FiberTypingChannelColorBox
             app.FiberTypingChannelColorBox = uiaxes(app.FiberTypingControlPanel);
+            app.FiberTypingChannelColorBox.Toolbar.Visible = 'off';
             app.FiberTypingChannelColorBox.FontName = 'Avenir';
             app.FiberTypingChannelColorBox.XTick = [];
             app.FiberTypingChannelColorBox.YTick = [];
@@ -2402,10 +2425,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeumpixelEditField_3Label.Position = [44 232 59 32];
             app.PixelSizeumpixelEditField_3Label.Text = {'Pixel Size'; '(um/pixel)'};
 
-            % Create PixelSizeFiberType
-            app.PixelSizeFiberType = uieditfield(app.FiberTypingControlPanel, 'numeric');
-            app.PixelSizeFiberType.FontName = 'Avenir';
-            app.PixelSizeFiberType.Position = [118 242 100 22];
+            % Create PixelSizeFiberTyping
+            app.PixelSizeFiberTyping = uieditfield(app.FiberTypingControlPanel, 'numeric');
+            app.PixelSizeFiberTyping.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberTypingValueChanged, true);
+            app.PixelSizeFiberTyping.FontName = 'Avenir';
+            app.PixelSizeFiberTyping.Position = [118 242 100 22];
 
             % Create DataOutputFolderEditField_3Label
             app.DataOutputFolderEditField_3Label = uilabel(app.FiberTypingControlPanel);
@@ -2499,6 +2523,84 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberAccept.FontName = 'Avenir';
             app.NonfiberAccept.Position = [542 8 100 24];
             app.NonfiberAccept.Text = 'Accept';
+
+            % Create BatchModeLabel
+            app.BatchModeLabel = uilabel(app.UIFigure);
+            app.BatchModeLabel.FontName = 'Avenir';
+            app.BatchModeLabel.Visible = 'off';
+            app.BatchModeLabel.Position = [156 596 130 22];
+            app.BatchModeLabel.Text = 'Batch Mode';
+
+            % Create SegmentationParameters
+            app.SegmentationParameters = uipanel(app.UIFigure);
+            app.SegmentationParameters.Visible = 'off';
+            app.SegmentationParameters.BackgroundColor = [1 1 1];
+            app.SegmentationParameters.FontName = 'Avenir';
+            app.SegmentationParameters.Position = [14 353 286 218];
+
+            % Create FiberOutlineChannelColorBox
+            app.FiberOutlineChannelColorBox = uiaxes(app.SegmentationParameters);
+            app.FiberOutlineChannelColorBox.Toolbar.Visible = 'off';
+            app.FiberOutlineChannelColorBox.FontName = 'Avenir';
+            app.FiberOutlineChannelColorBox.XTick = [];
+            app.FiberOutlineChannelColorBox.YTick = [];
+            app.FiberOutlineChannelColorBox.Color = [0 1 1];
+            app.FiberOutlineChannelColorBox.Box = 'on';
+            app.FiberOutlineChannelColorBox.PickableParts = 'none';
+            app.FiberOutlineChannelColorBox.Position = [253 163 30 30];
+
+            % Create SegmentButton
+            app.SegmentButton = uibutton(app.SegmentationParameters, 'push');
+            app.SegmentButton.ButtonPushedFcn = createCallbackFcn(app, @SegmentButtonPushed, true);
+            app.SegmentButton.FontName = 'Avenir';
+            app.SegmentButton.Position = [142 61 100 24];
+            app.SegmentButton.Text = 'Segment';
+
+            % Create FiberOutlineColorDropDownLabel
+            app.FiberOutlineColorDropDownLabel = uilabel(app.SegmentationParameters);
+            app.FiberOutlineColorDropDownLabel.HorizontalAlignment = 'right';
+            app.FiberOutlineColorDropDownLabel.FontName = 'Avenir';
+            app.FiberOutlineColorDropDownLabel.Position = [20 167 109 22];
+            app.FiberOutlineColorDropDownLabel.Text = 'Fiber Outline Color';
+
+            % Create FiberOutlineColorDropDown
+            app.FiberOutlineColorDropDown = uidropdown(app.SegmentationParameters);
+            app.FiberOutlineColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.FiberOutlineColorDropDown.ItemsData = {'1', '2', '3'};
+            app.FiberOutlineColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberOutlineColorValueChanged, true);
+            app.FiberOutlineColorDropDown.FontName = 'Avenir';
+            app.FiberOutlineColorDropDown.Position = [144 167 100 22];
+            app.FiberOutlineColorDropDown.Value = '1';
+
+            % Create AcceptSegmentationButton
+            app.AcceptSegmentationButton = uibutton(app.SegmentationParameters, 'push');
+            app.AcceptSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptSegmentationButtonPushed, true);
+            app.AcceptSegmentationButton.FontName = 'Avenir';
+            app.AcceptSegmentationButton.Enable = 'off';
+            app.AcceptSegmentationButton.Position = [81 22 100 24];
+            app.AcceptSegmentationButton.Text = 'Accept';
+
+            % Create SegmentationThresholdSliderLabel
+            app.SegmentationThresholdSliderLabel = uilabel(app.SegmentationParameters);
+            app.SegmentationThresholdSliderLabel.HorizontalAlignment = 'center';
+            app.SegmentationThresholdSliderLabel.FontName = 'Avenir';
+            app.SegmentationThresholdSliderLabel.Position = [15 106 81 43];
+            app.SegmentationThresholdSliderLabel.Text = {'Segmentation'; 'Threshold'};
+
+            % Create SegmentationThresholdSlider
+            app.SegmentationThresholdSlider = uislider(app.SegmentationParameters);
+            app.SegmentationThresholdSlider.Limits = [0 50];
+            app.SegmentationThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SegmentationThresholdSliderValueChanged, true);
+            app.SegmentationThresholdSlider.FontName = 'Avenir';
+            app.SegmentationThresholdSlider.Position = [103 133 139 3];
+
+            % Create DetectValueButton
+            app.DetectValueButton = uibutton(app.SegmentationParameters, 'push');
+            app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
+            app.DetectValueButton.BackgroundColor = [0.902 0.902 0.902];
+            app.DetectValueButton.FontName = 'Avenir';
+            app.DetectValueButton.Position = [22 61 100 24];
+            app.DetectValueButton.Text = 'Detect Value';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
