@@ -20,7 +20,7 @@ function CheckSMASHDependencies
 end
 
 function isSuccess = CheckIfInstalledAddOnsContainAllRequiredAddons()
-% CheckIfInstalledAddOnsContainAllRequiredAddons  Checks add-on installation.
+% CheckIfInstalledAddOnsContainAllRequiredAddons  Checks add-on installations.
 %   For each add-on listed in SMASHAddons, CheckIfInstalledAddOnsContainAllRequiredAddons
 %   outputs whether or not that add-on is installed and enabled.
 %
@@ -39,9 +39,16 @@ function isSuccess = CheckIfInstalledAddOnsContainAllRequiredAddons()
 end
 
 function isSuccess = CheckIfInstalledAddOnsContainRequiredAddon(requiredAddon)
+% CheckIfInstalledAddOnsContainRequiredAddon Checks add-on installation.
+%   CheckIfInstalledAddOnsContainRequiredAddon checks if requiredAddon is
+%   installed and enabled.
+%
+%   CheckIfInstalledAddOnsContainRequiredAddon(requiredAddon) returns:
+%     0 if requiredAddon is not installed or not enabled.
+%     1 if requiredAddon is both installed and enabled.
+
     fprintf("  Checking if Add-On ""%s"" is installed and enable...", requiredAddon);
-    info = GetAddOnInformation(requiredAddon);
-    isSuccess = CheckIfAddOnIsInstalledAndEnabled(info, requiredAddon);
+    isSuccess = CheckIfAddOnIsInstalledAndEnabled(requiredAddon);
     if isSuccess
         disp('Yes!');
     end
@@ -52,7 +59,8 @@ function info = GetAddOnInformation(addonName)
     info = installedAddons(strcmp(installedAddons.Name, addonName), :);
 end
 
-function isSuccess = CheckIfAddOnIsInstalledAndEnabled(info, addonName)
+function isSuccess = CheckIfAddOnIsInstalledAndEnabled(addonName)
+    info = GetAddOnInformation(addonName);
    if IsInstalled(info)
        isSuccess = CheckIfAddOnIsEnabled(info);
    else
