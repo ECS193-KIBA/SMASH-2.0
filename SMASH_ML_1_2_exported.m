@@ -334,10 +334,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             flat_img =flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w');
             imshow(flat_img,'Parent',app.UIAxes);
         end
-
-        function SegmentBatchMode(app)
-            SegmentAndDisplayImage(app);
-        end
                    
         function CreateFolderIfDirectoryIsNonexistent(~, pathDirectory)
             if exist(pathDirectory,'dir') == 0
@@ -459,16 +455,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.model = load('MediumTreeModel.mat','MediumTree');
             app.segmodel = load('SegmentationModel.mat','segModel');
             % Apply defaults
-            app.PixelSizeFiberProperties.Value = app.default{2,2};
+            app.pix_size = app.default{2,2};
+            app.PixelSizeFiberProperties.Value = app.pix_size;
             %app.SegmentationThresholdSlider.Value = app.default{7,2};
             app.FiberOutlineColorDropDown.Value = num2str(app.default{3,2});
             app.NucleiColorDropDown.Value = num2str(app.default{4,2});
-            app.PixelSizeCentralNuclei.Value = app.default{2,2};
+            app.PixelSizeCentralNuclei.Value = app.pix_size;
             app.DistancefromborderEditField.Value = app.default{14,2};
             app.MinimumNucleusSizeum2EditField.Value = app.default{15,2};
-            app.PixelSizeFiberTyping.Value = app.default{2,2};
+            app.PixelSizeFiberTyping.Value = app.pix_size;
             app.FiberTypeColorDropDown.Value = num2str(app.default{5,2});
-            app.PixelSizeNonfiberObjects.Value = app.default{2,2};
+            app.PixelSizeNonfiberObjects.Value = app.pix_size;
             app.NonfiberObjectsColorDropDown.Value = num2str(app.default{6,2});
         end
 
@@ -709,7 +706,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     % then continue
                     FileInitialization(app, currentFile, app.BatchModePathName, app.BatchModeFilterIndex);
                     % Run segment button functionality
-                    SegmentBatchMode(app);
+                    SegmentAndDisplayImage(app);
                     % Accept segmentation
                     label = bwlabel(~logical(app.bw_obj),4);
                     SaveMaskToMaskFile(app, label);
