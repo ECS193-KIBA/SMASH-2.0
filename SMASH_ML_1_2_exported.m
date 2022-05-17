@@ -34,15 +34,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeFiberType              matlab.ui.control.NumericEditField
         PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
         NonfiberClassificationControlPanel  matlab.ui.container.Panel
+        NonfiberObjectsClassificationDataOutputFolder  matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label_3  matlab.ui.control.Label
+        ClassifyNonfiberObjects         matlab.ui.control.Button
         NonfiberClassificationAccept    matlab.ui.control.Button
         NonfiberClassificationAdjust    matlab.ui.control.Button
         NonfiberClassificationThreshold  matlab.ui.control.NumericEditField
         ThresholdEditField_2Label_3     matlab.ui.control.Label
         NonfiberClassificationDone      matlab.ui.control.Button
         NonfiberClassificationWritetoExcel  matlab.ui.control.Button
-        ClassifyNonfiberObjects         matlab.ui.control.Button
-        NonfiberObjectsClassificationDataOutputFolder  matlab.ui.control.EditField
-        DataOutputFolderEditField_3Label_3  matlab.ui.control.Label
         NonfiberObjectClassificationColorDropDown  matlab.ui.control.DropDown
         ClassificationColorChannelLabel  matlab.ui.control.Label
         Toolbar                         matlab.ui.container.Panel
@@ -290,24 +290,38 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             cutoff_avg = threshes(2);
             app.NonfiberClassificationThreshold.Enable = 'on';
             app.NonfiberClassificationThreshold.Value = double(cutoff_avg);
-            
-            % Fiber Properties
-            rprop = regionprops(regions_mask,fti,'MeanIntensity','Centroid','Area','PixelIdxList');
-            mean_intensity = [rprop.MeanIntensity];
-            areas = [rprop.Area];
-            
-            % Determine which regions are above threshold
-            app.ponf = false(num,1); % logical zeros array of size num
-            app.ponf(mean_intensity > cutoff_avg) = 1;
-            img_out = single(app.nf_bw_obj).* 0.3;
-            p_ind = find(app.ponf);
-            for i = 1:length(p_ind)
-                img_out(regions_mask == p_ind(i)) = 1;
-            end
 
             % Display image
             imshow(app.orig_img,'Parent',app.NonfiberClassificationAxes_L);
-            imshow(img_out,'Parent',app.NonfiberClassificationAxes_R);
+
+            app.Obj_Adj = 1;
+
+            while app.Obj_Adj
+                % Fiber Properties
+                rprop = regionprops(regions_mask,fti,'MeanIntensity','Centroid','Area','PixelIdxList');
+                mean_intensity = [rprop.MeanIntensity];
+                areas = [rprop.Area];
+                
+                % Determine which regions are above threshold
+                app.ponf = false(num,1); % logical zeros array of size num
+                app.ponf(mean_intensity > cutoff_avg) = 1; % set all elements where the intensity exceeds the threshold
+                img_out = single(app.nf_bw_obj).* 0.3;
+
+                p_ind = find(app.ponf); % vector qualifying regions
+                for i = 1:length(p_ind)
+                    img_out(regions_mask == p_ind(i)) = 1; % whiten region
+                end
+
+                % Display image
+                imshow(img_out,'Parent',app.NonfiberClassificationAxes_R);
+                
+                uiwait(app.UIFigure);
+                
+                if app.Obj_Adj
+                    cutoff_avg = app.NonfiberClassificationThreshold.Value/255;
+                end
+                
+            end
         end
     end
 
@@ -1533,11 +1547,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: NonfiberClassificationAdjust
         function NonfiberClassificationAdjustButtonPushed(app, event)
+            app.cutoff_avg = app.ThresholdEditField.Value;
             uiresume(app.UIFigure);
         end
 
         % Button pushed function: NonfiberClassificationAccept
         function NonfiberClassificationAcceptButtonPushed(app, event)
+            app.Obj_Adj = 0;
             app.NonfiberClassificationThreshold.Enable = 'off';
             app.NonfiberClassificationAccept.Enable = 'off';
             app.NonfiberClassificationAdjust.Enable = 'off';
@@ -2126,22 +2142,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectClassificationColorDropDown.Position = [136 246 100 22];
             app.NonfiberObjectClassificationColorDropDown.Value = '1';
 
-            % Create DataOutputFolderEditField_3Label_3
-            app.DataOutputFolderEditField_3Label_3 = uilabel(app.NonfiberClassificationControlPanel);
-            app.DataOutputFolderEditField_3Label_3.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_3Label_3.Position = [17 121 108 22];
-            app.DataOutputFolderEditField_3Label_3.Text = 'Data Output Folder';
-
-            % Create NonfiberObjectsClassificationDataOutputFolder
-            app.NonfiberObjectsClassificationDataOutputFolder = uieditfield(app.NonfiberClassificationControlPanel, 'text');
-            app.NonfiberObjectsClassificationDataOutputFolder.Position = [140 121 100 22];
-
-            % Create ClassifyNonfiberObjects
-            app.ClassifyNonfiberObjects = uibutton(app.NonfiberClassificationControlPanel, 'push');
-            app.ClassifyNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @ClassifyNonfiberObjectsButtonPushed, true);
-            app.ClassifyNonfiberObjects.Position = [78 88 100 22];
-            app.ClassifyNonfiberObjects.Text = 'Calculate';
-
             % Create NonfiberClassificationWritetoExcel
             app.NonfiberClassificationWritetoExcel = uibutton(app.NonfiberClassificationControlPanel, 'push');
             app.NonfiberClassificationWritetoExcel.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationWritetoExcelButtonPushed, true);
@@ -2157,24 +2157,40 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Create ThresholdEditField_2Label_3
             app.ThresholdEditField_2Label_3 = uilabel(app.NonfiberClassificationControlPanel);
             app.ThresholdEditField_2Label_3.HorizontalAlignment = 'right';
-            app.ThresholdEditField_2Label_3.Position = [17 211 59 22];
+            app.ThresholdEditField_2Label_3.Position = [22 119 59 22];
             app.ThresholdEditField_2Label_3.Text = 'Threshold';
 
             % Create NonfiberClassificationThreshold
             app.NonfiberClassificationThreshold = uieditfield(app.NonfiberClassificationControlPanel, 'numeric');
-            app.NonfiberClassificationThreshold.Position = [91 211 100 22];
+            app.NonfiberClassificationThreshold.Position = [96 119 100 22];
 
             % Create NonfiberClassificationAdjust
             app.NonfiberClassificationAdjust = uibutton(app.NonfiberClassificationControlPanel, 'push');
             app.NonfiberClassificationAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAdjustButtonPushed, true);
-            app.NonfiberClassificationAdjust.Position = [13 180 100 22];
+            app.NonfiberClassificationAdjust.Position = [18 88 100 22];
             app.NonfiberClassificationAdjust.Text = 'Adjust';
 
             % Create NonfiberClassificationAccept
             app.NonfiberClassificationAccept = uibutton(app.NonfiberClassificationControlPanel, 'push');
             app.NonfiberClassificationAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAcceptButtonPushed, true);
-            app.NonfiberClassificationAccept.Position = [136 180 100 22];
+            app.NonfiberClassificationAccept.Position = [141 88 100 22];
             app.NonfiberClassificationAccept.Text = 'Accept';
+
+            % Create ClassifyNonfiberObjects
+            app.ClassifyNonfiberObjects = uibutton(app.NonfiberClassificationControlPanel, 'push');
+            app.ClassifyNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @ClassifyNonfiberObjectsButtonPushed, true);
+            app.ClassifyNonfiberObjects.Position = [76 168 100 22];
+            app.ClassifyNonfiberObjects.Text = 'Calculate';
+
+            % Create DataOutputFolderEditField_3Label_3
+            app.DataOutputFolderEditField_3Label_3 = uilabel(app.NonfiberClassificationControlPanel);
+            app.DataOutputFolderEditField_3Label_3.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_3Label_3.Position = [15 201 108 22];
+            app.DataOutputFolderEditField_3Label_3.Text = 'Data Output Folder';
+
+            % Create NonfiberObjectsClassificationDataOutputFolder
+            app.NonfiberObjectsClassificationDataOutputFolder = uieditfield(app.NonfiberClassificationControlPanel, 'text');
+            app.NonfiberObjectsClassificationDataOutputFolder.Position = [138 201 100 22];
 
             % Create FiberTypingControlPanel
             app.FiberTypingControlPanel = uipanel(app.UIFigure);
