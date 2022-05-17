@@ -1,11 +1,11 @@
-function CheckAddOnsRequiredForSMASH
+function CheckSMASHDependencies
     disp("Checking Add-Ons Required for SMASH...");
     installedAddons = matlab.addons.installedAddons;
-    requiredDependencies = SmashDependencies();
-    successCount = CheckIfInstalledAddOnsContainAllRequiredDependencies(installedAddons, requiredDependencies);
+    requiredAddons = SMASHAddons();
+    successCount = CheckIfInstalledAddOnsContainAllRequiredAddons(installedAddons, requiredAddons);
     isBioformatsInstalled = CheckIfBioformatsIsInstalled();
     printSeparator();
-    if successCount == size(requiredDependencies, 2) && isBioformatsInstalled
+    if successCount == size(requiredAddons, 2) && isBioformatsInstalled
         disp("You're all set! All required Add-Ons have been installed!");
     else
         fprintf(2, "Please install the missing Add-On(s) before running SMASH.%c", newline)
@@ -13,17 +13,17 @@ function CheckAddOnsRequiredForSMASH
     
 end
 
-function successCount = CheckIfInstalledAddOnsContainAllRequiredDependencies(installedAddons, requiredDependencies)
+function successCount = CheckIfInstalledAddOnsContainAllRequiredAddons(installedAddons, requiredAddons)
     successCount = 0;
-    for dependency = requiredDependencies
-        successCount = successCount + CheckIfInstalledAddOnsContainRequiredDependency(installedAddons, dependency);
+    for addon = requiredAddons
+        successCount = successCount + CheckIfInstalledAddOnsContainRequiredAddon(installedAddons, addon);
     end
 end
 
-function isSuccess = CheckIfInstalledAddOnsContainRequiredDependency(installedAddOns, requiredDependency)
-    fprintf("  Checking if Add-On ""%s"" is installed and enable...", requiredDependency);
-    info = GetAddOnInformation(installedAddOns, requiredDependency);
-    isSuccess = CheckIfAddOnIsInstalledAndEnabled(info, requiredDependency);
+function isSuccess = CheckIfInstalledAddOnsContainRequiredAddon(installedAddOns, requiredAddon)
+    fprintf("  Checking if Add-On ""%s"" is installed and enable...", requiredAddon);
+    info = GetAddOnInformation(installedAddOns, requiredAddon);
+    isSuccess = CheckIfAddOnIsInstalledAndEnabled(info, requiredAddon);
     if isSuccess
         disp('Yes!');
     end
