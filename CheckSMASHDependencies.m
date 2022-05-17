@@ -1,4 +1,17 @@
 function CheckSMASHDependencies
+% CheckSMASHDependencies  Checks SMASH Dependencies.
+%   CheckSMASHDependencies checks that required add-ons and Bioformats
+%   MATLAB toolbox are installed.
+%
+%   Required add-ons are listed in SMASHAddons.m file. For each add-on,
+%   CheckSMASHDependencies checks that add-on is both installed and
+%   enabled.
+%
+%   CheckSMASHDependencies checks that the <a href="matlab:web('https://docs.openmicroscopy.org/bio-formats/6.9.1/users/matlab/index.html')">Bio-Formats MATLAB toolbox</a>
+%   is installed and added to the MATLAB path.
+%
+%   See also SMASHAddons.
+
     disp("Checking Add-Ons Required for SMASH...");
     installedAddons = matlab.addons.installedAddons;
     requiredAddons = SMASHAddons();
