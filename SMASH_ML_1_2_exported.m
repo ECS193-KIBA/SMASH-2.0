@@ -3,6 +3,26 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        NonfiberClassificationControlPanel  matlab.ui.container.Panel
+        DoneNonfiberClassification      matlab.ui.control.Button
+        WritetoExcelNonfiberClassification  matlab.ui.control.Button
+        ClassifyNonfiberObjects         matlab.ui.control.Button
+        NonfiberClassificationColorDropDown  matlab.ui.control.DropDown
+        FiberTypeColorDropDown_2Label   matlab.ui.control.Label
+        NonfiberClassificationDataOutputFolder  matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label_3  matlab.ui.control.Label
+        PixelSizeNonfiberClassification  matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditField_3Label_2  matlab.ui.control.Label
+        NonfiberClassificationChannelColorBox  matlab.ui.control.UIAxes
+        NonfiberClassificationPanel     matlab.ui.container.Panel
+        PercentClassifiedTextArea       matlab.ui.control.TextArea
+        PercentClassifiedTextAreaLabel  matlab.ui.control.Label
+        NonfiberClassificationAccept    matlab.ui.control.Button
+        NonfiberClassificationAdjust    matlab.ui.control.Button
+        NonfiberClassificationThreshold  matlab.ui.control.NumericEditField
+        ThresholdEditField_2Label_3     matlab.ui.control.Label
+        NonfiberClassificationAxes_L    matlab.ui.control.UIAxes
+        NonfiberClassificationAxes_R    matlab.ui.control.UIAxes
         SegmentationParameters          matlab.ui.container.Panel
         DetectValueButton               matlab.ui.control.Button
         SegmentationThresholdSlider     matlab.ui.control.Slider
@@ -85,6 +105,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         AcceptLineButton                matlab.ui.control.Button
         StartDrawingButton              matlab.ui.control.Button
         Toolbar                         matlab.ui.container.Panel
+        NonfiberClassificationButton    matlab.ui.control.Button
         InitialSegmentationButton       matlab.ui.control.Button
         NonfiberObjectsButton           matlab.ui.control.Button
         FiberTypingButton               matlab.ui.control.Button
@@ -155,6 +176,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         thresh_nf
         num_nf
         nf_data
+        nf_mask
+        nf_bw_obj
+
+        % Nonfiber classification properties
+        nonfiber_classification_cutoff_avg
+        classified_nonfiber_num_obj
+        classified_nonfiber_ave_g
+        classified_nonfiber_ponf
+        classified_nonfiber_areas
+        
         segmodel
         channelRGB % Contains all the RGB values of the channel colors
         IsBatchMode % Boolean to store whether running in batch mode
@@ -199,6 +230,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiDataOutputFolder.Value = pwd;
             app.FiberTypingDataOutputFolder.Value = pwd;
             app.NonfiberObjectsDataOutputFolder.Value = pwd;
+            app.NonfiberClassificationDataOutputFolder.Value = pwd;
             
             BioformatsData = bfopen(FileName);
             PixelDataForAllLayers = BioformatsData{1,1};
@@ -290,6 +322,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.CentralNucleiButton.Enable = 'on';
                 app.FiberTypingButton.Enable = 'on';
                 app.NonfiberObjectsButton.Enable = 'on';
+                app.NonfiberClassificationButton.Enable = 'on';
             else
                 % Enable all the buttons to be used in batch mode
                 app.InitialSegmentationButton.Enable = 'on';
@@ -318,6 +351,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Fiber Outline
             FiberOutlineChannel = app.channelRGB(str2double(app.FiberOutlineColorDropDown.Value), :);
             app.FiberOutlineChannelColorBox.Color = FiberOutlineChannel;
+            
+            % Nonfiber objects classification
+            NonfiberClassificationRGBChannel = app.channelRGB(str2double(app.NonfiberClassificationColorDropDown.Value), :);
+            app.NonfiberClassificationChannelColorBox.Color = NonfiberClassificationRGBChannel;
         end
 
         function SegmentAndDisplayImage(app)
@@ -443,6 +480,40 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             acceptable_labels = [0 first_region_to_merge second_region_to_merge];
             results = all(ismember(point_neighbor_labels, acceptable_labels));
         end
+
+        function EnableMenuBarButtons(app) % TODO - make all stages use this
+            app.SelectFilesButton.Enable = 'on';
+            app.InitialSegmentationButton.Enable = 'on';
+            app.ManualSegmentationButton.Enable = 'on';
+            app.FiberPredictionButton.Enable = 'on';
+            app.ManualFiberFilterButton.Enable = 'on';
+            app.FiberPropertiesButton.Enable = 'on';
+            app.CentralNucleiButton.Enable = 'on';
+            app.FiberTypingButton.Enable = 'on';
+            app.NonfiberObjectsButton.Enable = 'on';
+            app.NonfiberClassificationButton.Enable = 'on';
+        end
+        
+        function DisableMenuBarButtons(app) % TODO - make all stages use this
+            app.SelectFilesButton.Enable = 'off';
+            app.InitialSegmentationButton.Enable = 'off';
+            app.FiberPredictionButton.Enable = 'off';
+            app.ManualFiberFilterButton.Enable = 'off';
+            app.ManualSegmentationButton.Enable = 'off';
+            app.FiberPropertiesButton.Enable = 'off';
+            app.CentralNucleiButton.Enable = 'off';
+            app.FiberTypingButton.Enable = 'off';
+            app.NonfiberObjectsButton.Enable = 'off';
+            app.NonfiberClassificationButton.Enable = 'off';
+        end
+
+        function SyncPixelSize(app)
+            app.PixelSizeFiberProperties.Value = app.pix_size;
+            app.PixelSizeCentralNuclei.Value = app.pix_size;
+            app.PixelSizeFiberTyping.Value = app.pix_size;
+            app.PixelSizeNonfiberObjects.Value = app.pix_size;
+            app.PixelSizeNonfiberClassification.Value = app.pix_size;
+        end
     end
 
 
@@ -467,6 +538,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypeColorDropDown.Value = num2str(app.default{5,2});
             app.PixelSizeNonfiberObjects.Value = app.pix_size;
             app.NonfiberObjectsColorDropDown.Value = num2str(app.default{6,2});
+            app.PixelSizeNonfiberClassification.Value = app.pix_size;
+            % TODO - default for nofiber classification
         end
 
         % Button pushed function: SelectFilesButton
@@ -565,6 +638,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'on';
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
+            app.NonfiberClassificationButton.Enable = 'on';
             app.SegmentationParameters.Visible = 'off';
             app.Prompt.Text = '';
         end
@@ -673,7 +747,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'on';
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
-            
+            app.NonfiberClassificationButton.Enable = 'on';
         end
 
         % Button pushed function: AcceptSegmentationButton
@@ -690,6 +764,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.CentralNucleiButton.Enable = 'on';
                 app.FiberTypingButton.Enable = 'on';
                 app.NonfiberObjectsButton.Enable = 'on';
+                app.NonfiberClassificationButton.Enable = 'on';
             else 
                 numberOfFilesSelected = length(app.BatchModeFileNames);
 
@@ -803,6 +878,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'on';
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
+            app.NonfiberClassificationButton.Enable = 'on';
             app.Prompt.Text = '';
             app.RemoveObjectsButton.Enable = 'on';
         end
@@ -849,6 +925,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'on';
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
+            app.NonfiberClassificationButton.Enable = 'on';
         end
 
         % Button pushed function: WritetoExcelButton
@@ -1034,7 +1111,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'on';
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
-            app.NonfiberObjectsButton.Enable = 'on';
+            app.NonfiberClassificationButton.Enable = 'on';
         end
 
         % Button pushed function: CalculateFiberTyping
@@ -1185,6 +1262,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'on';
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
+            app.NonfiberClassificationButton.Enable = 'on';
         end
 
         % Button pushed function: AdjustCNF
@@ -1238,9 +1316,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 end
                 
             end
-            
-            label = bwconncomp(ch_bw,4);
-            nfprops = regionprops(label,'Centroid','Area');
+
+            app.nf_bw_obj = ch_bw;
+            app.nf_mask = bwlabel(ch_bw,4);
+            nfprops = regionprops(bwconncomp(ch_bw,4),'Centroid','Area');
             area_nf = [nfprops.Area]'*app.pix_size^2;
             cents_nf = cat(1,nfprops.Centroid);
             app.num_nf = length(area_nf);
@@ -1292,7 +1371,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: DoneNonfiber
         function DoneNonfiberButtonPushed(app, event)
             app.thresh_nf = 0;
-            app.num_nf = 0;
             app.nf_data = 0;
             app.Prompt.Text = '';
             app.NonfiberPanel.Visible = 'off';
@@ -1305,8 +1383,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'on';
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
+            app.NonfiberClassificationButton.Enable = 'on';
             app.SelectFilesButton.Enable = 'on';
-            
         end
 
         % Button pushed function: InitialSegmentationButton
@@ -1698,6 +1776,148 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeNonfiberObjects.Value = app.pix_size;
             
         end
+
+        % Button pushed function: NonfiberClassificationButton
+        function NonfiberClassificationButtonPushed(app, event)
+            DisableMenuBarButtons(app);
+            app.NonfiberClassificationPanel.Visible = 'on';
+            app.NonfiberClassificationControlPanel.Visible = 'on';
+            app.PixelSizeNonfiberClassification.Enable = 'on';
+            app.NonfiberClassificationColorDropDown.Enable = 'on';
+            app.WritetoExcelNonfiberClassification.Enable = 'off';
+            app.NonfiberClassificationChannelColorBox.Visible = 'on';
+            app.PercentClassifiedTextArea.Visible = 'on';
+            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+        end
+
+        % Button pushed function: ClassifyNonfiberObjects
+        function ClassifyNonfiberObjectsButtonPushed(app, event)
+            % Labelled objects
+            app.classified_nonfiber_num_obj = max(max(app.nf_mask));
+
+            % Threshold Objects
+            channel_name = app.NonfiberClassificationColorDropDown.Value;
+            fti = app.orig_img_multispectral(:,:,str2double(channel_name));
+            threshes = multithresh(fti,10);
+            app.nonfiber_classification_cutoff_avg = threshes(2);
+            app.NonfiberClassificationThreshold.Enable = 'on';
+            app.NonfiberClassificationThreshold.Value = double(app.nonfiber_classification_cutoff_avg);
+
+            % Display image
+            imshow(app.orig_img,'Parent',app.NonfiberClassificationAxes_L);
+
+            app.Obj_Adj = 1;
+            while app.Obj_Adj
+                % Fiber Properties
+                rprop = regionprops(app.nf_mask,fti,'MeanIntensity','Centroid','Area','PixelIdxList');
+                app.classified_nonfiber_ave_g = [rprop.MeanIntensity];
+                app.classified_nonfiber_areas = [rprop.Area];
+
+                % Determine which regions are above threshold
+                app.classified_nonfiber_ponf = false(app.classified_nonfiber_num_obj,1); % logical zeros array of size num
+                app.classified_nonfiber_ponf(app.classified_nonfiber_ave_g > app.nonfiber_classification_cutoff_avg) = 1; % set all elements where the intensity exceeds the threshold
+                img_out = single(app.nf_bw_obj).* 0.3;
+
+                p_ind = find(app.classified_nonfiber_ponf); % vector of qualifying regions
+                percent_classified = length(p_ind) / app.classified_nonfiber_num_obj * 100;
+                app.PercentClassifiedTextArea.Value = string(percent_classified) + " %";
+                for i = 1:length(p_ind)
+                    img_out(app.nf_mask == p_ind(i)) = 1; % whiten region
+                end
+
+                % Display image
+                imshow(img_out,'Parent',app.NonfiberClassificationAxes_R);
+
+                uiwait(app.UIFigure);       
+            end
+        end
+
+        % Button pushed function: NonfiberClassificationAdjust
+        function NonfiberClassificationAdjustButtonPushed(app, event)
+            app.nonfiber_classification_cutoff_avg = app.NonfiberClassificationThreshold.Value;         
+            uiresume(app.UIFigure);
+        end
+
+        % Button pushed function: NonfiberClassificationAccept
+        function NonfiberClassificationAcceptButtonPushed(app, event)
+            app.Obj_Adj = 0;
+            
+            app.NonfiberClassificationThreshold.Enable = 'off';
+            app.NonfiberClassificationAccept.Enable = 'off';
+            app.NonfiberClassificationAdjust.Enable = 'off';
+            app.ClassifyNonfiberObjects.Enable = 'on';
+            app.WritetoExcelNonfiberClassification.Enable = 'on';
+            app.DoneNonfiberClassification.Enable = 'on';
+
+            uiresume(app.UIFigure);
+        end
+
+        % Button pushed function: WritetoExcelNonfiberClassification
+        function WritetoExcelNonfiberClassificationButtonPushed(app, event)
+            % Create folder if directory does not exist for excel input
+            CreateFolderIfDirectoryIsNonexistent(app, app.NonfiberClassificationDataOutputFolder.Value);
+            cd(app.NonfiberClassificationDataOutputFolder.Value)
+
+            pix_area = app.pix_size^2;
+            header{1,1} = 'Average Classified Nonfiber Object Size';
+            header{1,2} = 'Average Classified Nonfiber Object Intensity';
+            header{1,3} = 'Percent Positive';
+
+            header{2,1} = mean(app.classified_nonfiber_areas).*pix_area;
+            header{2,2} = mean(app.classified_nonfiber_ave_g);
+            header{2,3} = mean(app.classified_nonfiber_ponf);
+
+            header{3,1} = 'Positive Classified Nonfiber Object Size';
+            header{3,2} = 'Positive Classified Nonfiber Object Intensity';
+            header{3,3} = 'Number Positive';
+
+            header{4,1} = mean(app.areas(app.classified_nonfiber_ponf)).*pix_area;
+            header{4,2} = mean(app.classified_nonfiber_ave_g(app.classified_nonfiber_ponf));
+            header{4,3} = sum(app.classified_nonfiber_ponf);
+
+            header{5,1} = 'Negative Classified Nonfiber Object Size';
+            header{5,2} = 'Negative Classified Nonfiber Object Intensity';
+            header{5,3} = 'Number Negative';
+
+            header{6,1} = mean(app.classified_nonfiber_areas(~app.classified_nonfiber_ponf)).*pix_area;
+            header{6,2} = mean(app.classified_nonfiber_ave_g(~app.classified_nonfiber_ponf));
+            header{6,3} = app.classified_nonfiber_num_obj - sum(app.classified_nonfiber_ponf);
+
+            header{10,1} = 'Classified Nonfiber Object Size';
+            header{10,2} = 'Classified Nonfiber Object Intensity';
+            header{10,3} = 'Classified Nonfiber Object Positive';
+
+            out_data = zeros(app.classified_nonfiber_num_obj,3);
+            out_data(:,1) = app.classified_nonfiber_areas.*pix_area;
+            out_data(:,2) = app.classified_nonfiber_ave_g;
+            out_data(:,3) = app.classified_nonfiber_ponf;
+
+            out_file = cat(1,header,num2cell(out_data));
+%             if str2double(app.FiberTypeColorDropDown.Value) == 2
+%                 writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','L1');
+%             elseif str2double(app.FiberTypeColorDropDown.Value) == 1
+%                 writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','O1');
+%             elseif str2double(app.FiberTypeColorDropDown.Value) == 3
+%                 writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','R1');
+%             end
+%             
+            writecell(out_file, [app.Files{4} '_Properties.xlsx'], 'Range','S1');
+            app.Prompt.Text = 'Write to Excel done';
+            cd(app.Files{3})
+            app.classified_nonfiber_ponf = 0;
+            app.classified_nonfiber_ave_g = 0;
+            app.classified_nonfiber_areas = 0;
+        end
+
+        % Button pushed function: DoneNonfiberClassification
+        function DoneNonfiberClassificationButtonPushed(app, event)
+            app.nf_mask = 0;
+            app.Prompt.Text = '';
+            app.NonfiberPanel.Visible = 'off';
+            app.NonfiberClassificationControlPanel.Visible = 'off';
+            app.NonfiberClassificationPanel.Visible = 'off';
+            EnableMenuBarButtons(app);
+        end
     end
 
     % Component initialization
@@ -1943,7 +2163,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Toolbar.ForegroundColor = [1 1 1];
             app.Toolbar.BackgroundColor = [1 1 1];
             app.Toolbar.FontName = 'Avenir';
-            app.Toolbar.Position = [95 675 1015 43];
+            app.Toolbar.Position = [25 675 1155 43];
 
             % Create ManualSegmentationButton
             app.ManualSegmentationButton = uibutton(app.Toolbar, 'push');
@@ -2011,6 +2231,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.InitialSegmentationButton.Enable = 'off';
             app.InitialSegmentationButton.Position = [6 6 120 33];
             app.InitialSegmentationButton.Text = 'Initial Segmentation';
+
+            % Create NonfiberClassificationButton
+            app.NonfiberClassificationButton = uibutton(app.Toolbar, 'push');
+            app.NonfiberClassificationButton.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationButtonPushed, true);
+            app.NonfiberClassificationButton.FontName = 'Avenir';
+            app.NonfiberClassificationButton.Enable = 'off';
+            app.NonfiberClassificationButton.Position = [1012 6 136 33];
+            app.NonfiberClassificationButton.Text = 'Nonfiber Classification';
 
             % Create ManualSegmentationControls
             app.ManualSegmentationControls = uipanel(app.UIFigure);
@@ -2601,6 +2829,148 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DetectValueButton.FontName = 'Avenir';
             app.DetectValueButton.Position = [22 61 100 24];
             app.DetectValueButton.Text = 'Detect Value';
+
+            % Create NonfiberClassificationPanel
+            app.NonfiberClassificationPanel = uipanel(app.UIFigure);
+            app.NonfiberClassificationPanel.Visible = 'off';
+            app.NonfiberClassificationPanel.BackgroundColor = [1 1 1];
+            app.NonfiberClassificationPanel.FontName = 'Avenir';
+            app.NonfiberClassificationPanel.Position = [282 56 876 605];
+
+            % Create NonfiberClassificationAxes_R
+            app.NonfiberClassificationAxes_R = uiaxes(app.NonfiberClassificationPanel);
+            xlabel(app.NonfiberClassificationAxes_R, 'X')
+            ylabel(app.NonfiberClassificationAxes_R, 'Y')
+            app.NonfiberClassificationAxes_R.PlotBoxAspectRatio = [1.35976789168279 1 1];
+            app.NonfiberClassificationAxes_R.FontName = 'Avenir';
+            app.NonfiberClassificationAxes_R.XColor = 'none';
+            app.NonfiberClassificationAxes_R.YColor = 'none';
+            app.NonfiberClassificationAxes_R.Position = [504 1 365 556];
+
+            % Create NonfiberClassificationAxes_L
+            app.NonfiberClassificationAxes_L = uiaxes(app.NonfiberClassificationPanel);
+            xlabel(app.NonfiberClassificationAxes_L, 'X')
+            ylabel(app.NonfiberClassificationAxes_L, 'Y')
+            app.NonfiberClassificationAxes_L.PlotBoxAspectRatio = [1.35976789168279 1 1];
+            app.NonfiberClassificationAxes_L.FontName = 'Avenir';
+            app.NonfiberClassificationAxes_L.XColor = 'none';
+            app.NonfiberClassificationAxes_L.YColor = 'none';
+            app.NonfiberClassificationAxes_L.Position = [63 1 365 556];
+
+            % Create ThresholdEditField_2Label_3
+            app.ThresholdEditField_2Label_3 = uilabel(app.NonfiberClassificationPanel);
+            app.ThresholdEditField_2Label_3.HorizontalAlignment = 'right';
+            app.ThresholdEditField_2Label_3.FontName = 'Avenir';
+            app.ThresholdEditField_2Label_3.Position = [204 10 59 22];
+            app.ThresholdEditField_2Label_3.Text = 'Threshold';
+
+            % Create NonfiberClassificationThreshold
+            app.NonfiberClassificationThreshold = uieditfield(app.NonfiberClassificationPanel, 'numeric');
+            app.NonfiberClassificationThreshold.FontName = 'Avenir';
+            app.NonfiberClassificationThreshold.Position = [278 10 100 22];
+
+            % Create NonfiberClassificationAdjust
+            app.NonfiberClassificationAdjust = uibutton(app.NonfiberClassificationPanel, 'push');
+            app.NonfiberClassificationAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAdjustButtonPushed, true);
+            app.NonfiberClassificationAdjust.FontName = 'Avenir';
+            app.NonfiberClassificationAdjust.Position = [418 9 100 24];
+            app.NonfiberClassificationAdjust.Text = 'Adjust';
+
+            % Create NonfiberClassificationAccept
+            app.NonfiberClassificationAccept = uibutton(app.NonfiberClassificationPanel, 'push');
+            app.NonfiberClassificationAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAcceptButtonPushed, true);
+            app.NonfiberClassificationAccept.FontName = 'Avenir';
+            app.NonfiberClassificationAccept.Position = [542 8 100 24];
+            app.NonfiberClassificationAccept.Text = 'Accept';
+
+            % Create PercentClassifiedTextAreaLabel
+            app.PercentClassifiedTextAreaLabel = uilabel(app.NonfiberClassificationPanel);
+            app.PercentClassifiedTextAreaLabel.HorizontalAlignment = 'right';
+            app.PercentClassifiedTextAreaLabel.FontName = 'Avenir';
+            app.PercentClassifiedTextAreaLabel.Position = [425 549 100 22];
+            app.PercentClassifiedTextAreaLabel.Text = 'Percent Classified';
+
+            % Create PercentClassifiedTextArea
+            app.PercentClassifiedTextArea = uitextarea(app.NonfiberClassificationPanel);
+            app.PercentClassifiedTextArea.Position = [540 513 150 60];
+
+            % Create NonfiberClassificationControlPanel
+            app.NonfiberClassificationControlPanel = uipanel(app.UIFigure);
+            app.NonfiberClassificationControlPanel.Visible = 'off';
+            app.NonfiberClassificationControlPanel.BackgroundColor = [1 1 1];
+            app.NonfiberClassificationControlPanel.FontName = 'Avenir';
+            app.NonfiberClassificationControlPanel.Position = [15 298 260 293];
+
+            % Create NonfiberClassificationChannelColorBox
+            app.NonfiberClassificationChannelColorBox = uiaxes(app.NonfiberClassificationControlPanel);
+            app.NonfiberClassificationChannelColorBox.Toolbar.Visible = 'off';
+            app.NonfiberClassificationChannelColorBox.FontName = 'Avenir';
+            app.NonfiberClassificationChannelColorBox.XTick = [];
+            app.NonfiberClassificationChannelColorBox.YTick = [];
+            app.NonfiberClassificationChannelColorBox.Color = [0 1 1];
+            app.NonfiberClassificationChannelColorBox.Box = 'on';
+            app.NonfiberClassificationChannelColorBox.Position = [229 193 30 30];
+
+            % Create PixelSizeumpixelEditField_3Label_2
+            app.PixelSizeumpixelEditField_3Label_2 = uilabel(app.NonfiberClassificationControlPanel);
+            app.PixelSizeumpixelEditField_3Label_2.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditField_3Label_2.FontName = 'Avenir';
+            app.PixelSizeumpixelEditField_3Label_2.Position = [44 232 59 32];
+            app.PixelSizeumpixelEditField_3Label_2.Text = {'Pixel Size'; '(um/pixel)'};
+
+            % Create PixelSizeNonfiberClassification
+            app.PixelSizeNonfiberClassification = uieditfield(app.NonfiberClassificationControlPanel, 'numeric');
+            app.PixelSizeNonfiberClassification.FontName = 'Avenir';
+            app.PixelSizeNonfiberClassification.Position = [118 242 100 22];
+
+            % Create DataOutputFolderEditField_3Label_3
+            app.DataOutputFolderEditField_3Label_3 = uilabel(app.NonfiberClassificationControlPanel);
+            app.DataOutputFolderEditField_3Label_3.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_3Label_3.FontName = 'Avenir';
+            app.DataOutputFolderEditField_3Label_3.Position = [16 144 111 22];
+            app.DataOutputFolderEditField_3Label_3.Text = 'Data Output Folder';
+
+            % Create NonfiberClassificationDataOutputFolder
+            app.NonfiberClassificationDataOutputFolder = uieditfield(app.NonfiberClassificationControlPanel, 'text');
+            app.NonfiberClassificationDataOutputFolder.FontName = 'Avenir';
+            app.NonfiberClassificationDataOutputFolder.Position = [142 144 100 22];
+
+            % Create FiberTypeColorDropDown_2Label
+            app.FiberTypeColorDropDown_2Label = uilabel(app.NonfiberClassificationControlPanel);
+            app.FiberTypeColorDropDown_2Label.HorizontalAlignment = 'right';
+            app.FiberTypeColorDropDown_2Label.FontName = 'Avenir';
+            app.FiberTypeColorDropDown_2Label.Position = [16 197 95 22];
+            app.FiberTypeColorDropDown_2Label.Text = 'Fiber Type Color';
+
+            % Create NonfiberClassificationColorDropDown
+            app.NonfiberClassificationColorDropDown = uidropdown(app.NonfiberClassificationControlPanel);
+            app.NonfiberClassificationColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.NonfiberClassificationColorDropDown.ItemsData = {'1', '2', '3'};
+            app.NonfiberClassificationColorDropDown.FontName = 'Avenir';
+            app.NonfiberClassificationColorDropDown.Position = [126 197 100 22];
+            app.NonfiberClassificationColorDropDown.Value = '1';
+
+            % Create ClassifyNonfiberObjects
+            app.ClassifyNonfiberObjects = uibutton(app.NonfiberClassificationControlPanel, 'push');
+            app.ClassifyNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @ClassifyNonfiberObjectsButtonPushed, true);
+            app.ClassifyNonfiberObjects.FontName = 'Avenir';
+            app.ClassifyNonfiberObjects.Position = [80 88 100 24];
+            app.ClassifyNonfiberObjects.Text = 'Calculate';
+
+            % Create WritetoExcelNonfiberClassification
+            app.WritetoExcelNonfiberClassification = uibutton(app.NonfiberClassificationControlPanel, 'push');
+            app.WritetoExcelNonfiberClassification.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelNonfiberClassificationButtonPushed, true);
+            app.WritetoExcelNonfiberClassification.FontName = 'Avenir';
+            app.WritetoExcelNonfiberClassification.Enable = 'off';
+            app.WritetoExcelNonfiberClassification.Position = [26 43 100 24];
+            app.WritetoExcelNonfiberClassification.Text = 'Write to Excel';
+
+            % Create DoneNonfiberClassification
+            app.DoneNonfiberClassification = uibutton(app.NonfiberClassificationControlPanel, 'push');
+            app.DoneNonfiberClassification.ButtonPushedFcn = createCallbackFcn(app, @DoneNonfiberClassificationButtonPushed, true);
+            app.DoneNonfiberClassification.FontName = 'Avenir';
+            app.DoneNonfiberClassification.Position = [145 43 100 24];
+            app.DoneNonfiberClassification.Text = 'Done';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
