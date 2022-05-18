@@ -14,7 +14,7 @@ function CheckSMASHDependencies
 
     disp("Checking Add-Ons Required for SMASH...");
     isAddonsCheckSuccessful = CheckAddOnInstallations();
-    isBioformatsCheckSuccessful = CheckIfBioformatsIsInstalled();
+    isBioformatsCheckSuccessful = CheckBioformatsInstallation();
     areAllDependenciesInstalled = isAddonsCheckSuccessful && isBioformatsCheckSuccessful;
     PrintSummary(areAllDependenciesInstalled);
 end
@@ -100,19 +100,41 @@ function info = GetAddOnInformation(addonName)
 end
 
 function isSuccess = CheckIfAddOnIsEnabled(info)
+% CheckIfAddOnIsEnabled  Checks add-on is enabled.
+%   CheckIfAddOnIsEnabled(info) reads in the add-on info and determines if
+%   whether or not the add-on is enabled. Outputs to standard error if the
+%   add-on is not enabled.
+%
+%   CheckIfAddOnIsEnabled(info) returns:
+%     0 if info indicates that the add-on is enabled.
+%     1 if info indicates that the add-on is disabled.
+%
+%   See also matlab.addons.installedAddons.
+
     if info.Enabled
         isSuccess = 1;
     else
-       fprintf(2, " No%c    Add-On ""%s"" is installed but not enabled. Please enable it.%c",newline, info.Name, newline)
+        fprintf(2, " No%c    Add-On ""%s"" is installed but not enabled. Please enable it.%c",newline, info.Name, newline)
         isSuccess = 0;
     end
 end
 
-function printSeparator
+function PrintSeparator
+% PrintSeparator  Prints a line separator consisting of '-' repeated 80 times.
+
     disp(repmat('-',1,80))
 end
 
-function isInstalled = CheckIfBioformatsIsInstalled()
+function isInstalled = CheckBioformatsInstallation()
+% CheckBioformatsInstallation  Checks Bioformats installation.
+%
+%   CheckBioformatsInstallation verifies that Bio-Formats MATLAB toolbox is
+%   installed. If not, outputs to standard error.
+%
+%   CheckBioformatsInstallation() returns:
+%     0 if Bio-Formats is installed and added to the search path.
+%     1 if Bio-Formats is not installed or not added to the search path.
+
     fprintf("  Checking if the Bio-Formats MATLAB Toolbox is installed...");
     isInstalled = IsBioformatsInstalled();
     if isInstalled
@@ -125,12 +147,28 @@ function isInstalled = CheckIfBioformatsIsInstalled()
 end
 
 function isInstalled = IsBioformatsInstalled()
+% IsBioformatsInstalled  Check is Bio-Formats MATLAB toolbox is installed.
+%
+%  For simplicity, IsBioformatsInstalled checks for bfopen in the search
+%  path.
+%
+%   IsBioformatsInstalled() returns:
+%     0 if bfopen is found in the search path.
+%     1 if bfopen is not found in the search path.
+
     NAME_IS_M_FILE = 2;
     isInstalled = exist("bfopen", "file") == NAME_IS_M_FILE;
 end
 
 function PrintSummary(areAllDependenciesInstalled)
-    printSeparator();
+% PrintSummary  Summarizes the result of the check.
+%
+%  PrintSummary(areAllDependenciesInstalled) outputs a successful message
+%  to standard output if areAllDependenciesInstalled is true. Otherwise,
+%  outputs a error message to standard error if areAllDependenciesInstalled
+%  is false.
+
+    PrintSeparator();
     if areAllDependenciesInstalled
         disp("You're all set! All required dependencies have been installed!");
     else
