@@ -530,18 +530,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.segmodel = load('SegmentationModel.mat','segModel');
             % Apply defaults
             app.pix_size = app.default{2,2};
-            app.PixelSizeFiberProperties.Value = app.pix_size;
+            SyncPixelSize(app);
             %app.SegmentationThresholdSlider.Value = app.default{7,2};
             app.FiberOutlineColorDropDown.Value = num2str(app.default{3,2});
             app.NucleiColorDropDown.Value = num2str(app.default{4,2});
-            app.PixelSizeCentralNuclei.Value = app.pix_size;
             app.DistancefromborderEditField.Value = app.default{14,2};
             app.MinimumNucleusSizeum2EditField.Value = app.default{15,2};
-            app.PixelSizeFiberTyping.Value = app.pix_size;
             app.FiberTypeColorDropDown.Value = num2str(app.default{5,2});
-            app.PixelSizeNonfiberObjects.Value = app.pix_size;
             app.NonfiberObjectsColorDropDown.Value = num2str(app.default{6,2});
-            app.PixelSizeNonfiberClassification.Value = app.pix_size;
             % TODO - default for nofiber classification
         end
 
@@ -1747,37 +1743,25 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Value changed function: PixelSizeNonfiberObjects
         function PixelSizeNonfiberObjectsValueChanged(app, event)
             app.pix_size = app.PixelSizeNonfiberObjects.Value;
-            app.PixelSizeFiberProperties.Value = app.pix_size;
-            app.PixelSizeCentralNuclei.Value = app.pix_size;
-            app.PixelSizeFiberTyping.Value = app.pix_size;
-            
+            SyncPixelSize(app);
         end
 
         % Value changed function: PixelSizeFiberTyping
         function PixelSizeFiberTypingValueChanged(app, event)
             app.pix_size = app.PixelSizeFiberTyping.Value;
-            app.PixelSizeFiberProperties.Value = app.pix_size;
-            app.PixelSizeCentralNuclei.Value = app.pix_size;
-            app.PixelSizeNonfiberObjects.Value = app.pix_size;
-            
+            SyncPixelSize(app);
         end
 
         % Value changed function: PixelSizeCentralNuclei
         function PixelSizeCNFValueChanged(app, event)
             app.pix_size = app.PixelSizeCentralNuclei.Value;
-            app.PixelSizeFiberProperties.Value = app.pix_size;
-            app.PixelSizeFiberTyping.Value = app.pix_size;
-            app.PixelSizeNonfiberObjects.Value = app.pix_size;
-            
+            SyncPixelSize(app);
         end
 
         % Value changed function: PixelSizeFiberProperties
         function PixelSizeFiberPropertiesValueChanged(app, event)
             app.pix_size = app.PixelSizeFiberProperties.Value;
-            app.PixelSizeCentralNuclei.Value = app.pix_size;
-            app.PixelSizeFiberTyping.Value = app.pix_size;
-            app.PixelSizeNonfiberObjects.Value = app.pix_size;
-            
+            SyncPixelSize(app);
         end
 
         % Button pushed function: NonfiberClassificationButton
@@ -1913,6 +1897,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationControlPanel.Visible = 'off';
             app.NonfiberClassificationPanel.Visible = 'off';
             EnableMenuBarButtons(app);
+        end
+
+        % Value changed function: PixelSizeNonfiberClassification
+        function PixelSizeNonfiberClassificationValueChanged(app, event)
+            app.pix_size = app.PixelSizeNonfiberClassification.Value;
+            SyncPixelSize(app);
         end
     end
 
@@ -2935,6 +2925,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeNonfiberClassification
             app.PixelSizeNonfiberClassification = uieditfield(app.NonfiberClassificationControlPanel, 'numeric');
+            app.PixelSizeNonfiberClassification.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberClassificationValueChanged, true);
             app.PixelSizeNonfiberClassification.FontName = 'Avenir';
             app.PixelSizeNonfiberClassification.Position = [118 242 100 22];
 
