@@ -39,7 +39,7 @@ function isSuccess = CheckAddOnInstallations()
 end
 
 function isSuccess = CheckAddOnInstallation(requiredAddon)
-% CheckAddOnInstallation Checks add-on installation.
+% CheckAddOnInstallation  Checks add-on installation.
 %   CheckAddOnInstallation checks if requiredAddon is
 %   installed and enabled.
 %
@@ -55,7 +55,7 @@ function isSuccess = CheckAddOnInstallation(requiredAddon)
 end
 
 function isSuccess = CheckIfAddOnIsInstalledAndEnabled(addonName)
-% CheckIfAddOnIsInstalledAndEnabled Checks if add-on is installed and enabled.
+% CheckIfAddOnIsInstalledAndEnabled  Checks if add-on is installed and enabled.
 %   CheckIfAddOnIsInstalledAndEnabled checks if add-on is installed and
 %   enabled and prints to standard error any detected errors.
 %
@@ -70,8 +70,9 @@ function isSuccess = CheckIfAddOnIsInstalledAndEnabled(addonName)
 %   lookup add-ons.
 %
 %   See also matlab.addons.installedAddons.
+
     info = GetAddOnInformation(addonName);
-    if IsInstalled(info)
+    if ~isempty(info)
        isSuccess = CheckIfAddOnIsEnabled(info);
     else
        fprintf(2, " No%c    Add-On ""%s"" is not installed. Please install it.%c", newline, addonName, newline)
@@ -80,6 +81,20 @@ function isSuccess = CheckIfAddOnIsInstalledAndEnabled(addonName)
 end
 
 function info = GetAddOnInformation(addonName)
+% GetAddOnInformation  Returns add-ons information.
+%
+%   GetAddOnInformation(addonName) looks up addonName from the list of
+%   installed add-ons and returns a table of strings with these fields:
+%
+%           Name - Name of the add-on
+%        Version - Version of the add-on
+%        Enabled - Whether the add-on is enabled
+%     Identifier - Unique identifier of the add-on
+%
+%   The table will be 1 x 4 if a matching add-on is found, empty otherwise.
+%
+%   See also matlab.addons.installedAddons.
+
     installedAddons = matlab.addons.installedAddons;
     info = installedAddons(strcmp(installedAddons.Name, addonName), :);
 end
@@ -91,10 +106,6 @@ function isSuccess = CheckIfAddOnIsEnabled(info)
        fprintf(2, " No%c    Add-On ""%s"" is installed but not enabled. Please enable it.%c",newline, info.Name, newline)
         isSuccess = 0;
     end
-end
-
-function isSuccess = IsInstalled(info)
-    isSuccess = size(info, 1);
 end
 
 function printSeparator
