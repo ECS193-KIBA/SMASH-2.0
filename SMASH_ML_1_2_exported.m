@@ -293,6 +293,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             else
                 % Enable all the buttons to be used in batch mode
                 app.InitialSegmentationButton.Enable = 'on';
+                app.FiberPredictionButton.Enable = 'on';
             end
             
             UpdateColorChannelBox(app)
@@ -333,6 +334,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Display segmented image
             flat_img =flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w');
             imshow(flat_img,'Parent',app.UIAxes);
+        end
+
+        function AquireMaskFiberPrediction(app)
+            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+            app.bw_obj = imclearborder(app.bw_obj,4);
+            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
         end
 
         function FiberPredictionWithMediumTree(app)
@@ -378,7 +385,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             
             dispmask = logical((nonfiberfiltered.*maybefiltered) + fiberfiltered); % Show only the fibers and nonfiber maybes
             
-            % imshow(flattenMaskOverlay(app.orig_img,dispmask,0.5,'w'),'Parent',app.UIAxes);
+            imshow(flattenMaskOverlay(app.orig_img,dispmask,0.5,'w'),'Parent',app.UIAxes);
             app.Prompt.Text = '';
 
             SaveMaskToMaskFile(app, tempmask);
@@ -739,6 +746,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     % then continue
                     FileInitialization(app, currentFile, app.BatchModePathName, app.BatchModeFilterIndex);
                     % Run filter button functionality
+                    AquireMaskFiberPrediction(app);
                     FiberPredictionWithMediumTree(app);
                 end
 
@@ -1422,26 +1430,35 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FiberPredictionButton
         function FiberPredictionButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
-            app.InitialSegmentationButton.Enable = 'off';
-            app.FiberPredictionButton.Enable = 'off';
-            app.ManualFiberFilterButton.Enable = 'off';
-            app.ManualSegmentationButton.Enable = 'off';
-            app.FiberPropertiesButton.Enable = 'off';
-            app.CentralNucleiButton.Enable = 'off';
-            app.FiberTypingButton.Enable = 'off';
-            app.NonfiberObjectsButton.Enable = 'off';
-            app.FiberPredictionControlPanel.Visible = 'on';
-            % acquire mask and show over image
-            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
-            app.bw_obj = imclearborder(app.bw_obj,4);
-            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
-            app.FilterButton.Enable = 'on';
-            app.SortingThresholdSlider.Enable = 'on';
-
-            if app.IsBatchMode == 1
+            if app.IsBatchMode == 0
+                app.SelectFilesButton.Enable = 'off';
+                app.InitialSegmentationButton.Enable = 'off';
+                app.FiberPredictionButton.Enable = 'off';
+                app.ManualFiberFilterButton.Enable = 'off';
+                app.ManualSegmentationButton.Enable = 'off';
+                app.FiberPropertiesButton.Enable = 'off';
+                app.CentralNucleiButton.Enable = 'off';
+                app.FiberTypingButton.Enable = 'off';
+                app.NonfiberObjectsButton.Enable = 'off';
+                app.FiberPredictionControlPanel.Visible = 'on';
+                % acquire mask and show over image
+                app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+                app.bw_obj = imclearborder(app.bw_obj,4);
+                imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
+                app.FilterButton.Enable = 'on';
+                app.SortingThresholdSlider.Enable = 'on';
+            else
                 app.Prompt.Text = '';
+                app.SelectFilesButton.Enable = 'off';
+                app.InitialSegmentationButton.Enable = 'off';
+                app.FiberPredictionControlPanel.Visible = 'on';
+                app.SortingThresholdSlider.Visible = 'off';
+                app.ManualSortingButton.Enable = 'off';
+                app.ManualSortingButton.Visible = 'off';
+                app.SortingThresholdHigherrequiresmoremanualsortingLabel.Visible = 'off';
+                app.FilterButton.Enable = 'on';
             end
+
         end
 
         % Button pushed function: ManualFiberFilterButton
