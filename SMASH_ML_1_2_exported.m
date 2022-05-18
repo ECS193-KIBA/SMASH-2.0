@@ -317,15 +317,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             imshow(app.orig_img,'Parent',app.UIAxes);
 
             if exist(MaskName,'file') && app.IsBatchMode == 0
-                app.InitialSegmentationButton.Enable = 'on';
-                app.FiberPredictionButton.Enable = 'on';
-                app.ManualSegmentationButton.Enable = 'on';
-                app.ManualFiberFilterButton.Enable = 'on';
-                app.FiberPropertiesButton.Enable = 'on';
-                app.CentralNucleiButton.Enable = 'on';
-                app.FiberTypingButton.Enable = 'on';
-                app.NonfiberObjectsButton.Enable = 'on';
-                app.NonfiberClassificationButton.Enable = 'on';
+                EnableMenuBarButtons(app);
             else
                 % Enable all the buttons to be used in batch mode
                 app.InitialSegmentationButton.Enable = 'on';
@@ -484,7 +476,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             results = all(ismember(point_neighbor_labels, acceptable_labels));
         end
 
-        function EnableMenuBarButtons(app) % TODO - make all stages use this
+        function EnableMenuBarButtons(app)
             app.SelectFilesButton.Enable = 'on';
             app.InitialSegmentationButton.Enable = 'on';
             app.ManualSegmentationButton.Enable = 'on';
@@ -629,15 +621,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: CloseManualSegmentationButton
         function CloseManualSegmentationButtonPushed(app, event)
             app.ManualSegmentationControls.Visible = 'off';
-            app.InitialSegmentationButton.Enable = 'on';
-            app.FiberPredictionButton.Enable = 'on';
-            app.ManualFiberFilterButton.Enable = 'on';
-            app.ManualSegmentationButton.Enable = 'on';
-            app.FiberPropertiesButton.Enable = 'on';
-            app.CentralNucleiButton.Enable = 'on';
-            app.FiberTypingButton.Enable = 'on';
-            app.NonfiberObjectsButton.Enable = 'on';
-            app.NonfiberClassificationButton.Enable = 'on';
+            EnableMenuBarButtons(app);
             app.SegmentationParameters.Visible = 'off';
             app.Prompt.Text = '';
         end
@@ -738,15 +722,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             SaveMaskToMaskFile(app, tempmask);
 
             app.FiberPredictionControlPanel.Visible = 'off';
-            app.InitialSegmentationButton.Enable = 'on';
-            app.ManualSegmentationButton.Enable = 'on';
-            app.FiberPredictionButton.Enable = 'on';
-            app.ManualFiberFilterButton.Enable = 'on';
-            app.FiberPropertiesButton.Enable = 'on';
-            app.CentralNucleiButton.Enable = 'on';
-            app.FiberTypingButton.Enable = 'on';
-            app.NonfiberObjectsButton.Enable = 'on';
-            app.NonfiberClassificationButton.Enable = 'on';
+            EnableMenuBarButtons(app);
         end
 
         % Button pushed function: AcceptSegmentationButton
@@ -755,15 +731,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 label = bwlabel(~logical(app.bw_obj),4);
                 SaveMaskToMaskFile(app, label);
                 app.SegmentationParameters.Visible = 'off';
-                app.InitialSegmentationButton.Enable = 'on';
-                app.FiberPredictionButton.Enable = 'on';
-                app.ManualSegmentationButton.Enable ='on';
-                app.ManualFiberFilterButton.Enable = 'on';
-                app.FiberPropertiesButton.Enable = 'on';
-                app.CentralNucleiButton.Enable = 'on';
-                app.FiberTypingButton.Enable = 'on';
-                app.NonfiberObjectsButton.Enable = 'on';
-                app.NonfiberClassificationButton.Enable = 'on';
+                EnableMenuBarButtons(app);
             else 
                 numberOfFilesSelected = length(app.BatchModeFileNames);
 
@@ -869,15 +837,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             label = bwlabel(app.bw_obj,4);
             SaveMaskToMaskFile(app, label);
             app.ManualFilterControls.Visible = 'off';
-            app.InitialSegmentationButton.Enable = 'on';
-            app.ManualSegmentationButton.Enable = 'on';
-            app.FiberPredictionButton.Enable = 'on';
-            app.ManualFiberFilterButton.Enable = 'on';
-            app.FiberPropertiesButton.Enable = 'on';
-            app.CentralNucleiButton.Enable = 'on';
-            app.FiberTypingButton.Enable = 'on';
-            app.NonfiberObjectsButton.Enable = 'on';
-            app.NonfiberClassificationButton.Enable = 'on';
+            EnableMenuBarButtons(app);
             app.Prompt.Text = '';
             app.RemoveObjectsButton.Enable = 'on';
         end
@@ -916,15 +876,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = '';
             app.PropertiesControlPanel.Visible = 'off';
             app.PropertiesPanel.Visible = 'off';
-            app.InitialSegmentationButton.Enable = 'on';
-            app.ManualSegmentationButton.Enable = 'on';
-            app.FiberPredictionButton.Enable = 'on';
-            app.ManualFiberFilterButton.Enable = 'on';
-            app.FiberPropertiesButton.Enable = 'on';
-            app.CentralNucleiButton.Enable = 'on';
-            app.FiberTypingButton.Enable = 'on';
-            app.NonfiberObjectsButton.Enable = 'on';
-            app.NonfiberClassificationButton.Enable = 'on';
+            EnableMenuBarButtons(app);
         end
 
         % Button pushed function: WritetoExcelButton
@@ -1102,15 +1054,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = '';
             app.CNFControlPanel.Visible = 'off';
             app.CNFPanel.Visible = 'off';
-            app.InitialSegmentationButton.Enable = 'on';
-            app.ManualSegmentationButton.Enable = 'on';
-            app.FiberPredictionButton.Enable = 'on';
-            app.ManualFiberFilterButton.Enable = 'on';
-            app.FiberPropertiesButton.Enable = 'on';
-            app.CentralNucleiButton.Enable = 'on';
-            app.FiberTypingButton.Enable = 'on';
-            app.NonfiberObjectsButton.Enable = 'on';
-            app.NonfiberClassificationButton.Enable = 'on';
+            EnableMenuBarButtons(app);
         end
 
         % Button pushed function: CalculateFiberTyping
@@ -1253,15 +1197,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = '';
             app.FiberTypingControlPanel.Visible = 'off';
             app.FiberTypingPanel.Visible = 'off';
-            app.InitialSegmentationButton.Enable = 'on';
-            app.ManualSegmentationButton.Enable = 'on';
-            app.FiberPredictionButton.Enable = 'on';
-            app.ManualFiberFilterButton.Enable = 'on';
-            app.FiberPropertiesButton.Enable = 'on';
-            app.CentralNucleiButton.Enable = 'on';
-            app.FiberTypingButton.Enable = 'on';
-            app.NonfiberObjectsButton.Enable = 'on';
-            app.NonfiberClassificationButton.Enable = 'on';
+            EnableMenuBarButtons(app);
         end
 
         % Button pushed function: AdjustCNF
@@ -1374,45 +1310,19 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = '';
             app.NonfiberPanel.Visible = 'off';
             app.NonfiberControlPanel.Visible = 'off';
-            app.InitialSegmentationButton.Enable = 'on';
-            app.ManualSegmentationButton.Enable = 'on';
-            app.FiberPredictionButton.Enable = 'on';
-            app.ManualFiberFilterButton.Enable = 'on';
-            app.FiberPropertiesButton.Enable = 'on';
-            app.CentralNucleiButton.Enable = 'on';
-            app.FiberTypingButton.Enable = 'on';
-            app.NonfiberObjectsButton.Enable = 'on';
-            app.NonfiberClassificationButton.Enable = 'on';
-            app.SelectFilesButton.Enable = 'on';
+            EnableMenuBarButtons(app);
         end
 
         % Button pushed function: InitialSegmentationButton
         function InitialSegmentationButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
-            app.InitialSegmentationButton.Enable = 'off';
-            app.FiberPredictionButton.Enable = 'off';
-            app.ManualSegmentationButton.Enable = 'off';
-            app.ManualFiberFilterButton.Enable = 'off';
-            app.FiberPropertiesButton.Enable = 'off';
-            app.CentralNucleiButton.Enable = 'off';
-            app.FiberTypingButton.Enable = 'off';
-            app.NonfiberObjectsButton.Enable = 'off';
+            DisableMenuBarButtons(app);
             app.SegmentationParameters.Visible = 'on';
             app.FiberOutlineChannelColorBox.Visible = 'on';
-            
         end
 
         % Button pushed function: ManualSegmentationButton
         function ManualSegmentationButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
-            app.ManualSegmentationButton.Enable = 'off';
-            app.InitialSegmentationButton.Enable = 'off';
-            app.FiberPredictionButton.Enable = 'off';
-            app.ManualFiberFilterButton.Enable = 'off';
-            app.FiberPropertiesButton.Enable = 'off';
-            app.CentralNucleiButton.Enable = 'off';
-            app.FiberTypingButton.Enable = 'off';
-            app.NonfiberObjectsButton.Enable = 'off';
+            DisableMenuBarButtons(app);
             app.ManualSegmentationControls.Visible = 'on';
             app.bw_obj = ReadMaskFromMaskFile(app);
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w'),'Parent',app.UIAxes);
@@ -1420,15 +1330,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FiberPredictionButton
         function FiberPredictionButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
-            app.InitialSegmentationButton.Enable = 'off';
-            app.FiberPredictionButton.Enable = 'off';
-            app.ManualFiberFilterButton.Enable = 'off';
-            app.ManualSegmentationButton.Enable = 'off';
-            app.FiberPropertiesButton.Enable = 'off';
-            app.CentralNucleiButton.Enable = 'off';
-            app.FiberTypingButton.Enable = 'off';
-            app.NonfiberObjectsButton.Enable = 'off';
+            DisableMenuBarButtons(app);
             app.FiberPredictionControlPanel.Visible = 'on';
             % acquire mask and show over image
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
@@ -1440,15 +1342,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: ManualFiberFilterButton
         function ManualFiberFilterButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
-            app.InitialSegmentationButton.Enable = 'off';
-            app.FiberPredictionButton.Enable = 'off';
-            app.ManualFiberFilterButton.Enable = 'off';
-            app.ManualSegmentationButton.Enable = 'off';
-            app.FiberPropertiesButton.Enable = 'off';
-            app.CentralNucleiButton.Enable = 'off';
-            app.FiberTypingButton.Enable = 'off';
-            app.NonfiberObjectsButton.Enable = 'off';
+            DisableMenuBarButtons(app);
             app.ManualFilterControls.Visible = 'on';
             app.RemoveObjectsButton.Enable = 'on';
             app.FinishManualFilteringButton.Enable = 'off';
@@ -1458,15 +1352,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FiberPropertiesButton
         function FiberPropertiesButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
-            app.InitialSegmentationButton.Enable = 'off';
-            app.FiberPredictionButton.Enable = 'off';
-            app.ManualFiberFilterButton.Enable = 'off';
-            app.ManualSegmentationButton.Enable = 'off';
-            app.FiberPropertiesButton.Enable = 'off';
-            app.CentralNucleiButton.Enable = 'off';
-            app.FiberTypingButton.Enable = 'off';
-            app.NonfiberObjectsButton.Enable = 'off';
+            DisableMenuBarButtons(app);
             app.PropertiesControlPanel.Visible = 'on';
             app.PropertiesPanel.Visible = 'on';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
@@ -1476,15 +1362,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CentralNucleiButton
         function CentralNucleiButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
-            app.InitialSegmentationButton.Enable = 'off';
-            app.FiberPredictionButton.Enable = 'off';
-            app.ManualFiberFilterButton.Enable = 'off';
-            app.ManualSegmentationButton.Enable = 'off';
-            app.CentralNucleiButton.Enable = 'off';
-            app.FiberTypingButton.Enable = 'off';
-            app.NonfiberObjectsButton.Enable = 'off';
-            app.FiberPropertiesButton.Enable = 'off';
+            DisableMenuBarButtons(app);
             app.CNFPanel.Visible = 'on';
             app.CNFControlPanel.Visible = 'on';
             app.ThresholdCNF.Enable = 'off';
@@ -1498,15 +1376,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FiberTypingButton
         function FiberTypingButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
-            app.InitialSegmentationButton.Enable = 'off';
-            app.FiberPredictionButton.Enable = 'off';
-            app.ManualFiberFilterButton.Enable = 'off';
-            app.ManualSegmentationButton.Enable = 'off';
-            app.FiberPropertiesButton.Enable = 'off';
-            app.CentralNucleiButton.Enable = 'off';
-            app.FiberTypingButton.Enable = 'off';
-            app.NonfiberObjectsButton.Enable = 'off';
+            DisableMenuBarButtons(app);
             app.FiberTypingPanel.Visible = 'on';
             app.FiberTypingControlPanel.Visible = 'on';
             app.PixelSizeFiberTyping.Enable = 'on';
@@ -1519,15 +1389,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: NonfiberObjectsButton
         function NonfiberObjectsButtonPushed(app, event)
-            app.SelectFilesButton.Enable = 'off';
-            app.InitialSegmentationButton.Enable = 'off';
-            app.FiberPredictionButton.Enable = 'off';
-            app.ManualFiberFilterButton.Enable = 'off';
-            app.ManualSegmentationButton.Enable = 'off';
-            app.CentralNucleiButton.Enable = 'off';
-            app.FiberTypingButton.Enable = 'off';
-            app.NonfiberObjectsButton.Enable = 'off';
-            app.FiberPropertiesButton.Enable = 'off';
+            DisableMenuBarButtons(app);
             app.NonfiberPanel.Visible = 'on';
             app.NonfiberControlPanel.Visible = 'on';
             app.NonfiberThreshold.Enable = 'off';
