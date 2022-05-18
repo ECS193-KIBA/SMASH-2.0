@@ -268,6 +268,109 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 ImageData = imread(FileName);
                 app.orig_img = ImageData;
                 app.orig_img_multispectral = ImageData;
+		
+		app.orig_img_multispectral = ImageData;
+		
+		%H&E image
+		
+		%read image
+                HEImage = imread("example.jpg");
+                imshow(HEImage), title("H&E image");
+                text(size(HEImage,2),size(HEImage,1)+15, ...
+                "Image containing H&E", ...
+                "FontSize",7,"HorizontalAlignment","right");
+		
+		
+		
+
+                %use k-means clustering to segment image in RGB color space
+                numColors = 3;
+                L = imsegkmeans(HEImage, numColors); %returns a label corresponding to each cluster
+                B = labeloverlay(HEImage,L);
+                imshow(B)
+                title("RGB")
+		
+		%edge detection using Prewitt Operator
+		
+		%convert rgb image into a grayscale image
+		HEImage = rgb2gray(HEImage);
+		
+		%convert grayscale image into a double
+		HEImage = double(HEImage);
+		
+		%Preallocate filter image matrix with all zeroes
+		FilteredHEImage = zeros(size(HEImage));
+		
+		%Apply Prewitt Operator
+		Mx = [-1 0 1; -1 0 1; -1 0 1];
+		My = [-1 -1 -1; 0 0 0; 1 1 1];
+		
+		for i = 1:size(HEImage, 1) - 2
+		    for j = 1:size(HEImage, 2) - 2
+		        % approximate gradient
+        	        Gx = sum(sum(Mx.*HEImage(i:i+2, j:j+2)));
+                        Gy = sum(sum(My.*HEImage(i:i+2, j:j+2)));
+                 
+                        % vector magnitude
+                        FilteredHEImage(i+1, j+1) = sqrt(Gx.^2 + Gy.^2);
+         
+                    end
+                end
+		
+		% Display Image
+		FilteredHEImage = uint8(FilteredHEImage);
+		figure, imshow(FilteredHEImage); title('FilteredHEImage');
+  
+		% threshold value
+	        ThresholdValue = 100; % varies between [0 255]
+                OutputHEImage = max(FilteredHEImage, ThresholdValue);
+		OutputHEImage(OutputHEImage == round(ThresholdValue)) = 0;
+  
+		% Display Output Image
+		OutputHEImagee = im2bw(OutputHEImage);
+		figure, imshow(OutputHEImage); title('Edge Detected Image');
+		
+		
+
+                %convert rgb into L*a*b*
+                Lab_HEImage = rgb2lab(HEImage);
+
+                %use k-means clustering to classify in a*b* space
+                ab = Lab_HEImage(:,:,2:3);
+                ab = im2single(ab);
+                pixel_labels = imsegkmeans(ab,numColors, "NumAttempts",3)
+                B2 = labeloverlay(HEImage, pixel_labels);
+                imshow(B2)
+                title("Labeled Image a*b*")
+
+                %create images that segment H&E by color
+                mask1 = pixel_labels == 1;
+                cluster1 = HEImage.*uint8(mask1);
+                imshow(cluster1)
+                title("Objects in Cluster 1");
+
+                mask2 = pixel_labels == 2;
+                cluster2 = HEImage.*uint8(mask2);    
+                imshow(cluster2)
+                title("Objects in Cluster 2");
+
+                mask3 = pixel_labels == 3;
+                cluster3 = HEImage.*uint8(mask3);
+                imshow(cluster3)
+                title("Objects in Cluster 3");
+
+                %segment Nuclei
+                L = Lab_HEImage(:,:,1);
+                L_blue = L.*double(mask3);
+                L_blue = rescale(L_blue);
+                idx_light_blue = imbinarize(nonzeros(L_blue));
+                blue_idx = find(mask3);
+                mask_dark_blue = mask3;
+                mask_dark_blue(blue_idx(idx_light_blue)) = 0;
+                blue_nuclei = HEImage.*uint8(mask_dark_blue);
+                imshow(blue_nuclei)
+                title("Blue Nuclei");
+		
 
                 % Append RGB color channels to channelRGB for RGB images
                 % Add red, green, and blue to channelRGB
