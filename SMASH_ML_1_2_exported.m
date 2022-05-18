@@ -15,8 +15,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeumpixelEditField_3Label_2  matlab.ui.control.Label
         NonfiberClassificationChannelColorBox  matlab.ui.control.UIAxes
         NonfiberClassificationPanel     matlab.ui.container.Panel
-        PercentClassifiedTextArea       matlab.ui.control.TextArea
-        PercentClassifiedTextAreaLabel  matlab.ui.control.Label
+        PositiveNonfiberObjectsLabel    matlab.ui.control.Label
+        OriginalImageLabel              matlab.ui.control.Label
+        PercentPositiveTextArea         matlab.ui.control.TextArea
+        PercentPositiveLabel            matlab.ui.control.Label
         NonfiberClassificationAccept    matlab.ui.control.Button
         NonfiberClassificationAdjust    matlab.ui.control.Button
         NonfiberClassificationThreshold  matlab.ui.control.NumericEditField
@@ -185,6 +187,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         classified_nonfiber_ave_g
         classified_nonfiber_ponf
         classified_nonfiber_areas
+        classified_nonfiber_percentage
         
         segmodel
         channelRGB % Contains all the RGB values of the channel colors
@@ -1786,7 +1789,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationColorDropDown.Enable = 'on';
             app.WritetoExcelNonfiberClassification.Enable = 'off';
             app.NonfiberClassificationChannelColorBox.Visible = 'on';
-            app.PercentClassifiedTextArea.Visible = 'on';
+            app.PercentPositiveTextArea.Visible = 'on';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
         end
 
@@ -1819,8 +1822,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 img_out = single(app.nf_bw_obj).* 0.3;
 
                 p_ind = find(app.classified_nonfiber_ponf); % vector of qualifying regions
-                percent_classified = length(p_ind) / app.classified_nonfiber_num_obj * 100;
-                app.PercentClassifiedTextArea.Value = string(percent_classified) + " %";
+                app.classified_nonfiber_percentage = mean(app.classified_nonfiber_ponf) * 100;
+                app.PercentPositiveTextArea.Value = string(app.classified_nonfiber_percentage) + " %";
                 for i = 1:length(p_ind)
                     img_out(app.nf_mask == p_ind(i)) = 1; % whiten region
                 end
@@ -1865,13 +1868,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             header{2,1} = mean(app.classified_nonfiber_areas).*pix_area;
             header{2,2} = mean(app.classified_nonfiber_ave_g);
-            header{2,3} = mean(app.classified_nonfiber_ponf);
+            header{2,3} = app.classified_nonfiber_percentage;
 
             header{3,1} = 'Positive Classified Nonfiber Object Size';
             header{3,2} = 'Positive Classified Nonfiber Object Intensity';
             header{3,3} = 'Number Positive';
 
-            header{4,1} = mean(app.areas(app.classified_nonfiber_ponf)).*pix_area;
+            header{4,1} = mean(app.classified_nonfiber_areas(app.classified_nonfiber_ponf)).*pix_area;
             header{4,2} = mean(app.classified_nonfiber_ave_g(app.classified_nonfiber_ponf));
             header{4,3} = sum(app.classified_nonfiber_ponf);
 
@@ -1893,14 +1896,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             out_data(:,3) = app.classified_nonfiber_ponf;
 
             out_file = cat(1,header,num2cell(out_data));
-%             if str2double(app.FiberTypeColorDropDown.Value) == 2
-%                 writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','L1');
-%             elseif str2double(app.FiberTypeColorDropDown.Value) == 1
-%                 writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','O1');
-%             elseif str2double(app.FiberTypeColorDropDown.Value) == 3
-%                 writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','R1');
-%             end
-%             
+            
             writecell(out_file, [app.Files{4} '_Properties.xlsx'], 'Range','S1');
             app.Prompt.Text = 'Write to Excel done';
             cd(app.Files{3})
@@ -2242,15 +2238,18 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create ManualSegmentationControls
             app.ManualSegmentationControls = uipanel(app.UIFigure);
+            app.ManualSegmentationControls.BorderType = 'none';
             app.ManualSegmentationControls.Visible = 'off';
+            app.ManualSegmentationControls.BackgroundColor = [0.9412 0.9412 0.9412];
             app.ManualSegmentationControls.FontName = 'Avenir';
-            app.ManualSegmentationControls.Position = [45 252 263 318];
+            app.ManualSegmentationControls.FontWeight = 'bold';
+            app.ManualSegmentationControls.Position = [36 90 247 469];
 
             % Create StartDrawingButton
             app.StartDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
             app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
             app.StartDrawingButton.FontName = 'Avenir';
-            app.StartDrawingButton.Position = [28 249 100 24];
+            app.StartDrawingButton.Position = [28 401 100 24];
             app.StartDrawingButton.Text = 'Start Drawing';
 
             % Create AcceptLineButton
@@ -2259,33 +2258,33 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AcceptLineButton.BackgroundColor = [0.9608 0.9608 0.9608];
             app.AcceptLineButton.FontName = 'Avenir';
             app.AcceptLineButton.Enable = 'off';
-            app.AcceptLineButton.Position = [149 222 100 51];
+            app.AcceptLineButton.Position = [149 374 100 51];
             app.AcceptLineButton.Text = 'Accept Line';
 
             % Create CloseManualSegmentationButton
             app.CloseManualSegmentationButton = uibutton(app.ManualSegmentationControls, 'push');
             app.CloseManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseManualSegmentationButtonPushed, true);
             app.CloseManualSegmentationButton.FontName = 'Avenir';
-            app.CloseManualSegmentationButton.Position = [35 47 182 60];
+            app.CloseManualSegmentationButton.Position = [35 199 182 60];
             app.CloseManualSegmentationButton.Text = 'Close Manual Segmentation';
 
             % Create DrawingModeLabel
             app.DrawingModeLabel = uilabel(app.ManualSegmentationControls);
             app.DrawingModeLabel.FontName = 'Avenir';
-            app.DrawingModeLabel.Position = [30 283 85 22];
+            app.DrawingModeLabel.Position = [30 435 85 22];
             app.DrawingModeLabel.Text = 'Drawing Mode';
 
             % Create MergeObjectsModeLabel
             app.MergeObjectsModeLabel = uilabel(app.ManualSegmentationControls);
             app.MergeObjectsModeLabel.FontName = 'Avenir';
-            app.MergeObjectsModeLabel.Position = [27 181 121 22];
+            app.MergeObjectsModeLabel.Position = [27 333 121 22];
             app.MergeObjectsModeLabel.Text = 'Merge Objects Mode';
 
             % Create StartMergingButton
             app.StartMergingButton = uibutton(app.ManualSegmentationControls, 'push');
             app.StartMergingButton.ButtonPushedFcn = createCallbackFcn(app, @StartMergingButtonPushed, true);
             app.StartMergingButton.FontName = 'Avenir';
-            app.StartMergingButton.Position = [29 146 100 24];
+            app.StartMergingButton.Position = [29 298 100 24];
             app.StartMergingButton.Text = 'Start Merging';
 
             % Create FinishDrawingButton
@@ -2293,7 +2292,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FinishDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishDrawingButtonPushed, true);
             app.FinishDrawingButton.FontName = 'Avenir';
             app.FinishDrawingButton.Enable = 'off';
-            app.FinishDrawingButton.Position = [29 220 100 24];
+            app.FinishDrawingButton.Position = [29 372 100 24];
             app.FinishDrawingButton.Text = 'Finish Drawing';
 
             % Create Panel
@@ -2832,10 +2831,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create NonfiberClassificationPanel
             app.NonfiberClassificationPanel = uipanel(app.UIFigure);
+            app.NonfiberClassificationPanel.BorderType = 'none';
             app.NonfiberClassificationPanel.Visible = 'off';
-            app.NonfiberClassificationPanel.BackgroundColor = [1 1 1];
+            app.NonfiberClassificationPanel.BackgroundColor = [0.9412 0.9412 0.9412];
             app.NonfiberClassificationPanel.FontName = 'Avenir';
-            app.NonfiberClassificationPanel.Position = [282 56 876 605];
+            app.NonfiberClassificationPanel.Position = [282 52 876 605];
 
             % Create NonfiberClassificationAxes_R
             app.NonfiberClassificationAxes_R = uiaxes(app.NonfiberClassificationPanel);
@@ -2845,7 +2845,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationAxes_R.FontName = 'Avenir';
             app.NonfiberClassificationAxes_R.XColor = 'none';
             app.NonfiberClassificationAxes_R.YColor = 'none';
-            app.NonfiberClassificationAxes_R.Position = [504 1 365 556];
+            app.NonfiberClassificationAxes_R.Position = [450 90 405 469];
 
             % Create NonfiberClassificationAxes_L
             app.NonfiberClassificationAxes_L = uiaxes(app.NonfiberClassificationPanel);
@@ -2855,44 +2855,59 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationAxes_L.FontName = 'Avenir';
             app.NonfiberClassificationAxes_L.XColor = 'none';
             app.NonfiberClassificationAxes_L.YColor = 'none';
-            app.NonfiberClassificationAxes_L.Position = [63 1 365 556];
+            app.NonfiberClassificationAxes_L.Position = [2 90 405 469];
 
             % Create ThresholdEditField_2Label_3
             app.ThresholdEditField_2Label_3 = uilabel(app.NonfiberClassificationPanel);
             app.ThresholdEditField_2Label_3.HorizontalAlignment = 'right';
             app.ThresholdEditField_2Label_3.FontName = 'Avenir';
-            app.ThresholdEditField_2Label_3.Position = [204 10 59 22];
+            app.ThresholdEditField_2Label_3.Position = [215 13 59 22];
             app.ThresholdEditField_2Label_3.Text = 'Threshold';
 
             % Create NonfiberClassificationThreshold
             app.NonfiberClassificationThreshold = uieditfield(app.NonfiberClassificationPanel, 'numeric');
             app.NonfiberClassificationThreshold.FontName = 'Avenir';
-            app.NonfiberClassificationThreshold.Position = [278 10 100 22];
+            app.NonfiberClassificationThreshold.Position = [289 13 100 22];
 
             % Create NonfiberClassificationAdjust
             app.NonfiberClassificationAdjust = uibutton(app.NonfiberClassificationPanel, 'push');
             app.NonfiberClassificationAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAdjustButtonPushed, true);
             app.NonfiberClassificationAdjust.FontName = 'Avenir';
-            app.NonfiberClassificationAdjust.Position = [418 9 100 24];
+            app.NonfiberClassificationAdjust.Position = [429 12 100 24];
             app.NonfiberClassificationAdjust.Text = 'Adjust';
 
             % Create NonfiberClassificationAccept
             app.NonfiberClassificationAccept = uibutton(app.NonfiberClassificationPanel, 'push');
             app.NonfiberClassificationAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAcceptButtonPushed, true);
             app.NonfiberClassificationAccept.FontName = 'Avenir';
-            app.NonfiberClassificationAccept.Position = [542 8 100 24];
+            app.NonfiberClassificationAccept.Position = [553 11 100 24];
             app.NonfiberClassificationAccept.Text = 'Accept';
 
-            % Create PercentClassifiedTextAreaLabel
-            app.PercentClassifiedTextAreaLabel = uilabel(app.NonfiberClassificationPanel);
-            app.PercentClassifiedTextAreaLabel.HorizontalAlignment = 'right';
-            app.PercentClassifiedTextAreaLabel.FontName = 'Avenir';
-            app.PercentClassifiedTextAreaLabel.Position = [425 549 100 22];
-            app.PercentClassifiedTextAreaLabel.Text = 'Percent Classified';
+            % Create PercentPositiveLabel
+            app.PercentPositiveLabel = uilabel(app.NonfiberClassificationPanel);
+            app.PercentPositiveLabel.HorizontalAlignment = 'right';
+            app.PercentPositiveLabel.FontName = 'Avenir';
+            app.PercentPositiveLabel.Position = [323 147 94 22];
+            app.PercentPositiveLabel.Text = 'Percent Positive:';
 
-            % Create PercentClassifiedTextArea
-            app.PercentClassifiedTextArea = uitextarea(app.NonfiberClassificationPanel);
-            app.PercentClassifiedTextArea.Position = [540 513 150 60];
+            % Create PercentPositiveTextArea
+            app.PercentPositiveTextArea = uitextarea(app.NonfiberClassificationPanel);
+            app.PercentPositiveTextArea.FontName = 'Avenir';
+            app.PercentPositiveTextArea.Position = [431 147 150 24];
+
+            % Create OriginalImageLabel
+            app.OriginalImageLabel = uilabel(app.NonfiberClassificationPanel);
+            app.OriginalImageLabel.FontName = 'Avenir';
+            app.OriginalImageLabel.FontWeight = 'bold';
+            app.OriginalImageLabel.Position = [177 458 89 22];
+            app.OriginalImageLabel.Text = 'Original Image';
+
+            % Create PositiveNonfiberObjectsLabel
+            app.PositiveNonfiberObjectsLabel = uilabel(app.NonfiberClassificationPanel);
+            app.PositiveNonfiberObjectsLabel.FontName = 'Avenir';
+            app.PositiveNonfiberObjectsLabel.FontWeight = 'bold';
+            app.PositiveNonfiberObjectsLabel.Position = [589 462 150 22];
+            app.PositiveNonfiberObjectsLabel.Text = 'Positive Nonfiber Objects';
 
             % Create NonfiberClassificationControlPanel
             app.NonfiberClassificationControlPanel = uipanel(app.UIFigure);
