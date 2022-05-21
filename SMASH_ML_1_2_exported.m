@@ -3,6 +3,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        ManualSegmentationControls      matlab.ui.container.Panel
+        FinishDrawingButton             matlab.ui.control.Button
+        StartMergingButton              matlab.ui.control.Button
+        MergeObjectsModeLabel           matlab.ui.control.Label
+        DrawingModeLabel                matlab.ui.control.Label
+        CloseManualSegmentationButton   matlab.ui.control.Button
+        AcceptLineButton                matlab.ui.control.Button
+        StartDrawingButton              matlab.ui.control.Button
         ImageBackground                 matlab.ui.container.Panel
         UIAxes                          matlab.ui.control.UIAxes
         NonfiberClassificationPanel     matlab.ui.container.Panel
@@ -100,14 +108,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         Panel_2                         matlab.ui.container.Panel
         Image2                          matlab.ui.control.Image
         SMASHLabel                      matlab.ui.control.Label
-        ManualSegmentationControls      matlab.ui.container.Panel
-        FinishDrawingButton             matlab.ui.control.Button
-        StartMergingButton              matlab.ui.control.Button
-        MergeObjectsModeLabel           matlab.ui.control.Label
-        DrawingModeLabel                matlab.ui.control.Label
-        CloseManualSegmentationButton   matlab.ui.control.Button
-        AcceptLineButton                matlab.ui.control.Button
-        StartDrawingButton              matlab.ui.control.Button
         Toolbar                         matlab.ui.container.Panel
         NonfiberClassificationButton    matlab.ui.control.Button
         InitialSegmentationButton       matlab.ui.control.Button
@@ -875,6 +875,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: ManualSortingButton
         function ManualSortingButtonPushed(app, event)
             app.ManualSortingButton.Enable = 'off';
+            app.ImageBackground.Visible = 'off';
             uiresume(app.UIFigure);
         end
 
@@ -1412,10 +1413,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: InitialSegmentationButton
         function InitialSegmentationButtonPushed(app, event)
             DisableMenuBarButtons(app);
+            app.ImageBackground.Visible = 'on';
             app.SegmentationParameters.Visible = 'on';
             app.FiberOutlineChannelColorBox.Visible = 'on';
 
             if app.IsBatchMode == 1
+                app.ImageBackground.Visible = 'on';
                 app.Prompt.Text = '';
                 app.FiberPredictionControlPanel.Visible = 'off';
             end
@@ -1424,6 +1427,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: ManualSegmentationButton
         function ManualSegmentationButtonPushed(app, event)
             DisableMenuBarButtons(app);
+            app.ImageBackground.Visible = 'on';
             app.ManualSegmentationControls.Visible = 'on';
             app.bw_obj = ReadMaskFromMaskFile(app);
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w'),'Parent',app.UIAxes);
@@ -1433,6 +1437,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function FiberPredictionButtonPushed(app, event)
             if app.IsBatchMode == 0
                 DisableMenuBarButtons(app);
+                app.ImageBackground.Visible = 'on';
                 app.FiberPredictionControlPanel.Visible = 'on';
                 % acquire mask and show over image
                 app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
@@ -1442,6 +1447,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.SortingThresholdSlider.Enable = 'on';
             else
                 app.Prompt.Text = '';
+                app.ImageBackground.Visible = 'on';
                 app.SelectFilesButton.Enable = 'off';
                 app.InitialSegmentationButton.Enable = 'off';
                 app.FiberPredictionControlPanel.Visible = 'on';
@@ -1456,6 +1462,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: ManualFiberFilterButton
         function ManualFiberFilterButtonPushed(app, event)
             DisableMenuBarButtons(app);
+            app.ImageBackground.Visible = 'on';
             app.ManualFilterControls.Visible = 'on';
             app.RemoveObjectsButton.Enable = 'on';
             app.FinishManualFilteringButton.Enable = 'off';
@@ -1766,7 +1773,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             fti = app.orig_img_multispectral(:,:,str2double(channel_name));
             threshes = multithresh(fti,10);
             app.nonfiber_classification_cutoff_avg = threshes(2);
-            app.NonfiberClassificationThreshold.Enable = 'on';
             app.NonfiberClassificationThreshold.Value = double(app.nonfiber_classification_cutoff_avg);
 
             % Display image
@@ -1794,7 +1800,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 % Display image
                 imshow(img_out,'Parent',app.NonfiberClassificationAxes_R);
 
-                uiwait(app.UIFigure);       
+                app.NonfiberClassificationThreshold.Enable = 'on';
+                app.NonfiberClassificationThreshold.Editable = 'on';
+                app.NonfiberClassificationAccept.Enable = 'on';
+                app.NonfiberClassificationAdjust.Enable = 'on';
+                app.ClassifyNonfiberObjects.Enable = 'off';
+                app.DoneNonfiberClassification.Enable = 'off';
+
+                uiwait(app.UIFigure);
+
             end
         end
 
@@ -1920,6 +1934,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create ThresholdCNF
             app.ThresholdCNF = uieditfield(app.CNFPanel, 'numeric');
+            app.ThresholdCNF.Limits = [0 Inf];
             app.ThresholdCNF.FontName = 'Avenir';
             app.ThresholdCNF.Position = [280 38 100 22];
 
@@ -2092,6 +2107,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create ThresholdEditField
             app.ThresholdEditField = uieditfield(app.FiberTypingPanel, 'numeric');
+            app.ThresholdEditField.Limits = [0 Inf];
             app.ThresholdEditField.FontName = 'Avenir';
             app.ThresholdEditField.Enable = 'off';
             app.ThresholdEditField.Position = [284 39 100 22];
@@ -2193,65 +2209,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationButton.Enable = 'off';
             app.NonfiberClassificationButton.Position = [1012 6 136 33];
             app.NonfiberClassificationButton.Text = 'Nonfiber Classification';
-
-            % Create ManualSegmentationControls
-            app.ManualSegmentationControls = uipanel(app.UIFigure);
-            app.ManualSegmentationControls.BorderType = 'none';
-            app.ManualSegmentationControls.Visible = 'off';
-            app.ManualSegmentationControls.BackgroundColor = [0.9412 0.9412 0.9412];
-            app.ManualSegmentationControls.FontName = 'Avenir';
-            app.ManualSegmentationControls.FontWeight = 'bold';
-            app.ManualSegmentationControls.Position = [36 90 247 469];
-
-            % Create StartDrawingButton
-            app.StartDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
-            app.StartDrawingButton.FontName = 'Avenir';
-            app.StartDrawingButton.Position = [28 401 100 24];
-            app.StartDrawingButton.Text = 'Start Drawing';
-
-            % Create AcceptLineButton
-            app.AcceptLineButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
-            app.AcceptLineButton.BackgroundColor = [0.9608 0.9608 0.9608];
-            app.AcceptLineButton.FontName = 'Avenir';
-            app.AcceptLineButton.Enable = 'off';
-            app.AcceptLineButton.Position = [149 374 100 51];
-            app.AcceptLineButton.Text = 'Accept Line';
-
-            % Create CloseManualSegmentationButton
-            app.CloseManualSegmentationButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.CloseManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseManualSegmentationButtonPushed, true);
-            app.CloseManualSegmentationButton.FontName = 'Avenir';
-            app.CloseManualSegmentationButton.Position = [35 199 182 60];
-            app.CloseManualSegmentationButton.Text = 'Close Manual Segmentation';
-
-            % Create DrawingModeLabel
-            app.DrawingModeLabel = uilabel(app.ManualSegmentationControls);
-            app.DrawingModeLabel.FontName = 'Avenir';
-            app.DrawingModeLabel.Position = [30 435 85 22];
-            app.DrawingModeLabel.Text = 'Drawing Mode';
-
-            % Create MergeObjectsModeLabel
-            app.MergeObjectsModeLabel = uilabel(app.ManualSegmentationControls);
-            app.MergeObjectsModeLabel.FontName = 'Avenir';
-            app.MergeObjectsModeLabel.Position = [27 333 121 22];
-            app.MergeObjectsModeLabel.Text = 'Merge Objects Mode';
-
-            % Create StartMergingButton
-            app.StartMergingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.StartMergingButton.ButtonPushedFcn = createCallbackFcn(app, @StartMergingButtonPushed, true);
-            app.StartMergingButton.FontName = 'Avenir';
-            app.StartMergingButton.Position = [29 298 100 24];
-            app.StartMergingButton.Text = 'Start Merging';
-
-            % Create FinishDrawingButton
-            app.FinishDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.FinishDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishDrawingButtonPushed, true);
-            app.FinishDrawingButton.FontName = 'Avenir';
-            app.FinishDrawingButton.Enable = 'off';
-            app.FinishDrawingButton.Position = [29 372 100 24];
-            app.FinishDrawingButton.Text = 'Finish Drawing';
 
             % Create Panel
             app.Panel = uipanel(app.UIFigure);
@@ -2424,6 +2381,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeNonfiberObjects
             app.PixelSizeNonfiberObjects = uieditfield(app.NonfiberControlPanel, 'numeric');
+            app.PixelSizeNonfiberObjects.Limits = [0 Inf];
             app.PixelSizeNonfiberObjects.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberObjectsValueChanged, true);
             app.PixelSizeNonfiberObjects.FontName = 'Avenir';
             app.PixelSizeNonfiberObjects.Position = [125 253 100 22];
@@ -2455,6 +2413,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeCentralNuclei
             app.PixelSizeCentralNuclei = uieditfield(app.CNFControlPanel, 'numeric');
+            app.PixelSizeCentralNuclei.Limits = [0 Inf];
             app.PixelSizeCentralNuclei.ValueChangedFcn = createCallbackFcn(app, @PixelSizeCNFValueChanged, true);
             app.PixelSizeCentralNuclei.FontName = 'Avenir';
             app.PixelSizeCentralNuclei.Position = [121 261 100 22];
@@ -2505,6 +2464,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create DistancefromborderEditField
             app.DistancefromborderEditField = uieditfield(app.CNFControlPanel, 'numeric');
+            app.DistancefromborderEditField.Limits = [0 Inf];
             app.DistancefromborderEditField.FontName = 'Avenir';
             app.DistancefromborderEditField.Position = [148 194 100 22];
 
@@ -2517,6 +2477,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create MinimumNucleusSizeum2EditField
             app.MinimumNucleusSizeum2EditField = uieditfield(app.CNFControlPanel, 'numeric');
+            app.MinimumNucleusSizeum2EditField.Limits = [0 Inf];
             app.MinimumNucleusSizeum2EditField.FontName = 'Avenir';
             app.MinimumNucleusSizeum2EditField.Position = [150 163 100 22];
 
@@ -2575,6 +2536,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeFiberProperties
             app.PixelSizeFiberProperties = uieditfield(app.PropertiesControlPanel, 'numeric');
+            app.PixelSizeFiberProperties.Limits = [0 Inf];
             app.PixelSizeFiberProperties.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPropertiesValueChanged, true);
             app.PixelSizeFiberProperties.FontName = 'Avenir';
             app.PixelSizeFiberProperties.Position = [139 218 100 22];
@@ -2612,6 +2574,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeFiberTyping
             app.PixelSizeFiberTyping = uieditfield(app.FiberTypingControlPanel, 'numeric');
+            app.PixelSizeFiberTyping.Limits = [0 Inf];
             app.PixelSizeFiberTyping.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberTypingValueChanged, true);
             app.PixelSizeFiberTyping.FontName = 'Avenir';
             app.PixelSizeFiberTyping.Position = [118 242 100 22];
@@ -2692,6 +2655,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create NonfiberThreshold
             app.NonfiberThreshold = uieditfield(app.NonfiberPanel, 'numeric');
+            app.NonfiberThreshold.Limits = [0 Inf];
             app.NonfiberThreshold.FontName = 'Avenir';
             app.NonfiberThreshold.Position = [278 10 100 22];
 
@@ -2813,6 +2777,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeNonfiberClassification
             app.PixelSizeNonfiberClassification = uieditfield(app.NonfiberClassificationControlPanel, 'numeric');
+            app.PixelSizeNonfiberClassification.Limits = [0 Inf];
             app.PixelSizeNonfiberClassification.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberClassificationValueChanged, true);
             app.PixelSizeNonfiberClassification.FontName = 'Avenir';
             app.PixelSizeNonfiberClassification.Position = [118 242 100 22];
@@ -2903,13 +2868,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create NonfiberClassificationThreshold
             app.NonfiberClassificationThreshold = uieditfield(app.NonfiberClassificationPanel, 'numeric');
+            app.NonfiberClassificationThreshold.Limits = [0 Inf];
+            app.NonfiberClassificationThreshold.Editable = 'off';
             app.NonfiberClassificationThreshold.FontName = 'Avenir';
+            app.NonfiberClassificationThreshold.Enable = 'off';
             app.NonfiberClassificationThreshold.Position = [289 13 100 22];
 
             % Create NonfiberClassificationAdjust
             app.NonfiberClassificationAdjust = uibutton(app.NonfiberClassificationPanel, 'push');
             app.NonfiberClassificationAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAdjustButtonPushed, true);
             app.NonfiberClassificationAdjust.FontName = 'Avenir';
+            app.NonfiberClassificationAdjust.Enable = 'off';
             app.NonfiberClassificationAdjust.Position = [429 12 100 24];
             app.NonfiberClassificationAdjust.Text = 'Adjust';
 
@@ -2917,6 +2886,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationAccept = uibutton(app.NonfiberClassificationPanel, 'push');
             app.NonfiberClassificationAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAcceptButtonPushed, true);
             app.NonfiberClassificationAccept.FontName = 'Avenir';
+            app.NonfiberClassificationAccept.Enable = 'off';
             app.NonfiberClassificationAccept.Position = [553 11 100 24];
             app.NonfiberClassificationAccept.Text = 'Accept';
 
@@ -2929,6 +2899,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PercentPositiveTextArea
             app.PercentPositiveTextArea = uitextarea(app.NonfiberClassificationPanel);
+            app.PercentPositiveTextArea.Editable = 'off';
             app.PercentPositiveTextArea.FontName = 'Avenir';
             app.PercentPositiveTextArea.Position = [431 147 150 24];
 
@@ -2962,6 +2933,64 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIAxes.GridColor = 'none';
             app.UIAxes.MinorGridColor = 'none';
             app.UIAxes.Position = [7 -51 897 633];
+
+            % Create ManualSegmentationControls
+            app.ManualSegmentationControls = uipanel(app.UIFigure);
+            app.ManualSegmentationControls.Visible = 'off';
+            app.ManualSegmentationControls.BackgroundColor = [1 1 1];
+            app.ManualSegmentationControls.FontName = 'Avenir';
+            app.ManualSegmentationControls.FontWeight = 'bold';
+            app.ManualSegmentationControls.Position = [18 262 265 309];
+
+            % Create StartDrawingButton
+            app.StartDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
+            app.StartDrawingButton.FontName = 'Avenir';
+            app.StartDrawingButton.Position = [28 240 100 24];
+            app.StartDrawingButton.Text = 'Start Drawing';
+
+            % Create AcceptLineButton
+            app.AcceptLineButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
+            app.AcceptLineButton.BackgroundColor = [0.9608 0.9608 0.9608];
+            app.AcceptLineButton.FontName = 'Avenir';
+            app.AcceptLineButton.Enable = 'off';
+            app.AcceptLineButton.Position = [149 213 100 51];
+            app.AcceptLineButton.Text = 'Accept Line';
+
+            % Create CloseManualSegmentationButton
+            app.CloseManualSegmentationButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.CloseManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseManualSegmentationButtonPushed, true);
+            app.CloseManualSegmentationButton.FontName = 'Avenir';
+            app.CloseManualSegmentationButton.Position = [35 38 182 60];
+            app.CloseManualSegmentationButton.Text = 'Close Manual Segmentation';
+
+            % Create DrawingModeLabel
+            app.DrawingModeLabel = uilabel(app.ManualSegmentationControls);
+            app.DrawingModeLabel.FontName = 'Avenir';
+            app.DrawingModeLabel.Position = [30 274 85 22];
+            app.DrawingModeLabel.Text = 'Drawing Mode';
+
+            % Create MergeObjectsModeLabel
+            app.MergeObjectsModeLabel = uilabel(app.ManualSegmentationControls);
+            app.MergeObjectsModeLabel.FontName = 'Avenir';
+            app.MergeObjectsModeLabel.Position = [27 172 121 22];
+            app.MergeObjectsModeLabel.Text = 'Merge Objects Mode';
+
+            % Create StartMergingButton
+            app.StartMergingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.StartMergingButton.ButtonPushedFcn = createCallbackFcn(app, @StartMergingButtonPushed, true);
+            app.StartMergingButton.FontName = 'Avenir';
+            app.StartMergingButton.Position = [29 137 100 24];
+            app.StartMergingButton.Text = 'Start Merging';
+
+            % Create FinishDrawingButton
+            app.FinishDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.FinishDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishDrawingButtonPushed, true);
+            app.FinishDrawingButton.FontName = 'Avenir';
+            app.FinishDrawingButton.Enable = 'off';
+            app.FinishDrawingButton.Position = [29 211 100 24];
+            app.FinishDrawingButton.Text = 'Finish Drawing';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
