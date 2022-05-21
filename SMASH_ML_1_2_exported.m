@@ -1766,7 +1766,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             fti = app.orig_img_multispectral(:,:,str2double(channel_name));
             threshes = multithresh(fti,10);
             app.nonfiber_classification_cutoff_avg = threshes(2);
-            app.NonfiberClassificationThreshold.Enable = 'on';
             app.NonfiberClassificationThreshold.Value = double(app.nonfiber_classification_cutoff_avg);
 
             % Display image
@@ -1794,7 +1793,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 % Display image
                 imshow(img_out,'Parent',app.NonfiberClassificationAxes_R);
 
-                uiwait(app.UIFigure);       
+                app.NonfiberClassificationThreshold.Enable = 'on';
+                app.NonfiberClassificationThreshold.Editable = 'on';
+                app.NonfiberClassificationAccept.Enable = 'on';
+                app.NonfiberClassificationAdjust.Enable = 'on';
+                app.ClassifyNonfiberObjects.Enable = 'off';
+                app.DoneNonfiberClassification.Enable = 'off';
+
+                uiwait(app.UIFigure);
+
             end
         end
 
@@ -2914,13 +2921,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Create NonfiberClassificationThreshold
             app.NonfiberClassificationThreshold = uieditfield(app.NonfiberClassificationPanel, 'numeric');
             app.NonfiberClassificationThreshold.Limits = [0 Inf];
+            app.NonfiberClassificationThreshold.Editable = 'off';
             app.NonfiberClassificationThreshold.FontName = 'Avenir';
+            app.NonfiberClassificationThreshold.Enable = 'off';
             app.NonfiberClassificationThreshold.Position = [289 13 100 22];
 
             % Create NonfiberClassificationAdjust
             app.NonfiberClassificationAdjust = uibutton(app.NonfiberClassificationPanel, 'push');
             app.NonfiberClassificationAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAdjustButtonPushed, true);
             app.NonfiberClassificationAdjust.FontName = 'Avenir';
+            app.NonfiberClassificationAdjust.Enable = 'off';
             app.NonfiberClassificationAdjust.Position = [429 12 100 24];
             app.NonfiberClassificationAdjust.Text = 'Adjust';
 
@@ -2928,6 +2938,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationAccept = uibutton(app.NonfiberClassificationPanel, 'push');
             app.NonfiberClassificationAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAcceptButtonPushed, true);
             app.NonfiberClassificationAccept.FontName = 'Avenir';
+            app.NonfiberClassificationAccept.Enable = 'off';
             app.NonfiberClassificationAccept.Position = [553 11 100 24];
             app.NonfiberClassificationAccept.Text = 'Accept';
 
@@ -2940,6 +2951,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PercentPositiveTextArea
             app.PercentPositiveTextArea = uitextarea(app.NonfiberClassificationPanel);
+            app.PercentPositiveTextArea.Editable = 'off';
             app.PercentPositiveTextArea.FontName = 'Avenir';
             app.PercentPositiveTextArea.Position = [431 147 150 24];
 
