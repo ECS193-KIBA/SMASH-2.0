@@ -731,6 +731,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.FiberTypingButton.Enable = 'on';
                 app.NonfiberObjectsButton.Enable = 'on';
             else
+                app.SortingThresholdSlider.Enable = 'off';
                 numberOfFilesSelected = length(app.BatchModeFileNames);
 
                 for k=1:numberOfFilesSelected
@@ -1452,10 +1453,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.SelectFilesButton.Enable = 'off';
                 app.InitialSegmentationButton.Enable = 'off';
                 app.FiberPredictionControlPanel.Visible = 'on';
-                app.SortingThresholdSlider.Visible = 'off';
                 app.ManualSortingButton.Enable = 'off';
                 app.ManualSortingButton.Visible = 'off';
-                app.SortingThresholdHigherrequiresmoremanualsortingLabel.Visible = 'off';
+                app.SortingThresholdSlider.Visible = 'on';
                 app.FilterButton.Enable = 'on';
             end
 
