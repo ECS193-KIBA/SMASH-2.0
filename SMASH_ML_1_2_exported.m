@@ -617,7 +617,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Run file initialization
             FileInitialization(app, FileName, PathName, FilterIndex);
-           
+            app.ImageBackground.Visible = 'on';
         end
 
         % Button pushed function: SegmentButton
@@ -769,6 +769,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
 
                 app.SortingAxesPanel.Visible = 'off';
+                app.ImageBackground.Visible = 'on';
             
             hiprobnon = ~ismember(nonfiberindex,maybe);  % Find the index of regions that are nonfiber with high probability
             hiprobnonidx = nonzeros(hiprobnon.*nonfiberindex);
@@ -941,6 +942,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CalculateFiberProperties
         function CalculateFiberPropertiesPushed(app, event)
+            app.PropertiesPanel.Visible = 'on';
+            app.ImageBackground.Visible = 'off';
+
             app.WritetoExcelButton.Enable = 'on';
             app.pix_size = app.PixelSizeFiberProperties.Value;
             app.output_path = app.FiberPropertiesDataOutputFolder.Value;
@@ -966,6 +970,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = '';
             app.PropertiesControlPanel.Visible = 'off';
             app.PropertiesPanel.Visible = 'off';
+            app.ImageBackground.Visible = 'on';
             EnableMenuBarButtons(app);
         end
 
@@ -1463,9 +1468,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: FiberPropertiesButton
         function FiberPropertiesButtonPushed(app, event)
             DisableMenuBarButtons(app);
-            app.ImageBackground.Visible = 'off';
             app.PropertiesControlPanel.Visible = 'on';
-            app.PropertiesPanel.Visible = 'on';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             app.bw_obj = imclearborder(app.bw_obj,4);
                
@@ -2967,7 +2970,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create ImageBackground
             app.ImageBackground = uipanel(app.UIFigure);
-            app.ImageBackground.BackgroundColor = [0 0 0];
+            app.ImageBackground.Visible = 'off';
+            app.ImageBackground.BackgroundColor = [0.9412 0.9412 0.9412];
             app.ImageBackground.Position = [331 28 827 625];
 
             % Create UIAxes
@@ -2977,9 +2981,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIAxes.FontName = 'Avenir';
             app.UIAxes.XColor = 'none';
             app.UIAxes.YColor = 'none';
-            app.UIAxes.Color = [0 0 0];
+            app.UIAxes.LineWidth = 1;
+            app.UIAxes.Color = [0.9412 0.9412 0.9412];
             app.UIAxes.GridColor = 'none';
             app.UIAxes.MinorGridColor = 'none';
+            app.UIAxes.Box = 'on';
             app.UIAxes.Position = [7 -51 897 633];
 
             % Show the figure after all components are created
