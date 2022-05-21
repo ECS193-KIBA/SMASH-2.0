@@ -875,6 +875,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: ManualSortingButton
         function ManualSortingButtonPushed(app, event)
             app.ManualSortingButton.Enable = 'off';
+            app.ImageBackground.Visible = 'off';
             uiresume(app.UIFigure);
         end
 
@@ -1412,10 +1413,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: InitialSegmentationButton
         function InitialSegmentationButtonPushed(app, event)
             DisableMenuBarButtons(app);
+            app.ImageBackground.Visible = 'on';
             app.SegmentationParameters.Visible = 'on';
             app.FiberOutlineChannelColorBox.Visible = 'on';
 
             if app.IsBatchMode == 1
+                app.ImageBackground.Visible = 'on';
                 app.Prompt.Text = '';
                 app.FiberPredictionControlPanel.Visible = 'off';
             end
@@ -1424,6 +1427,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: ManualSegmentationButton
         function ManualSegmentationButtonPushed(app, event)
             DisableMenuBarButtons(app);
+            app.ImageBackground.Visible = 'on';
             app.ManualSegmentationControls.Visible = 'on';
             app.bw_obj = ReadMaskFromMaskFile(app);
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w'),'Parent',app.UIAxes);
@@ -1433,6 +1437,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function FiberPredictionButtonPushed(app, event)
             if app.IsBatchMode == 0
                 DisableMenuBarButtons(app);
+                app.ImageBackground.Visible = 'on';
                 app.FiberPredictionControlPanel.Visible = 'on';
                 % acquire mask and show over image
                 app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
@@ -1442,6 +1447,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.SortingThresholdSlider.Enable = 'on';
             else
                 app.Prompt.Text = '';
+                app.ImageBackground.Visible = 'on';
                 app.SelectFilesButton.Enable = 'off';
                 app.InitialSegmentationButton.Enable = 'off';
                 app.FiberPredictionControlPanel.Visible = 'on';
@@ -1456,6 +1462,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: ManualFiberFilterButton
         function ManualFiberFilterButtonPushed(app, event)
             DisableMenuBarButtons(app);
+            app.ImageBackground.Visible = 'on';
             app.ManualFilterControls.Visible = 'on';
             app.RemoveObjectsButton.Enable = 'on';
             app.FinishManualFilteringButton.Enable = 'off';
