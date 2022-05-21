@@ -1025,6 +1025,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CalculateCentralNuclei
         function CalculateCentralNucleiPushed(app, event)
+            app.ImageBackground.Visible = 'off';
+            app.CNFPanel.Visible = 'on';
+            app.ThresholdCNF.Enable = 'off';
+            app.AdjustCNF.Enable = 'off';
+            app.AcceptCNF.Enable = 'off';
+
             app.Prompt.Text = '';
             app.CalculateCentralNuclei.Enable = 'off';
             app.DoneButton_CNF.Enable = 'off';
@@ -1147,6 +1153,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = '';
             app.CNFControlPanel.Visible = 'off';
             app.CNFPanel.Visible = 'off';
+            app.ImageBackground.Visible = 'on';
             EnableMenuBarButtons(app);
         end
 
@@ -1471,22 +1478,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PropertiesControlPanel.Visible = 'on';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             app.bw_obj = imclearborder(app.bw_obj,4);
-               
         end
 
         % Button pushed function: CentralNucleiButton
         function CentralNucleiButtonPushed(app, event)
             DisableMenuBarButtons(app);
-            app.ImageBackground.Visible = 'off';
-            app.CNFPanel.Visible = 'on';
+
             app.CNFControlPanel.Visible = 'on';
-            app.ThresholdCNF.Enable = 'off';
-            app.AdjustCNF.Enable = 'off';
-            app.AcceptCNF.Enable = 'off';
             app.CNFExcelWrite.Enable = 'off';
             app.CNFChannelColorBox.Visible = 'on';
+
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
-            
         end
 
         % Button pushed function: FiberTypingButton
