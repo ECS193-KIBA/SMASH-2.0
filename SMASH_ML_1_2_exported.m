@@ -317,10 +317,19 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             imshow(app.orig_img,'Parent',app.UIAxes);
 
             if exist(MaskName,'file') && app.IsBatchMode == 0
+                app.InitialSegmentationButton.Enable = 'on';
+                app.FiberPredictionButton.Enable = 'on';
+                app.ManualSegmentationButton.Enable = 'on';
+                app.ManualFiberFilterButton.Enable = 'on';
+                app.FiberPropertiesButton.Enable = 'on';
+                app.CentralNucleiButton.Enable = 'on';
+                app.FiberTypingButton.Enable = 'on';
+                app.NonfiberObjectsButton.Enable = 'on';
                 EnableMenuBarButtons(app);
             else
                 % Enable all the buttons to be used in batch mode
                 app.InitialSegmentationButton.Enable = 'on';
+                app.FiberPredictionButton.Enable = 'on';
             end
             
             UpdateColorChannelBox(app)
@@ -365,6 +374,61 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Display segmented image
             flat_img =flattenMaskOverlay(app.orig_img,app.bw_obj,1,'w');
             imshow(flat_img,'Parent',app.UIAxes);
+        end
+                   
+        function AquireMaskFiberPrediction(app)
+            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+            app.bw_obj = imclearborder(app.bw_obj,4);
+            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
+        end
+
+        function FiberPredictionWithMediumTree(app)
+            app.FilterButton.Enable = 'off';
+            app.SortingThresholdSlider.Enable = 'off';
+            app.Prompt.Text = 'Filtering, please wait.';
+            
+            drawnow limitrate
+            pix_area = app.pix_size^2;
+            label = bwlabel(app.bw_obj,4);
+            %num_obj = max(max(label));
+            
+            % Get properties of regions
+            Rprop = regionprops('table',label,'Centroid','Area','Eccentricity','Solidity','Extent','Circularity','PixelIdxList');
+            cents = cat(1,Rprop.Centroid);
+            predictors = table(Rprop.Area,Rprop.Eccentricity,Rprop.Solidity,Rprop.Extent,Rprop.Circularity);
+            predictors.Properties.VariableNames{1} = 'Area';
+            predictors.Properties.VariableNames{2} = 'Eccentricity';
+            predictors.Properties.VariableNames{3} = 'Convexity';
+            predictors.Properties.VariableNames{4} = 'Extent';
+            predictors.Properties.VariableNames{5} = 'Circularity';
+           
+            % Predict if a region is a fiber
+            classifier = app.model.MediumTree.ClassificationTree;
+            predictors.Area = pix_area*predictors.Area;
+            [Class, Score] = predict(classifier,predictors);
+            fiberindex = find(Class == 'Fiber');
+            nonfiberindex = find(Class == 'Nonfiber');
+            fiberfiltered = ismember(label,fiberindex);
+            nonfiberfiltered = ismember(label,nonfiberindex);
+            
+            % Determine if fiber prediction is a "maybe"
+            maybe = abs(Score(:,1)-Score(:,2));
+            maybe = find(maybe < app.SortingThresholdSlider.Value);  % Change this value to adjust sensitivty
+            maybefiltered = ismember(label,maybe);
+            
+            tempmask = label;
+            
+            
+            codedim = cat(3,nonfiberfiltered,fiberfiltered,maybefiltered); % Color coded image
+            codedim = uint8(codedim);                                      % Magenta - nonfibers
+            codedim = 255.*codedim;                                        % Cyan - Fibers
+            
+            dispmask = logical((nonfiberfiltered.*maybefiltered) + fiberfiltered); % Show only the fibers and nonfiber maybes
+            
+            imshow(flattenMaskOverlay(app.orig_img,dispmask,0.5,'w'),'Parent',app.UIAxes);
+            app.Prompt.Text = '';
+
+            SaveMaskToMaskFile(app, tempmask);
         end
                    
         function CreateFolderIfDirectoryIsNonexistent(~, pathDirectory)
@@ -628,87 +692,89 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FilterButton
         function FilterButtonPushed(app, event)
-            app.FilterButton.Enable = 'off';
-            app.SortingThresholdSlider.Enable = 'off';
-            app.Prompt.Text = 'Filtering, please wait.';
             
-            drawnow limitrate
-            pix_area = app.pix_size^2;
-            label = bwlabel(app.bw_obj,4);
-            %num_obj = max(max(label));
+            if app.IsBatchMode == 0
+                app.FilterButton.Enable = 'off';
+                app.SortingThresholdSlider.Enable = 'off';
+                app.Prompt.Text = 'Filtering, please wait.';
+                
+                drawnow limitrate
+                pix_area = app.pix_size^2;
+                label = bwlabel(app.bw_obj,4);
+                %num_obj = max(max(label));
             
-            % Get properties of regions
-            Rprop = regionprops('table',label,'Centroid','Area','Eccentricity','Solidity','Extent','Circularity','PixelIdxList');
-            cents = cat(1,Rprop.Centroid);
-            predictors = table(Rprop.Area,Rprop.Eccentricity,Rprop.Solidity,Rprop.Extent,Rprop.Circularity);
-            predictors.Properties.VariableNames{1} = 'Area';
-            predictors.Properties.VariableNames{2} = 'Eccentricity';
-            predictors.Properties.VariableNames{3} = 'Convexity';
-            predictors.Properties.VariableNames{4} = 'Extent';
-            predictors.Properties.VariableNames{5} = 'Circularity';
+                % Get properties of regions
+                Rprop = regionprops('table',label,'Centroid','Area','Eccentricity','Solidity','Extent','Circularity','PixelIdxList');
+                cents = cat(1,Rprop.Centroid);
+                predictors = table(Rprop.Area,Rprop.Eccentricity,Rprop.Solidity,Rprop.Extent,Rprop.Circularity);
+                predictors.Properties.VariableNames{1} = 'Area';
+                predictors.Properties.VariableNames{2} = 'Eccentricity';
+                predictors.Properties.VariableNames{3} = 'Convexity';
+                predictors.Properties.VariableNames{4} = 'Extent';
+                predictors.Properties.VariableNames{5} = 'Circularity';
            
-            % Predict if a region is a fiber
-            classifier = app.model.MediumTree.ClassificationTree;
-            predictors.Area = pix_area*predictors.Area;
-            [Class, Score] = predict(classifier,predictors);
-            fiberindex = find(Class == 'Fiber');
-            nonfiberindex = find(Class == 'Nonfiber');
-            fiberfiltered = ismember(label,fiberindex);
-            nonfiberfiltered = ismember(label,nonfiberindex);
+                % Predict if a region is a fiber
+                classifier = app.model.MediumTree.ClassificationTree;
+                predictors.Area = pix_area*predictors.Area;
+                [Class, Score] = predict(classifier,predictors);
+                fiberindex = find(Class == 'Fiber');
+                nonfiberindex = find(Class == 'Nonfiber');
+                fiberfiltered = ismember(label,fiberindex);
+                nonfiberfiltered = ismember(label,nonfiberindex);
             
-            % Determine if fiber prediction is a "maybe"
-            maybe = abs(Score(:,1)-Score(:,2));
-            maybe = find(maybe < app.SortingThresholdSlider.Value);  % Change this value to adjust sensitivty
-            maybefiltered = ismember(label,maybe);
-            
-            tempmask = label;
-            
-            
-            codedim = cat(3,nonfiberfiltered,fiberfiltered,maybefiltered); % Color coded image
-            codedim = uint8(codedim);                                      % Magenta - nonfibers
-            codedim = 255.*codedim;                                        % Cyan - Fibers
-            
-            dispmask = logical((nonfiberfiltered.*maybefiltered) + fiberfiltered); % Show only the fibers and nonfiber maybes
-            
-            imshow(flattenMaskOverlay(app.orig_img,dispmask,0.5,'w'),'Parent',app.UIAxes);
-            app.Prompt.Text = '';
-            app.ManualSortingButton.Enable = 'on';
-            uiwait(app.UIFigure);
-            
-            
-                app.SortingAxesPanel.Visible = 'on';
+                % Determine if fiber prediction is a "maybe"
+                maybe = abs(Score(:,1)-Score(:,2));
+                maybe = find(maybe < app.SortingThresholdSlider.Value);  % Change this value to adjust sensitivty
+                maybefiltered = ismember(label,maybe);
                 
-                % Manual sorting
-                
-                for i = 1:length(maybe)
-                    app.SortingAxesPanel.Title = [num2str(i) ' of ' num2str(length(maybe))];
-                    app.notfiber = 0;
-                    imshow(codedim,'Parent',app.UIAxesL);
-                    hold(app.UIAxesL,'on');
-                    plot(cents(maybe(i),1),cents(maybe(i),2),'y*','Parent',app.UIAxesL)
-                    xlim(app.UIAxesL,[(cents(maybe(i),1)-100) (cents(maybe(i),1)+100)])
-                    ylim(app.UIAxesL,[(cents(maybe(i),2)-100) (cents(maybe(i),2)+100)])
+                tempmask = label;
+            
+            
+                codedim = cat(3,nonfiberfiltered,fiberfiltered,maybefiltered); % Color coded image
+                codedim = uint8(codedim);                                      % Magenta - nonfibers
+                codedim = 255.*codedim;                                        % Cyan - Fibers
+            
+                dispmask = logical((nonfiberfiltered.*maybefiltered) + fiberfiltered); % Show only the fibers and nonfiber maybes
+            
+                imshow(flattenMaskOverlay(app.orig_img,dispmask,0.5,'w'),'Parent',app.UIAxes);
+                app.Prompt.Text = '';
+                app.ManualSortingButton.Enable = 'on';
+                uiwait(app.UIFigure);
+            
+            
+                    app.SortingAxesPanel.Visible = 'on';
                     
+                    % Manual sorting
                     
-                    imshow(app.orig_img,'Parent',app.UIAxesR);
-                    hold(app.UIAxesR,'on');
-                    plot(cents(maybe(i),1),cents(maybe(i),2),'y*','Parent',app.UIAxesR)
-                    xlim(app.UIAxesR,[(cents(maybe(i),1)-100) (cents(maybe(i),1)+100)])
-                    ylim(app.UIAxesR,[(cents(maybe(i),2)-100) (cents(maybe(i),2)+100)])
-                
-                    uiwait(app.UIFigure);
+                    for i = 1:length(maybe)
+                        app.SortingAxesPanel.Title = [num2str(i) ' of ' num2str(length(maybe))];
+                        app.notfiber = 0;
+                        imshow(codedim,'Parent',app.UIAxesL);
+                        hold(app.UIAxesL,'on');
+                        plot(cents(maybe(i),1),cents(maybe(i),2),'y*','Parent',app.UIAxesL)
+                        xlim(app.UIAxesL,[(cents(maybe(i),1)-100) (cents(maybe(i),1)+100)])
+                        ylim(app.UIAxesL,[(cents(maybe(i),2)-100) (cents(maybe(i),2)+100)])
+                        
                     
-                    if app.notfiber
-                        removeidx = Rprop(maybe(i),7);
-                        tempmask(removeidx.PixelIdxList{1,1}) = 0;
+                        imshow(app.orig_img,'Parent',app.UIAxesR);
+                        hold(app.UIAxesR,'on');
+                        plot(cents(maybe(i),1),cents(maybe(i),2),'y*','Parent',app.UIAxesR)
+                        xlim(app.UIAxesR,[(cents(maybe(i),1)-100) (cents(maybe(i),1)+100)])
+                        ylim(app.UIAxesR,[(cents(maybe(i),2)-100) (cents(maybe(i),2)+100)])
+                    
+                        uiwait(app.UIFigure);
+                        
+                        if app.notfiber
+                            removeidx = Rprop(maybe(i),7);
+                            tempmask(removeidx.PixelIdxList{1,1}) = 0;
+                        end
+                        hold(app.UIAxesL,'off');
+                        hold(app.UIAxesR,'off');
                     end
-                    hold(app.UIAxesL,'off');
-                    hold(app.UIAxesR,'off');
-                end
                 
 
 
-            app.SortingAxesPanel.Visible = 'off';
+                app.SortingAxesPanel.Visible = 'off';
             
             hiprobnon = ~ismember(nonfiberindex,maybe);  % Find the index of regions that are nonfiber with high probability
             hiprobnonidx = nonzeros(hiprobnon.*nonfiberindex);
@@ -723,6 +789,33 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             app.FiberPredictionControlPanel.Visible = 'off';
             EnableMenuBarButtons(app);
+
+            else
+                app.SortingThresholdSlider.Enable = 'off';
+                numberOfFilesSelected = length(app.BatchModeFileNames);
+
+                for k=1:numberOfFilesSelected
+                    % Retrieve the filename of the current file
+                    currentFile = app.BatchModeFileNames{k};
+                    % Add the prompt at the top for indication that batch
+                    % mode is running on which file
+                    promptString = "Batch Mode - In Progress: " + int2str(k-1) + " out of " + int2str(numberOfFilesSelected) + " completed.";
+                    app.Prompt.Text = promptString;
+                    % Go through file initilization
+                    % In file initialization, it enables all the other buttons,
+                    % so you need to change this button to the initial page and
+                    % then continue
+                    FileInitialization(app, currentFile, app.BatchModePathName, app.BatchModeFilterIndex);
+                    % Run filter button functionality
+                    AquireMaskFiberPrediction(app);
+                    FiberPredictionWithMediumTree(app);
+                end
+
+                app.Prompt.Text = 'Batch Mode - Fiber Prediction Completed.';
+            end
+
+
+            
         end
 
         % Button pushed function: AcceptSegmentationButton
@@ -755,6 +848,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 end
 
                 app.Prompt.Text = 'Batch Mode - Initial Segmentation Completed.';
+                app.FiberPredictionButton.Enable = 'on';
+                app.SegmentationParameters.Visible = 'off';
             end
         end
 
@@ -1318,6 +1413,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             DisableMenuBarButtons(app);
             app.SegmentationParameters.Visible = 'on';
             app.FiberOutlineChannelColorBox.Visible = 'on';
+
+            if app.IsBatchMode == 1
+                app.Prompt.Text = '';
+                app.FiberPredictionControlPanel.Visible = 'off';
+            end
         end
 
         % Button pushed function: ManualSegmentationButton
@@ -1330,14 +1430,26 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FiberPredictionButton
         function FiberPredictionButtonPushed(app, event)
-            DisableMenuBarButtons(app);
-            app.FiberPredictionControlPanel.Visible = 'on';
-            % acquire mask and show over image
-            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
-            app.bw_obj = imclearborder(app.bw_obj,4);
-            imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
-            app.FilterButton.Enable = 'on';
-            app.SortingThresholdSlider.Enable = 'on';
+            if app.IsBatchMode == 0
+                DisableMenuBarButtons(app);
+                app.FiberPredictionControlPanel.Visible = 'on';
+                % acquire mask and show over image
+                app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+                app.bw_obj = imclearborder(app.bw_obj,4);
+                imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
+                app.FilterButton.Enable = 'on';
+                app.SortingThresholdSlider.Enable = 'on';
+            else
+                app.Prompt.Text = '';
+                app.SelectFilesButton.Enable = 'off';
+                app.InitialSegmentationButton.Enable = 'off';
+                app.FiberPredictionControlPanel.Visible = 'on';
+                app.ManualSortingButton.Enable = 'off';
+                app.ManualSortingButton.Visible = 'on';
+                app.SortingThresholdSlider.Visible = 'on';
+                app.SortingThresholdSlider.Enable = 'off';
+                app.FilterButton.Enable = 'on';
+            end
         end
 
         % Button pushed function: ManualFiberFilterButton
