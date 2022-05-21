@@ -3,6 +3,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        ManualSegmentationControls      matlab.ui.container.Panel
+        FinishDrawingButton             matlab.ui.control.Button
+        StartMergingButton              matlab.ui.control.Button
+        MergeObjectsModeLabel           matlab.ui.control.Label
+        DrawingModeLabel                matlab.ui.control.Label
+        CloseManualSegmentationButton   matlab.ui.control.Button
+        AcceptLineButton                matlab.ui.control.Button
+        StartDrawingButton              matlab.ui.control.Button
         ImageBackground                 matlab.ui.container.Panel
         UIAxes                          matlab.ui.control.UIAxes
         NonfiberClassificationPanel     matlab.ui.container.Panel
@@ -100,14 +108,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         Panel_2                         matlab.ui.container.Panel
         Image2                          matlab.ui.control.Image
         SMASHLabel                      matlab.ui.control.Label
-        ManualSegmentationControls      matlab.ui.container.Panel
-        FinishDrawingButton             matlab.ui.control.Button
-        StartMergingButton              matlab.ui.control.Button
-        MergeObjectsModeLabel           matlab.ui.control.Label
-        DrawingModeLabel                matlab.ui.control.Label
-        CloseManualSegmentationButton   matlab.ui.control.Button
-        AcceptLineButton                matlab.ui.control.Button
-        StartDrawingButton              matlab.ui.control.Button
         Toolbar                         matlab.ui.container.Panel
         NonfiberClassificationButton    matlab.ui.control.Button
         InitialSegmentationButton       matlab.ui.control.Button
@@ -2203,65 +2203,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationButton.Position = [1012 6 136 33];
             app.NonfiberClassificationButton.Text = 'Nonfiber Classification';
 
-            % Create ManualSegmentationControls
-            app.ManualSegmentationControls = uipanel(app.UIFigure);
-            app.ManualSegmentationControls.BorderType = 'none';
-            app.ManualSegmentationControls.Visible = 'off';
-            app.ManualSegmentationControls.BackgroundColor = [0.9412 0.9412 0.9412];
-            app.ManualSegmentationControls.FontName = 'Avenir';
-            app.ManualSegmentationControls.FontWeight = 'bold';
-            app.ManualSegmentationControls.Position = [36 90 247 469];
-
-            % Create StartDrawingButton
-            app.StartDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
-            app.StartDrawingButton.FontName = 'Avenir';
-            app.StartDrawingButton.Position = [28 401 100 24];
-            app.StartDrawingButton.Text = 'Start Drawing';
-
-            % Create AcceptLineButton
-            app.AcceptLineButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
-            app.AcceptLineButton.BackgroundColor = [0.9608 0.9608 0.9608];
-            app.AcceptLineButton.FontName = 'Avenir';
-            app.AcceptLineButton.Enable = 'off';
-            app.AcceptLineButton.Position = [149 374 100 51];
-            app.AcceptLineButton.Text = 'Accept Line';
-
-            % Create CloseManualSegmentationButton
-            app.CloseManualSegmentationButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.CloseManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseManualSegmentationButtonPushed, true);
-            app.CloseManualSegmentationButton.FontName = 'Avenir';
-            app.CloseManualSegmentationButton.Position = [35 199 182 60];
-            app.CloseManualSegmentationButton.Text = 'Close Manual Segmentation';
-
-            % Create DrawingModeLabel
-            app.DrawingModeLabel = uilabel(app.ManualSegmentationControls);
-            app.DrawingModeLabel.FontName = 'Avenir';
-            app.DrawingModeLabel.Position = [30 435 85 22];
-            app.DrawingModeLabel.Text = 'Drawing Mode';
-
-            % Create MergeObjectsModeLabel
-            app.MergeObjectsModeLabel = uilabel(app.ManualSegmentationControls);
-            app.MergeObjectsModeLabel.FontName = 'Avenir';
-            app.MergeObjectsModeLabel.Position = [27 333 121 22];
-            app.MergeObjectsModeLabel.Text = 'Merge Objects Mode';
-
-            % Create StartMergingButton
-            app.StartMergingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.StartMergingButton.ButtonPushedFcn = createCallbackFcn(app, @StartMergingButtonPushed, true);
-            app.StartMergingButton.FontName = 'Avenir';
-            app.StartMergingButton.Position = [29 298 100 24];
-            app.StartMergingButton.Text = 'Start Merging';
-
-            % Create FinishDrawingButton
-            app.FinishDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.FinishDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishDrawingButtonPushed, true);
-            app.FinishDrawingButton.FontName = 'Avenir';
-            app.FinishDrawingButton.Enable = 'off';
-            app.FinishDrawingButton.Position = [29 372 100 24];
-            app.FinishDrawingButton.Text = 'Finish Drawing';
-
             % Create Panel
             app.Panel = uipanel(app.UIFigure);
             app.Panel.BackgroundColor = [0 0.2902 0.4784];
@@ -2985,6 +2926,64 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIAxes.GridColor = 'none';
             app.UIAxes.MinorGridColor = 'none';
             app.UIAxes.Position = [7 -51 897 633];
+
+            % Create ManualSegmentationControls
+            app.ManualSegmentationControls = uipanel(app.UIFigure);
+            app.ManualSegmentationControls.Visible = 'off';
+            app.ManualSegmentationControls.BackgroundColor = [1 1 1];
+            app.ManualSegmentationControls.FontName = 'Avenir';
+            app.ManualSegmentationControls.FontWeight = 'bold';
+            app.ManualSegmentationControls.Position = [18 262 265 309];
+
+            % Create StartDrawingButton
+            app.StartDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
+            app.StartDrawingButton.FontName = 'Avenir';
+            app.StartDrawingButton.Position = [28 240 100 24];
+            app.StartDrawingButton.Text = 'Start Drawing';
+
+            % Create AcceptLineButton
+            app.AcceptLineButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
+            app.AcceptLineButton.BackgroundColor = [0.9608 0.9608 0.9608];
+            app.AcceptLineButton.FontName = 'Avenir';
+            app.AcceptLineButton.Enable = 'off';
+            app.AcceptLineButton.Position = [149 213 100 51];
+            app.AcceptLineButton.Text = 'Accept Line';
+
+            % Create CloseManualSegmentationButton
+            app.CloseManualSegmentationButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.CloseManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseManualSegmentationButtonPushed, true);
+            app.CloseManualSegmentationButton.FontName = 'Avenir';
+            app.CloseManualSegmentationButton.Position = [35 38 182 60];
+            app.CloseManualSegmentationButton.Text = 'Close Manual Segmentation';
+
+            % Create DrawingModeLabel
+            app.DrawingModeLabel = uilabel(app.ManualSegmentationControls);
+            app.DrawingModeLabel.FontName = 'Avenir';
+            app.DrawingModeLabel.Position = [30 274 85 22];
+            app.DrawingModeLabel.Text = 'Drawing Mode';
+
+            % Create MergeObjectsModeLabel
+            app.MergeObjectsModeLabel = uilabel(app.ManualSegmentationControls);
+            app.MergeObjectsModeLabel.FontName = 'Avenir';
+            app.MergeObjectsModeLabel.Position = [27 172 121 22];
+            app.MergeObjectsModeLabel.Text = 'Merge Objects Mode';
+
+            % Create StartMergingButton
+            app.StartMergingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.StartMergingButton.ButtonPushedFcn = createCallbackFcn(app, @StartMergingButtonPushed, true);
+            app.StartMergingButton.FontName = 'Avenir';
+            app.StartMergingButton.Position = [29 137 100 24];
+            app.StartMergingButton.Text = 'Start Merging';
+
+            % Create FinishDrawingButton
+            app.FinishDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.FinishDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishDrawingButtonPushed, true);
+            app.FinishDrawingButton.FontName = 'Avenir';
+            app.FinishDrawingButton.Enable = 'off';
+            app.FinishDrawingButton.Position = [29 211 100 24];
+            app.FinishDrawingButton.Text = 'Finish Drawing';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
