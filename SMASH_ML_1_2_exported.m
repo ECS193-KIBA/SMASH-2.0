@@ -1920,6 +1920,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create ThresholdCNF
             app.ThresholdCNF = uieditfield(app.CNFPanel, 'numeric');
+            app.ThresholdCNF.Limits = [0 Inf];
             app.ThresholdCNF.FontName = 'Avenir';
             app.ThresholdCNF.Position = [280 38 100 22];
 
@@ -2092,6 +2093,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create ThresholdEditField
             app.ThresholdEditField = uieditfield(app.FiberTypingPanel, 'numeric');
+            app.ThresholdEditField.Limits = [0 Inf];
             app.ThresholdEditField.FontName = 'Avenir';
             app.ThresholdEditField.Enable = 'off';
             app.ThresholdEditField.Position = [284 39 100 22];
@@ -2424,6 +2426,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeNonfiberObjects
             app.PixelSizeNonfiberObjects = uieditfield(app.NonfiberControlPanel, 'numeric');
+            app.PixelSizeNonfiberObjects.Limits = [0 Inf];
             app.PixelSizeNonfiberObjects.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberObjectsValueChanged, true);
             app.PixelSizeNonfiberObjects.FontName = 'Avenir';
             app.PixelSizeNonfiberObjects.Position = [125 253 100 22];
@@ -2455,6 +2458,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeCentralNuclei
             app.PixelSizeCentralNuclei = uieditfield(app.CNFControlPanel, 'numeric');
+            app.PixelSizeCentralNuclei.Limits = [0 Inf];
             app.PixelSizeCentralNuclei.ValueChangedFcn = createCallbackFcn(app, @PixelSizeCNFValueChanged, true);
             app.PixelSizeCentralNuclei.FontName = 'Avenir';
             app.PixelSizeCentralNuclei.Position = [121 261 100 22];
@@ -2505,6 +2509,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create DistancefromborderEditField
             app.DistancefromborderEditField = uieditfield(app.CNFControlPanel, 'numeric');
+            app.DistancefromborderEditField.Limits = [0 Inf];
             app.DistancefromborderEditField.FontName = 'Avenir';
             app.DistancefromborderEditField.Position = [148 194 100 22];
 
@@ -2517,6 +2522,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create MinimumNucleusSizeum2EditField
             app.MinimumNucleusSizeum2EditField = uieditfield(app.CNFControlPanel, 'numeric');
+            app.MinimumNucleusSizeum2EditField.Limits = [0 Inf];
             app.MinimumNucleusSizeum2EditField.FontName = 'Avenir';
             app.MinimumNucleusSizeum2EditField.Position = [150 163 100 22];
 
@@ -2575,6 +2581,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeFiberProperties
             app.PixelSizeFiberProperties = uieditfield(app.PropertiesControlPanel, 'numeric');
+            app.PixelSizeFiberProperties.Limits = [0 Inf];
             app.PixelSizeFiberProperties.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPropertiesValueChanged, true);
             app.PixelSizeFiberProperties.FontName = 'Avenir';
             app.PixelSizeFiberProperties.Position = [139 218 100 22];
@@ -2612,6 +2619,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeFiberTyping
             app.PixelSizeFiberTyping = uieditfield(app.FiberTypingControlPanel, 'numeric');
+            app.PixelSizeFiberTyping.Limits = [0 Inf];
             app.PixelSizeFiberTyping.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberTypingValueChanged, true);
             app.PixelSizeFiberTyping.FontName = 'Avenir';
             app.PixelSizeFiberTyping.Position = [118 242 100 22];
@@ -2692,6 +2700,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create NonfiberThreshold
             app.NonfiberThreshold = uieditfield(app.NonfiberPanel, 'numeric');
+            app.NonfiberThreshold.Limits = [0 Inf];
             app.NonfiberThreshold.FontName = 'Avenir';
             app.NonfiberThreshold.Position = [278 10 100 22];
 
@@ -2813,6 +2822,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create PixelSizeNonfiberClassification
             app.PixelSizeNonfiberClassification = uieditfield(app.NonfiberClassificationControlPanel, 'numeric');
+            app.PixelSizeNonfiberClassification.Limits = [0 Inf];
             app.PixelSizeNonfiberClassification.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberClassificationValueChanged, true);
             app.PixelSizeNonfiberClassification.FontName = 'Avenir';
             app.PixelSizeNonfiberClassification.Position = [118 242 100 22];
@@ -2903,6 +2913,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create NonfiberClassificationThreshold
             app.NonfiberClassificationThreshold = uieditfield(app.NonfiberClassificationPanel, 'numeric');
+            app.NonfiberClassificationThreshold.Limits = [0 Inf];
             app.NonfiberClassificationThreshold.FontName = 'Avenir';
             app.NonfiberClassificationThreshold.Position = [289 13 100 22];
 
