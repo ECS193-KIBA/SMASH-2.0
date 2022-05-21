@@ -1454,8 +1454,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.InitialSegmentationButton.Enable = 'off';
                 app.FiberPredictionControlPanel.Visible = 'on';
                 app.ManualSortingButton.Enable = 'off';
-                app.ManualSortingButton.Visible = 'off';
+                app.ManualSortingButton.Visible = 'on';
                 app.SortingThresholdSlider.Visible = 'on';
+                app.SortingThresholdSlider.Enable = 'off';
                 app.FilterButton.Enable = 'on';
             end
 
