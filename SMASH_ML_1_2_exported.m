@@ -148,6 +148,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         ThresholdCentralNuclei          matlab.ui.control.NumericEditField
         ThresholdEditField_2Label       matlab.ui.control.Label
         CentralNucleiAxes               matlab.ui.control.UIAxes
+        SelectFileErrorLabel            matlab.ui.control.Label
     end
 
     
@@ -196,6 +197,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         BatchModeFileNames % Store batch mode file names
         BatchModePathName % Store batch mode path name
         BatchModeFilterIndex % Store batch mode filter index
+        AcceptedFileExtensions
     end
     
     methods (Access = private)
@@ -547,7 +549,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationButton.Enable = 'on';
         end
         
-        function DisableMenuBarButtons(app) % TODO - make all stages use this
+        function DisableMenuBarButtonsAndClearSelectFileErrorLabel(app) % TODO - make all stages use this
             app.SelectFilesButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
@@ -558,6 +560,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingButton.Enable = 'off';
             app.NonfiberObjectsButton.Enable = 'off';
             app.NonfiberClassificationButton.Enable = 'off';
+            app.SelectFileErrorLabel.Visible = 'off';
         end
 
         function SyncPixelSize(app)
@@ -566,6 +569,34 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeFiberTyping.Value = app.pix_size;
             app.PixelSizeNonfiberObjects.Value = app.pix_size;
             app.PixelSizeNonfiberClassification.Value = app.pix_size;
+        end
+
+        function filter = AcceptedFileExtensionsFilter(app)
+        % AcceptedFileExtensionsFilter  Returns file type filter
+        %   AcceptedFileExtensionsFilter(app) returns a cell array of filters to be
+        %   used by uigetfile.
+        %
+        %   See also uigetfile.
+
+            % This is needed because uigetfile filter requires each filter
+            % to be on a separate row. In our case, this means reshaping
+            % the array to have one column.
+            filter = strcat('*.', app.AcceptedFileExtensions);
+        end
+
+        function isAccepted = IsFileAccepted(app, filename)
+            fileType = GetFileExtension(app, filename);
+            isAccepted = ismember(fileType, app.AcceptedFileExtensions);
+        end
+
+        function fileExtension = GetFileExtension(~, filename)
+            C = strsplit(filename,'.');
+            fileExtension = C{end};
+        end
+
+        function message = GetFileExtensionErrorMessage(app, filename)
+            acceptedFileTypeString = join(app.AcceptedFileExtensions, ', ');
+            message = [filename, ' does not have one of the appropriate file extensions: ', acceptedFileTypeString{1}];
         end
     end
 
@@ -588,6 +619,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.MinimumNucleusSizeum2EditField.Value = app.default{15,2};
             app.FiberTypeColorDropDown.Value = num2str(app.default{5,2});
             app.NonfiberObjectsColorDropDown.Value = num2str(app.default{6,2});
+            app.AcceptedFileExtensions = {'tif';'tiff';'jpg';'png';'bmp';'czi'};
             % TODO - default for nofiber classification
         end
 
@@ -613,6 +645,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.IsBatchMode = 0;
                 FileName = FileNames;
             end
+
+            if ~IsFileAccepted(app, FileName)
+                app.SelectFileErrorLabel.Text = GetFileExtensionErrorMessage(app, FileName);
+                app.SelectFileErrorLabel.Visible = 'on';
+                return
+            end
+
+            app.SelectFileErrorLabel.Visible = 'off';
 
             % Run file initialization
             FileInitialization(app, FileName, PathName, FilterIndex);
@@ -1414,7 +1454,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: InitialSegmentationButton
         function InitialSegmentationButtonPushed(app, event)
-            DisableMenuBarButtons(app);
+            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
             app.ImageBackground.Visible = 'on';
             app.SegmentationParameters.Visible = 'on';
             app.FiberOutlineChannelColorBox.Visible = 'on';
@@ -1428,7 +1468,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: ManualSegmentationButton
         function ManualSegmentationButtonPushed(app, event)
-            DisableMenuBarButtons(app);
+            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
             app.ImageBackground.Visible = 'on';
             app.ManualSegmentationControls.Visible = 'on';
             app.bw_obj = ReadMaskFromMaskFile(app);
@@ -1438,7 +1478,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: FiberPredictionButton
         function FiberPredictionButtonPushed(app, event)
             if app.IsBatchMode == 0
-                DisableMenuBarButtons(app);
+                DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
                 app.ImageBackground.Visible = 'on';
                 app.FiberPredictionControlPanel.Visible = 'on';
                 % acquire mask and show over image
@@ -1463,7 +1503,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: ManualFiberFilterButton
         function ManualFiberFilterButtonPushed(app, event)
-            DisableMenuBarButtons(app);
+            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
             app.ImageBackground.Visible = 'on';
             app.ManualFilterControls.Visible = 'on';
             app.RemoveObjectsButton.Enable = 'on';
@@ -1474,7 +1514,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FiberPropertiesButton
         function FiberPropertiesButtonPushed(app, event)
-            DisableMenuBarButtons(app);
+            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
             app.FiberPropertiesControlPanel.Visible = 'on';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             app.bw_obj = imclearborder(app.bw_obj,4);
@@ -1482,7 +1522,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CentralNucleiButton
         function CentralNucleiButtonPushed(app, event)
-            DisableMenuBarButtons(app);
+            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
 
             app.CentralNucleiControlPanel.Visible = 'on';
             app.CentralNucleiExcelWrite.Enable = 'off';
@@ -1493,7 +1533,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FiberTypingButton
         function FiberTypingButtonPushed(app, event)
-            DisableMenuBarButtons(app);
+            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
 
             app.FiberTypingControlPanel.Visible = 'on';
             app.PixelSizeFiberTyping.Enable = 'on';
@@ -1506,7 +1546,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: NonfiberObjectsButton
         function NonfiberObjectsButtonPushed(app, event)
-            DisableMenuBarButtons(app);
+            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
             app.NonfiberControlPanel.Visible = 'on';
             app.WritetoExcelNonfiber.Enable = 'off';
             app.NonfiberChannelColorBox.Visible = 'on';
@@ -1740,7 +1780,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: NonfiberClassificationButton
         function NonfiberClassificationButtonPushed(app, event)
-            DisableMenuBarButtons(app);
+            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
             app.NonfiberClassificationControlPanel.Visible = 'on';
             app.PixelSizeNonfiberClassification.Enable = 'on';
             app.NonfiberClassificationColorDropDown.Enable = 'on';
@@ -1901,6 +1941,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIFigure.Color = [1 1 1];
             app.UIFigure.Position = [100 100 1199 779];
             app.UIFigure.Name = 'MATLAB App';
+
+            % Create SelectFileErrorLabel
+            app.SelectFileErrorLabel = uilabel(app.UIFigure);
+            app.SelectFileErrorLabel.VerticalAlignment = 'top';
+            app.SelectFileErrorLabel.WordWrap = 'on';
+            app.SelectFileErrorLabel.FontColor = [1 0 0];
+            app.SelectFileErrorLabel.Visible = 'off';
+            app.SelectFileErrorLabel.Position = [40 52 235 549];
+            app.SelectFileErrorLabel.Text = {'Some Error Message Will Go Here When There Is An Error'; ''; ''};
 
             % Create CentralNucleiPanel
             app.CentralNucleiPanel = uipanel(app.UIFigure);
