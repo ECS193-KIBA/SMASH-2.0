@@ -17,11 +17,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         NonfiberClassificationAxes_L    matlab.ui.control.UIAxes
         NonfiberClassificationAxes_R    matlab.ui.control.UIAxes
         NonfiberClassificationControlPanel  matlab.ui.container.Panel
+        NonfiberClassificationColorDropDown  matlab.ui.control.DropDown
+        FiberTypeColorDropDown_2Label   matlab.ui.control.Label
         DoneNonfiberClassification      matlab.ui.control.Button
         WritetoExcelNonfiberClassification  matlab.ui.control.Button
         ClassifyNonfiberObjects         matlab.ui.control.Button
-        NonfiberClassificationColorDropDown  matlab.ui.control.DropDown
-        FiberTypeColorDropDown_2Label   matlab.ui.control.Label
         NonfiberClassificationDataOutputFolder  matlab.ui.control.EditField
         DataOutputFolderEditField_3Label_3  matlab.ui.control.Label
         PixelSizeNonfiberClassification  matlab.ui.control.NumericEditField
@@ -1742,7 +1742,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: NonfiberClassificationButton
         function NonfiberClassificationButtonPushed(app, event)
             DisableMenuBarButtons(app);
-            app.NonfiberClassificationPanel.Visible = 'on';
             app.NonfiberClassificationControlPanel.Visible = 'on';
             app.PixelSizeNonfiberClassification.Enable = 'on';
             app.NonfiberClassificationColorDropDown.Enable = 'on';
@@ -1754,6 +1753,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: ClassifyNonfiberObjects
         function ClassifyNonfiberObjectsButtonPushed(app, event)
+            app.ImageBackground.Visible = 'off';
+            app.NonfiberClassificationPanel.Visible = 'on';
+
             % Labelled objects
             app.classified_nonfiber_num_obj = max(max(app.nf_mask));
 
@@ -1873,6 +1875,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: DoneNonfiberClassification
         function DoneNonfiberClassificationButtonPushed(app, event)
+            app.ImageBackground.Visible = 'on';
             app.nf_mask = 0;
             app.Prompt.Text = '';
             app.NonfiberPanel.Visible = 'off';
@@ -2841,21 +2844,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationDataOutputFolder.FontName = 'Avenir';
             app.NonfiberClassificationDataOutputFolder.Position = [142 144 100 22];
 
-            % Create FiberTypeColorDropDown_2Label
-            app.FiberTypeColorDropDown_2Label = uilabel(app.NonfiberClassificationControlPanel);
-            app.FiberTypeColorDropDown_2Label.HorizontalAlignment = 'right';
-            app.FiberTypeColorDropDown_2Label.FontName = 'Avenir';
-            app.FiberTypeColorDropDown_2Label.Position = [16 197 95 22];
-            app.FiberTypeColorDropDown_2Label.Text = 'Fiber Type Color';
-
-            % Create NonfiberClassificationColorDropDown
-            app.NonfiberClassificationColorDropDown = uidropdown(app.NonfiberClassificationControlPanel);
-            app.NonfiberClassificationColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.NonfiberClassificationColorDropDown.ItemsData = {'1', '2', '3'};
-            app.NonfiberClassificationColorDropDown.FontName = 'Avenir';
-            app.NonfiberClassificationColorDropDown.Position = [126 197 100 22];
-            app.NonfiberClassificationColorDropDown.Value = '1';
-
             % Create ClassifyNonfiberObjects
             app.ClassifyNonfiberObjects = uibutton(app.NonfiberClassificationControlPanel, 'push');
             app.ClassifyNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @ClassifyNonfiberObjectsButtonPushed, true);
@@ -2877,6 +2865,21 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DoneNonfiberClassification.FontName = 'Avenir';
             app.DoneNonfiberClassification.Position = [145 43 100 24];
             app.DoneNonfiberClassification.Text = 'Done';
+
+            % Create FiberTypeColorDropDown_2Label
+            app.FiberTypeColorDropDown_2Label = uilabel(app.NonfiberClassificationControlPanel);
+            app.FiberTypeColorDropDown_2Label.HorizontalAlignment = 'right';
+            app.FiberTypeColorDropDown_2Label.FontName = 'Avenir';
+            app.FiberTypeColorDropDown_2Label.Position = [16 197 95 22];
+            app.FiberTypeColorDropDown_2Label.Text = 'Fiber Type Color';
+
+            % Create NonfiberClassificationColorDropDown
+            app.NonfiberClassificationColorDropDown = uidropdown(app.NonfiberClassificationControlPanel);
+            app.NonfiberClassificationColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.NonfiberClassificationColorDropDown.ItemsData = {'1', '2', '3'};
+            app.NonfiberClassificationColorDropDown.FontName = 'Avenir';
+            app.NonfiberClassificationColorDropDown.Position = [126 197 100 22];
+            app.NonfiberClassificationColorDropDown.Value = '1';
 
             % Create NonfiberClassificationPanel
             app.NonfiberClassificationPanel = uipanel(app.UIFigure);
