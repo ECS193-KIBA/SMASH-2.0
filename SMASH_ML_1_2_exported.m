@@ -1159,6 +1159,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CalculateFiberTyping
         function CalculateFiberTypingButtonPushed(app, event)
+            app.ImageBackground.Visible = 'off';
+            app.FiberTypingPanel.Visible = 'on';
+
             app.CalculateFiberTyping.Enable = 'off';
             app.PixelSizeFiberTyping.Enable = 'off';
             app.FiberTypeColorDropDown.Enable = 'off';
@@ -1294,6 +1297,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: DoneFT
         function DoneFTButtonPushed(app, event)
             app.Prompt.Text = '';
+            app.ImageBackground.Visible = 'on';
             app.FiberTypingControlPanel.Visible = 'off';
             app.FiberTypingPanel.Visible = 'off';
             EnableMenuBarButtons(app);
@@ -1494,15 +1498,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: FiberTypingButton
         function FiberTypingButtonPushed(app, event)
             DisableMenuBarButtons(app);
-            app.ImageBackground.Visible = 'off';
-            app.FiberTypingPanel.Visible = 'on';
+
             app.FiberTypingControlPanel.Visible = 'on';
             app.PixelSizeFiberTyping.Enable = 'on';
             app.FiberTypeColorDropDown.Enable = 'on';
             app.WritetoExcelFT.Enable = 'off';
             app.FiberTypingChannelColorBox.Visible = 'on';
-            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
 
+            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
         end
 
         % Button pushed function: NonfiberObjectsButton
