@@ -44,7 +44,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         ThresholdEditField_2Label_2     matlab.ui.control.Label
         NonfiberAxes                    matlab.ui.control.UIAxes
         FiberTypingControlPanel         matlab.ui.container.Panel
-        DoneFT                          matlab.ui.control.Button
+        DoneFiberTyping                 matlab.ui.control.Button
         WritetoExcelFT                  matlab.ui.control.Button
         CalculateFiberTyping            matlab.ui.control.Button
         FiberTypeColorDropDown          matlab.ui.control.DropDown
@@ -54,29 +54,29 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeFiberTyping            matlab.ui.control.NumericEditField
         PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
         FiberTypingChannelColorBox      matlab.ui.control.UIAxes
-        PropertiesControlPanel          matlab.ui.container.Panel
+        FiberPropertiesControlPanel     matlab.ui.container.Panel
         CalculateFiberProperties        matlab.ui.control.Button
         PixelSizeFiberProperties        matlab.ui.control.NumericEditField
         PixelSizeumpixelEditFieldLabel_2  matlab.ui.control.Label
         FiberPropertiesDataOutputFolder  matlab.ui.control.EditField
         DataOutputFolderEditFieldLabel  matlab.ui.control.Label
-        DoneButton                      matlab.ui.control.Button
+        DoneFiberProperties             matlab.ui.control.Button
         WritetoExcelButton              matlab.ui.control.Button
-        CNFControlPanel                 matlab.ui.container.Panel
+        CentralNucleiControlPanel       matlab.ui.container.Panel
         CentralNucleiDataOutputFolder   matlab.ui.control.EditField
         DataOutputFolderEditField_2Label  matlab.ui.control.Label
         MinimumNucleusSizeum2EditField  matlab.ui.control.NumericEditField
         MinimumNucleusSizeum2EditFieldLabel  matlab.ui.control.Label
         DistancefromborderEditField     matlab.ui.control.NumericEditField
         DistancefromborderEditFieldLabel  matlab.ui.control.Label
-        DoneButton_CNF                  matlab.ui.control.Button
-        CNFExcelWrite                   matlab.ui.control.Button
+        DoneCentralNuclei               matlab.ui.control.Button
+        CentralNucleiExcelWrite         matlab.ui.control.Button
         CalculateCentralNuclei          matlab.ui.control.Button
         NucleiColorDropDown             matlab.ui.control.DropDown
         NucleiColorDropDownLabel        matlab.ui.control.Label
         PixelSizeCentralNuclei          matlab.ui.control.NumericEditField
         PixelSizeumpixelLabel           matlab.ui.control.Label
-        CNFChannelColorBox              matlab.ui.control.UIAxes
+        CentralNucleiChannelColorBox    matlab.ui.control.UIAxes
         NonfiberControlPanel            matlab.ui.container.Panel
         PixelSizeNonfiberObjects        matlab.ui.control.NumericEditField
         PixelSizeumpixelLabel_2         matlab.ui.control.Label
@@ -142,12 +142,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PropertiesPanel                 matlab.ui.container.Panel
         FiberSizeAxes                   matlab.ui.control.UIAxes
         FeretAxes                       matlab.ui.control.UIAxes
-        CNFPanel                        matlab.ui.container.Panel
-        AcceptCNF                       matlab.ui.control.Button
-        AdjustCNF                       matlab.ui.control.Button
-        ThresholdCNF                    matlab.ui.control.NumericEditField
+        CentralNucleiPanel              matlab.ui.container.Panel
+        AcceptCentralNuclei             matlab.ui.control.Button
+        AdjustCentralNuclei             matlab.ui.control.Button
+        ThresholdCentralNuclei          matlab.ui.control.NumericEditField
         ThresholdEditField_2Label       matlab.ui.control.Label
-        CNFAxes                         matlab.ui.control.UIAxes
+        CentralNucleiAxes               matlab.ui.control.UIAxes
     end
 
     
@@ -174,7 +174,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         ave_g
         ponf
         areas
-        CNF_Adj
+        CentralNucleiAdj
         Obj_Adj
         thresh_nf
         num_nf
@@ -346,8 +346,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberChannelColorBox.Color = NonfiberRGBChannel;
 
             % Central Nuclei
-            CNFRGBChannel = app.channelRGB(str2double(app.NucleiColorDropDown.Value), :);
-            app.CNFChannelColorBox.Color = CNFRGBChannel;
+            CentralNucleiRGBChannel = app.channelRGB(str2double(app.NucleiColorDropDown.Value), :);
+            app.CentralNucleiChannelColorBox.Color = CentralNucleiRGBChannel;
 
             % Fiber Typing
             FiberTypingChannel = app.channelRGB(str2double(app.FiberTypeColorDropDown.Value), :);
@@ -965,10 +965,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             
         end
 
-        % Button pushed function: DoneButton
-        function DoneButtonPushed(app, event)
+        % Button pushed function: DoneFiberProperties
+        function DoneFiberPropertiesPushed(app, event)
             app.Prompt.Text = '';
-            app.PropertiesControlPanel.Visible = 'off';
+            app.FiberPropertiesControlPanel.Visible = 'off';
             app.PropertiesPanel.Visible = 'off';
             app.ImageBackground.Visible = 'on';
             EnableMenuBarButtons(app);
@@ -1026,14 +1026,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: CalculateCentralNuclei
         function CalculateCentralNucleiPushed(app, event)
             app.ImageBackground.Visible = 'off';
-            app.CNFPanel.Visible = 'on';
-            app.ThresholdCNF.Enable = 'off';
-            app.AdjustCNF.Enable = 'off';
-            app.AcceptCNF.Enable = 'off';
+            app.CentralNucleiPanel.Visible = 'on';
+            app.ThresholdCentralNuclei.Enable = 'off';
+            app.AdjustCentralNuclei.Enable = 'off';
+            app.AcceptCentralNuclei.Enable = 'off';
 
             app.Prompt.Text = '';
             app.CalculateCentralNuclei.Enable = 'off';
-            app.DoneButton_CNF.Enable = 'off';
+            app.DoneCentralNuclei.Enable = 'off';
             app.pix_size = app.PixelSizeCentralNuclei.Value;
             min_nuc_pix = app.MinimumNucleusSizeum2EditField.Value/(app.pix_size^2);
             border = app.DistancefromborderEditField.Value;
@@ -1054,14 +1054,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             threshes = multithresh(nuc_fil,10);
             app.thresh_nuc = double(threshes(2))/255;
             
-            app.ThresholdCNF.Enable = 'on';
-            app.AdjustCNF.Enable = 'on';
-            app.AcceptCNF.Enable = 'on';
-            app.ThresholdCNF.Value = app.thresh_nuc*255;
+            app.ThresholdCentralNuclei.Enable = 'on';
+            app.AdjustCentralNuclei.Enable = 'on';
+            app.AcceptCentralNuclei.Enable = 'on';
+            app.ThresholdCentralNuclei.Value = app.thresh_nuc*255;
             
-            app.CNF_Adj = 1;
+            app.CentralNucleiAdj = 1;
             
-            while app.CNF_Adj
+            while app.CentralNucleiAdj
                 nuc_bw = imbinarize(nuc_fil,app.thresh_nuc);
                 nuc_cen = nuc_bw.*inv_brd;
             
@@ -1071,31 +1071,21 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                         app.cen_pix(i) = sum(nprop(i).PixelValues);
                     end
                 app.cen_nuc = logical(app.cen_pix >= min_nuc_pix);
-            
+
                 % Label fibers with central nuclei
                 app.fprop = regionprops(label_org,'PixelIdxList','Area');
-                cnf_img = app.bw_obj.*0.3;
-                cnf_img(vertcat(app.fprop(app.cen_nuc).PixelIdxList)) = 1;
-            
-                % Create image showing nuclei and border region
-                %comb_img = zeros([size(brd_img) 3]);
-                %comb_img(:,:,1) = uint8(brd_img).*255;
-                %comb_img(:,:,3) = uint8(nuc_bw).*255;
-            
-                % Show plots
-                %imshow(app.orig_img,'Parent',app.UIAxes2_TL)
-                %imshow(nuc_fil,'Parent',app.UIAxes2_TR)
-                %imshow(comb_img,'Parent',app.UIAxes2_BL)
-                %imshow(cnf_img,'Parent',app.UIAxes2_BR)
-                pos_img = flattenMaskOverlay(cnf_img,nuc_bw,0.6,'b');
-                imshow(pos_img,'Parent',app.CNFAxes);
+                central_nuclei_img = app.bw_obj.*0.3;
+                central_nuclei_img(vertcat(app.fprop(app.cen_nuc).PixelIdxList)) = 1;
+
+                pos_img = flattenMaskOverlay(central_nuclei_img,nuc_bw,0.6,'b');
+                imshow(pos_img,'Parent',app.CentralNucleiAxes);
                 uiwait(app.UIFigure);
             end
             
         end
 
-        % Button pushed function: CNFExcelWrite
-        function CNFExcelWriteButtonPushed(app, event)
+        % Button pushed function: CentralNucleiExcelWrite
+        function CentralNucleiExcelWriteButtonPushed(app, event)
             % Create folder if directory does not exist for excel input
             CreateFolderIfDirectoryIsNonexistent(app, app.CentralNucleiDataOutputFolder.Value);
             cd(app.CentralNucleiDataOutputFolder.Value)
@@ -1148,11 +1138,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.cen_pix = 0;
         end
 
-        % Button pushed function: DoneButton_CNF
-        function DoneButton_CNFPushed(app, event)
+        % Button pushed function: DoneCentralNuclei
+        function DoneCentralNucleiPushed(app, event)
             app.Prompt.Text = '';
-            app.CNFControlPanel.Visible = 'off';
-            app.CNFPanel.Visible = 'off';
+            app.CentralNucleiControlPanel.Visible = 'off';
+            app.CentralNucleiPanel.Visible = 'off';
             app.ImageBackground.Visible = 'on';
             EnableMenuBarButtons(app);
         end
@@ -1165,7 +1155,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CalculateFiberTyping.Enable = 'off';
             app.PixelSizeFiberTyping.Enable = 'off';
             app.FiberTypeColorDropDown.Enable = 'off';
-            app.DoneFT.Enable = 'off';
+            app.DoneFiberTyping.Enable = 'off';
             app.WritetoExcelFT.Enable = 'off';
             app.pix_size = app.PixelSizeFiberTyping.Value;
             pix_area = app.pix_size^2;
@@ -1235,7 +1225,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AcceptButton.Enable = 'off';
             app.CalculateFiberTyping.Enable = 'on';
             app.WritetoExcelFT.Enable = 'on';
-            app.DoneFT.Enable = 'on';
+            app.DoneFiberTyping.Enable = 'on';
             uiresume(app.UIFigure);
         end
 
@@ -1294,8 +1284,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.areas = 0;
         end
 
-        % Button pushed function: DoneFT
-        function DoneFTButtonPushed(app, event)
+        % Button pushed function: DoneFiberTyping
+        function DoneFiberTypingButtonPushed(app, event)
             app.Prompt.Text = '';
             app.ImageBackground.Visible = 'on';
             app.FiberTypingControlPanel.Visible = 'off';
@@ -1303,21 +1293,21 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             EnableMenuBarButtons(app);
         end
 
-        % Button pushed function: AdjustCNF
-        function AdjustCNFButtonPushed(app, event)
-            app.thresh_nuc = app.ThresholdCNF.Value/255;
+        % Button pushed function: AdjustCentralNuclei
+        function AdjustCentralNucleiButtonPushed(app, event)
+            app.thresh_nuc = app.ThresholdCentralNuclei.Value/255;
             uiresume(app.UIFigure);
         end
 
-        % Button pushed function: AcceptCNF
-        function AcceptCNFButtonPushed(app, event)
-            app.CNF_Adj = 0;
-            app.ThresholdCNF.Enable = 'off';
-            app.AdjustCNF.Enable = 'off';
-            app.AcceptCNF.Enable = 'off';
+        % Button pushed function: AcceptCentralNuclei
+        function AcceptCentralNucleiButtonPushed(app, event)
+            app.CentralNucleiAdj = 0;
+            app.ThresholdCentralNuclei.Enable = 'off';
+            app.AdjustCentralNuclei.Enable = 'off';
+            app.AcceptCentralNuclei.Enable = 'off';
             app.CalculateCentralNuclei.Enable = 'on';
-            app.CNFExcelWrite.Enable = 'on';
-            app.DoneButton_CNF.Enable = 'on';
+            app.CentralNucleiExcelWrite.Enable = 'on';
+            app.DoneCentralNuclei.Enable = 'on';
             uiresume(app.UIFigure);
         end
 
@@ -1479,7 +1469,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: FiberPropertiesButton
         function FiberPropertiesButtonPushed(app, event)
             DisableMenuBarButtons(app);
-            app.PropertiesControlPanel.Visible = 'on';
+            app.FiberPropertiesControlPanel.Visible = 'on';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             app.bw_obj = imclearborder(app.bw_obj,4);
         end
@@ -1488,9 +1478,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function CentralNucleiButtonPushed(app, event)
             DisableMenuBarButtons(app);
 
-            app.CNFControlPanel.Visible = 'on';
-            app.CNFExcelWrite.Enable = 'off';
-            app.CNFChannelColorBox.Visible = 'on';
+            app.CentralNucleiControlPanel.Visible = 'on';
+            app.CentralNucleiExcelWrite.Enable = 'off';
+            app.CentralNucleiChannelColorBox.Visible = 'on';
 
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
         end
@@ -1706,7 +1696,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             RGB1DValue = RGBValueOfColorChannel;
 
             % Update color on color box
-            app.CNFChannelColorBox.Color = RGB1DValue;
+            app.CentralNucleiChannelColorBox.Color = RGB1DValue;
             
         end
 
@@ -1737,7 +1727,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         end
 
         % Value changed function: PixelSizeCentralNuclei
-        function PixelSizeCNFValueChanged(app, event)
+        function PixelSizeCentralNucleiValueChanged(app, event)
             app.pix_size = app.PixelSizeCentralNuclei.Value;
             SyncPixelSize(app);
         end
@@ -1909,46 +1899,46 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIFigure.Position = [100 100 1199 779];
             app.UIFigure.Name = 'MATLAB App';
 
-            % Create CNFPanel
-            app.CNFPanel = uipanel(app.UIFigure);
-            app.CNFPanel.Visible = 'off';
-            app.CNFPanel.FontName = 'Avenir';
-            app.CNFPanel.Position = [285 28 882 634];
+            % Create CentralNucleiPanel
+            app.CentralNucleiPanel = uipanel(app.UIFigure);
+            app.CentralNucleiPanel.Visible = 'off';
+            app.CentralNucleiPanel.FontName = 'Avenir';
+            app.CentralNucleiPanel.Position = [285 28 882 634];
 
-            % Create CNFAxes
-            app.CNFAxes = uiaxes(app.CNFPanel);
-            app.CNFAxes.PlotBoxAspectRatio = [1.34971644612476 1 1];
-            app.CNFAxes.FontName = 'Avenir';
-            app.CNFAxes.XColor = 'none';
-            app.CNFAxes.YColor = 'none';
-            app.CNFAxes.Position = [72 70 743 555];
+            % Create CentralNucleiAxes
+            app.CentralNucleiAxes = uiaxes(app.CentralNucleiPanel);
+            app.CentralNucleiAxes.PlotBoxAspectRatio = [1.34971644612476 1 1];
+            app.CentralNucleiAxes.FontName = 'Avenir';
+            app.CentralNucleiAxes.XColor = 'none';
+            app.CentralNucleiAxes.YColor = 'none';
+            app.CentralNucleiAxes.Position = [72 70 743 555];
 
             % Create ThresholdEditField_2Label
-            app.ThresholdEditField_2Label = uilabel(app.CNFPanel);
+            app.ThresholdEditField_2Label = uilabel(app.CentralNucleiPanel);
             app.ThresholdEditField_2Label.HorizontalAlignment = 'right';
             app.ThresholdEditField_2Label.FontName = 'Avenir';
             app.ThresholdEditField_2Label.Position = [206 38 59 22];
             app.ThresholdEditField_2Label.Text = 'Threshold';
 
-            % Create ThresholdCNF
-            app.ThresholdCNF = uieditfield(app.CNFPanel, 'numeric');
-            app.ThresholdCNF.Limits = [0 Inf];
-            app.ThresholdCNF.FontName = 'Avenir';
-            app.ThresholdCNF.Position = [280 38 100 22];
+            % Create ThresholdCentralNuclei
+            app.ThresholdCentralNuclei = uieditfield(app.CentralNucleiPanel, 'numeric');
+            app.ThresholdCentralNuclei.Limits = [0 Inf];
+            app.ThresholdCentralNuclei.FontName = 'Avenir';
+            app.ThresholdCentralNuclei.Position = [280 38 100 22];
 
-            % Create AdjustCNF
-            app.AdjustCNF = uibutton(app.CNFPanel, 'push');
-            app.AdjustCNF.ButtonPushedFcn = createCallbackFcn(app, @AdjustCNFButtonPushed, true);
-            app.AdjustCNF.FontName = 'Avenir';
-            app.AdjustCNF.Position = [424 37 100 24];
-            app.AdjustCNF.Text = 'Adjust';
+            % Create AdjustCentralNuclei
+            app.AdjustCentralNuclei = uibutton(app.CentralNucleiPanel, 'push');
+            app.AdjustCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @AdjustCentralNucleiButtonPushed, true);
+            app.AdjustCentralNuclei.FontName = 'Avenir';
+            app.AdjustCentralNuclei.Position = [424 37 100 24];
+            app.AdjustCentralNuclei.Text = 'Adjust';
 
-            % Create AcceptCNF
-            app.AcceptCNF = uibutton(app.CNFPanel, 'push');
-            app.AcceptCNF.ButtonPushedFcn = createCallbackFcn(app, @AcceptCNFButtonPushed, true);
-            app.AcceptCNF.FontName = 'Avenir';
-            app.AcceptCNF.Position = [555 37 100 24];
-            app.AcceptCNF.Text = 'Accept';
+            % Create AcceptCentralNuclei
+            app.AcceptCentralNuclei = uibutton(app.CentralNucleiPanel, 'push');
+            app.AcceptCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @AcceptCentralNucleiButtonPushed, true);
+            app.AcceptCentralNuclei.FontName = 'Avenir';
+            app.AcceptCentralNuclei.Position = [555 37 100 24];
+            app.AcceptCentralNuclei.Text = 'Accept';
 
             % Create PropertiesPanel
             app.PropertiesPanel = uipanel(app.UIFigure);
@@ -2442,47 +2432,47 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeNonfiberObjects.FontName = 'Avenir';
             app.PixelSizeNonfiberObjects.Position = [125 253 100 22];
 
-            % Create CNFControlPanel
-            app.CNFControlPanel = uipanel(app.UIFigure);
-            app.CNFControlPanel.Visible = 'off';
-            app.CNFControlPanel.BackgroundColor = [1 1 1];
-            app.CNFControlPanel.FontName = 'Avenir';
-            app.CNFControlPanel.Position = [12 280 260 293];
+            % Create CentralNucleiControlPanel
+            app.CentralNucleiControlPanel = uipanel(app.UIFigure);
+            app.CentralNucleiControlPanel.Visible = 'off';
+            app.CentralNucleiControlPanel.BackgroundColor = [1 1 1];
+            app.CentralNucleiControlPanel.FontName = 'Avenir';
+            app.CentralNucleiControlPanel.Position = [12 280 260 293];
 
-            % Create CNFChannelColorBox
-            app.CNFChannelColorBox = uiaxes(app.CNFControlPanel);
-            app.CNFChannelColorBox.Toolbar.Visible = 'off';
-            app.CNFChannelColorBox.FontName = 'Avenir';
-            app.CNFChannelColorBox.XTick = [];
-            app.CNFChannelColorBox.YTick = [];
-            app.CNFChannelColorBox.Color = [0 1 1];
-            app.CNFChannelColorBox.Box = 'on';
-            app.CNFChannelColorBox.PickableParts = 'none';
-            app.CNFChannelColorBox.Position = [228 223 30 30];
+            % Create CentralNucleiChannelColorBox
+            app.CentralNucleiChannelColorBox = uiaxes(app.CentralNucleiControlPanel);
+            app.CentralNucleiChannelColorBox.Toolbar.Visible = 'off';
+            app.CentralNucleiChannelColorBox.FontName = 'Avenir';
+            app.CentralNucleiChannelColorBox.XTick = [];
+            app.CentralNucleiChannelColorBox.YTick = [];
+            app.CentralNucleiChannelColorBox.Color = [0 1 1];
+            app.CentralNucleiChannelColorBox.Box = 'on';
+            app.CentralNucleiChannelColorBox.PickableParts = 'none';
+            app.CentralNucleiChannelColorBox.Position = [228 223 30 30];
 
             % Create PixelSizeumpixelLabel
-            app.PixelSizeumpixelLabel = uilabel(app.CNFControlPanel);
+            app.PixelSizeumpixelLabel = uilabel(app.CentralNucleiControlPanel);
             app.PixelSizeumpixelLabel.HorizontalAlignment = 'right';
             app.PixelSizeumpixelLabel.FontName = 'Avenir';
             app.PixelSizeumpixelLabel.Position = [48 251 58 32];
             app.PixelSizeumpixelLabel.Text = {'Pixel Size'; 'um/pixel'};
 
             % Create PixelSizeCentralNuclei
-            app.PixelSizeCentralNuclei = uieditfield(app.CNFControlPanel, 'numeric');
+            app.PixelSizeCentralNuclei = uieditfield(app.CentralNucleiControlPanel, 'numeric');
             app.PixelSizeCentralNuclei.Limits = [0 Inf];
-            app.PixelSizeCentralNuclei.ValueChangedFcn = createCallbackFcn(app, @PixelSizeCNFValueChanged, true);
+            app.PixelSizeCentralNuclei.ValueChangedFcn = createCallbackFcn(app, @PixelSizeCentralNucleiValueChanged, true);
             app.PixelSizeCentralNuclei.FontName = 'Avenir';
             app.PixelSizeCentralNuclei.Position = [121 261 100 22];
 
             % Create NucleiColorDropDownLabel
-            app.NucleiColorDropDownLabel = uilabel(app.CNFControlPanel);
+            app.NucleiColorDropDownLabel = uilabel(app.CentralNucleiControlPanel);
             app.NucleiColorDropDownLabel.HorizontalAlignment = 'right';
             app.NucleiColorDropDownLabel.FontName = 'Avenir';
             app.NucleiColorDropDownLabel.Position = [37 226 73 22];
             app.NucleiColorDropDownLabel.Text = 'Nuclei Color';
 
             % Create NucleiColorDropDown
-            app.NucleiColorDropDown = uidropdown(app.CNFControlPanel);
+            app.NucleiColorDropDown = uidropdown(app.CentralNucleiControlPanel);
             app.NucleiColorDropDown.Items = {'Red', 'Green', 'Blue'};
             app.NucleiColorDropDown.ItemsData = {'1', '2', '3'};
             app.NucleiColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NucleiColorValueChanged, true);
@@ -2491,114 +2481,114 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NucleiColorDropDown.Value = '1';
 
             % Create CalculateCentralNuclei
-            app.CalculateCentralNuclei = uibutton(app.CNFControlPanel, 'push');
+            app.CalculateCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
             app.CalculateCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @CalculateCentralNucleiPushed, true);
             app.CalculateCentralNuclei.FontName = 'Avenir';
             app.CalculateCentralNuclei.Position = [85 64 100 24];
             app.CalculateCentralNuclei.Text = 'Calculate';
 
-            % Create CNFExcelWrite
-            app.CNFExcelWrite = uibutton(app.CNFControlPanel, 'push');
-            app.CNFExcelWrite.ButtonPushedFcn = createCallbackFcn(app, @CNFExcelWriteButtonPushed, true);
-            app.CNFExcelWrite.FontName = 'Avenir';
-            app.CNFExcelWrite.Position = [24 31 100 24];
-            app.CNFExcelWrite.Text = 'Write To Excel';
+            % Create CentralNucleiExcelWrite
+            app.CentralNucleiExcelWrite = uibutton(app.CentralNucleiControlPanel, 'push');
+            app.CentralNucleiExcelWrite.ButtonPushedFcn = createCallbackFcn(app, @CentralNucleiExcelWriteButtonPushed, true);
+            app.CentralNucleiExcelWrite.FontName = 'Avenir';
+            app.CentralNucleiExcelWrite.Position = [24 31 100 24];
+            app.CentralNucleiExcelWrite.Text = 'Write To Excel';
 
-            % Create DoneButton_CNF
-            app.DoneButton_CNF = uibutton(app.CNFControlPanel, 'push');
-            app.DoneButton_CNF.ButtonPushedFcn = createCallbackFcn(app, @DoneButton_CNFPushed, true);
-            app.DoneButton_CNF.FontName = 'Avenir';
-            app.DoneButton_CNF.Position = [142 31 100 24];
-            app.DoneButton_CNF.Text = 'Done';
+            % Create DoneCentralNuclei
+            app.DoneCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
+            app.DoneCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @DoneCentralNucleiPushed, true);
+            app.DoneCentralNuclei.FontName = 'Avenir';
+            app.DoneCentralNuclei.Position = [142 31 100 24];
+            app.DoneCentralNuclei.Text = 'Done';
 
             % Create DistancefromborderEditFieldLabel
-            app.DistancefromborderEditFieldLabel = uilabel(app.CNFControlPanel);
+            app.DistancefromborderEditFieldLabel = uilabel(app.CentralNucleiControlPanel);
             app.DistancefromborderEditFieldLabel.HorizontalAlignment = 'right';
             app.DistancefromborderEditFieldLabel.FontName = 'Avenir';
             app.DistancefromborderEditFieldLabel.Position = [14 194 119 22];
             app.DistancefromborderEditFieldLabel.Text = 'Distance from border';
 
             % Create DistancefromborderEditField
-            app.DistancefromborderEditField = uieditfield(app.CNFControlPanel, 'numeric');
+            app.DistancefromborderEditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
             app.DistancefromborderEditField.Limits = [0 Inf];
             app.DistancefromborderEditField.FontName = 'Avenir';
             app.DistancefromborderEditField.Position = [148 194 100 22];
 
             % Create MinimumNucleusSizeum2EditFieldLabel
-            app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CNFControlPanel);
+            app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CentralNucleiControlPanel);
             app.MinimumNucleusSizeum2EditFieldLabel.HorizontalAlignment = 'right';
             app.MinimumNucleusSizeum2EditFieldLabel.FontName = 'Avenir';
             app.MinimumNucleusSizeum2EditFieldLabel.Position = [8 153 127 32];
             app.MinimumNucleusSizeum2EditFieldLabel.Text = {'Minimum Nucleus Size'; '(um^2)'};
 
             % Create MinimumNucleusSizeum2EditField
-            app.MinimumNucleusSizeum2EditField = uieditfield(app.CNFControlPanel, 'numeric');
+            app.MinimumNucleusSizeum2EditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
             app.MinimumNucleusSizeum2EditField.Limits = [0 Inf];
             app.MinimumNucleusSizeum2EditField.FontName = 'Avenir';
             app.MinimumNucleusSizeum2EditField.Position = [150 163 100 22];
 
             % Create DataOutputFolderEditField_2Label
-            app.DataOutputFolderEditField_2Label = uilabel(app.CNFControlPanel);
+            app.DataOutputFolderEditField_2Label = uilabel(app.CentralNucleiControlPanel);
             app.DataOutputFolderEditField_2Label.HorizontalAlignment = 'right';
             app.DataOutputFolderEditField_2Label.FontName = 'Avenir';
             app.DataOutputFolderEditField_2Label.Position = [13 128 111 22];
             app.DataOutputFolderEditField_2Label.Text = 'Data Output Folder';
 
             % Create CentralNucleiDataOutputFolder
-            app.CentralNucleiDataOutputFolder = uieditfield(app.CNFControlPanel, 'text');
+            app.CentralNucleiDataOutputFolder = uieditfield(app.CentralNucleiControlPanel, 'text');
             app.CentralNucleiDataOutputFolder.FontName = 'Avenir';
             app.CentralNucleiDataOutputFolder.Position = [139 128 109 22];
 
-            % Create PropertiesControlPanel
-            app.PropertiesControlPanel = uipanel(app.UIFigure);
-            app.PropertiesControlPanel.Visible = 'off';
-            app.PropertiesControlPanel.BackgroundColor = [1 1 1];
-            app.PropertiesControlPanel.FontName = 'Avenir';
-            app.PropertiesControlPanel.Position = [17 284 251 275];
+            % Create FiberPropertiesControlPanel
+            app.FiberPropertiesControlPanel = uipanel(app.UIFigure);
+            app.FiberPropertiesControlPanel.Visible = 'off';
+            app.FiberPropertiesControlPanel.BackgroundColor = [1 1 1];
+            app.FiberPropertiesControlPanel.FontName = 'Avenir';
+            app.FiberPropertiesControlPanel.Position = [17 284 251 275];
 
             % Create WritetoExcelButton
-            app.WritetoExcelButton = uibutton(app.PropertiesControlPanel, 'push');
+            app.WritetoExcelButton = uibutton(app.FiberPropertiesControlPanel, 'push');
             app.WritetoExcelButton.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelButtonPushed, true);
             app.WritetoExcelButton.FontName = 'Avenir';
             app.WritetoExcelButton.Enable = 'off';
             app.WritetoExcelButton.Position = [27 63 100 24];
             app.WritetoExcelButton.Text = 'Write to Excel';
 
-            % Create DoneButton
-            app.DoneButton = uibutton(app.PropertiesControlPanel, 'push');
-            app.DoneButton.ButtonPushedFcn = createCallbackFcn(app, @DoneButtonPushed, true);
-            app.DoneButton.FontName = 'Avenir';
-            app.DoneButton.Position = [140 63 100 24];
-            app.DoneButton.Text = 'Done';
+            % Create DoneFiberProperties
+            app.DoneFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
+            app.DoneFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @DoneFiberPropertiesPushed, true);
+            app.DoneFiberProperties.FontName = 'Avenir';
+            app.DoneFiberProperties.Position = [140 63 100 24];
+            app.DoneFiberProperties.Text = 'Done';
 
             % Create DataOutputFolderEditFieldLabel
-            app.DataOutputFolderEditFieldLabel = uilabel(app.PropertiesControlPanel);
+            app.DataOutputFolderEditFieldLabel = uilabel(app.FiberPropertiesControlPanel);
             app.DataOutputFolderEditFieldLabel.HorizontalAlignment = 'right';
             app.DataOutputFolderEditFieldLabel.FontName = 'Avenir';
             app.DataOutputFolderEditFieldLabel.Position = [13 169 111 22];
             app.DataOutputFolderEditFieldLabel.Text = 'Data Output Folder';
 
             % Create FiberPropertiesDataOutputFolder
-            app.FiberPropertiesDataOutputFolder = uieditfield(app.PropertiesControlPanel, 'text');
+            app.FiberPropertiesDataOutputFolder = uieditfield(app.FiberPropertiesControlPanel, 'text');
             app.FiberPropertiesDataOutputFolder.FontName = 'Avenir';
             app.FiberPropertiesDataOutputFolder.Position = [139 169 100 22];
 
             % Create PixelSizeumpixelEditFieldLabel_2
-            app.PixelSizeumpixelEditFieldLabel_2 = uilabel(app.PropertiesControlPanel);
+            app.PixelSizeumpixelEditFieldLabel_2 = uilabel(app.FiberPropertiesControlPanel);
             app.PixelSizeumpixelEditFieldLabel_2.HorizontalAlignment = 'right';
             app.PixelSizeumpixelEditFieldLabel_2.FontName = 'Avenir';
             app.PixelSizeumpixelEditFieldLabel_2.Position = [10 218 114 22];
             app.PixelSizeumpixelEditFieldLabel_2.Text = 'Pixel Size (um/pixel)';
 
             % Create PixelSizeFiberProperties
-            app.PixelSizeFiberProperties = uieditfield(app.PropertiesControlPanel, 'numeric');
+            app.PixelSizeFiberProperties = uieditfield(app.FiberPropertiesControlPanel, 'numeric');
             app.PixelSizeFiberProperties.Limits = [0 Inf];
             app.PixelSizeFiberProperties.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPropertiesValueChanged, true);
             app.PixelSizeFiberProperties.FontName = 'Avenir';
             app.PixelSizeFiberProperties.Position = [139 218 100 22];
 
             % Create CalculateFiberProperties
-            app.CalculateFiberProperties = uibutton(app.PropertiesControlPanel, 'push');
+            app.CalculateFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
             app.CalculateFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberPropertiesPushed, true);
             app.CalculateFiberProperties.FontName = 'Avenir';
             app.CalculateFiberProperties.Position = [81 117 100 24];
@@ -2678,12 +2668,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.WritetoExcelFT.Position = [26 43 100 24];
             app.WritetoExcelFT.Text = 'Write to Excel';
 
-            % Create DoneFT
-            app.DoneFT = uibutton(app.FiberTypingControlPanel, 'push');
-            app.DoneFT.ButtonPushedFcn = createCallbackFcn(app, @DoneFTButtonPushed, true);
-            app.DoneFT.FontName = 'Avenir';
-            app.DoneFT.Position = [145 43 100 24];
-            app.DoneFT.Text = 'Done';
+            % Create DoneFiberTyping
+            app.DoneFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
+            app.DoneFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @DoneFiberTypingButtonPushed, true);
+            app.DoneFiberTyping.FontName = 'Avenir';
+            app.DoneFiberTyping.Position = [145 43 100 24];
+            app.DoneFiberTyping.Text = 'Done';
 
             % Create NonfiberPanel
             app.NonfiberPanel = uipanel(app.UIFigure);
