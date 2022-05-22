@@ -1313,6 +1313,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CalculateNonfiberObjects
         function CalculateNonfiberObjectsButtonPushed(app, event)
+            app.ImageBackground.Visible = 'off';
+            app.NonfiberPanel.Visible = 'on';
+            app.NonfiberThreshold.Enable = 'off';
+            app.NonfiberAdjust.Enable = 'off';
+            app.NonfiberAccept.Enable = 'off';
+
             img_org = app.orig_img_multispectral;
             app.CalculateNonfiberObjects.Enable = 'off';
             app.DoneNonfiber.Enable = 'off';
@@ -1398,6 +1404,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: DoneNonfiber
         function DoneNonfiberButtonPushed(app, event)
+            app.ImageBackground.Visible = 'on';
             app.thresh_nf = 0;
             app.nf_data = 0;
             app.Prompt.Text = '';
@@ -1501,15 +1508,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: NonfiberObjectsButton
         function NonfiberObjectsButtonPushed(app, event)
             DisableMenuBarButtons(app);
-            app.ImageBackground.Visible = 'off';
-            app.NonfiberPanel.Visible = 'on';
             app.NonfiberControlPanel.Visible = 'on';
-            app.NonfiberThreshold.Enable = 'off';
-            app.NonfiberAdjust.Enable = 'off';
-            app.NonfiberAccept.Enable = 'off';
             app.WritetoExcelNonfiber.Enable = 'off';
             app.NonfiberChannelColorBox.Visible = 'on';
-
         end
 
         % Button pushed function: DetectValueButton
