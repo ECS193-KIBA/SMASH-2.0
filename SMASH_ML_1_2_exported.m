@@ -205,6 +205,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function FileInitialization(app, FileName, PathName, FilterIndex)
             drawnow limitrate;
             figure(app.UIFigure)
+
+            % Reset app menu bar
+            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
+            
             if FilterIndex
                 if FileName == 0
                     return
@@ -215,6 +219,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 FileNameS = FileNameS{1};
                 MaskName = strcat(FileNameS,'_mask.',ExtName);
                 MaskName = MaskName{1};
+                NFMaskName = strcat(FileNameS,'_nf_mask.',ExtName);
+                NFMaskName = NFMaskName{1};
             end
             
             if app.IsBatchMode == 1
@@ -229,6 +235,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Files{2} = MaskName;
             app.Files{3} = PathName;
             app.Files{4} = FileNameS;
+            app.Files{5} = NFMaskName;
             cd(PathName)
     
             % Change output directory to where image is located
@@ -320,14 +327,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             imshow(app.orig_img,'Parent',app.UIAxes);
 
             if exist(MaskName,'file') && app.IsBatchMode == 0
-                app.InitialSegmentationButton.Enable = 'on';
-                app.FiberPredictionButton.Enable = 'on';
-                app.ManualSegmentationButton.Enable = 'on';
-                app.ManualFiberFilterButton.Enable = 'on';
-                app.FiberPropertiesButton.Enable = 'on';
-                app.CentralNucleiButton.Enable = 'on';
-                app.FiberTypingButton.Enable = 'on';
-                app.NonfiberObjectsButton.Enable = 'on';
                 EnableMenuBarButtons(app);
             else
                 % Enable all the buttons to be used in batch mode
@@ -450,6 +449,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             results = imbinarize(graymask,0.99);
         end
 
+        function SaveNFMaskToMaskFile(app, mask)
+            imwrite(mask,app.Files{5},'tiff');
+        end
+
+        function results = ReadNFMaskFromMaskFile(app)
+            results = imread(app.Files{5});
+        end
+
         %% ==================== Merge Region Functions ====================
 
         function [new_bw_obj, is_merge_successful] = MergeObjects(app, label, first_region_to_merge, second_region_to_merge)
@@ -546,7 +553,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.Enable = 'on';
             app.FiberTypingButton.Enable = 'on';
             app.NonfiberObjectsButton.Enable = 'on';
-            app.NonfiberClassificationButton.Enable = 'on';
+
+            % Only allow nonfiber classification if non-fiber objects mask
+            % exists
+            if exist(app.Files{5},'file') 
+                app.NonfiberClassificationButton.Enable = 'on';
+            end
         end
         
         function DisableMenuBarButtonsAndClearSelectFileErrorLabel(app) % TODO - make all stages use this
@@ -1382,6 +1394,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 ch_bw = imbinarize(ch_fil,app.thresh_nf);
                 imshow(ch_bw,'Parent',app.NonfiberAxes);
                 
+                app.nf_bw_obj = ch_bw;
                 uiwait(app.UIFigure);
                 
                 if app.Obj_Adj
@@ -1390,8 +1403,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 
             end
 
-            app.nf_bw_obj = ch_bw;
-            app.nf_mask = bwlabel(ch_bw,4);
             nfprops = regionprops(bwconncomp(ch_bw,4),'Centroid','Area');
             area_nf = [nfprops.Area]'*app.pix_size^2;
             cents_nf = cat(1,nfprops.Centroid);
@@ -1449,6 +1460,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = '';
             app.NonfiberPanel.Visible = 'off';
             app.NonfiberControlPanel.Visible = 'off';
+            SaveNFMaskToMaskFile(app, app.nf_bw_obj);
             EnableMenuBarButtons(app);
         end
 
@@ -1787,7 +1799,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.WritetoExcelNonfiberClassification.Enable = 'off';
             app.NonfiberClassificationChannelColorBox.Visible = 'on';
             app.PercentPositiveTextArea.Visible = 'on';
-            app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
+            app.nf_bw_obj = ReadNFMaskFromMaskFile(app);
+            app.nf_mask = bwlabel(app.nf_bw_obj,4);
         end
 
         % Button pushed function: ClassifyNonfiberObjects
@@ -1916,6 +1929,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function DoneNonfiberClassificationButtonPushed(app, event)
             app.ImageBackground.Visible = 'on';
             app.nf_mask = 0;
+            app.nf_bw_obj = 0;
             app.Prompt.Text = '';
             app.NonfiberPanel.Visible = 'off';
             app.NonfiberClassificationControlPanel.Visible = 'off';
