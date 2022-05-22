@@ -602,17 +602,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.BatchModeFileNames = FileNames;
 
             % Return if there no filenames
-            if FilterIndex
-                if iscell(FileNames) % If there are multiple FileNames, batch mode
-                    app.IsBatchMode = 1;
-                    FileName = FileNames{1};
-                else
-                    app.IsBatchMode = 0;
-                    FileName = FileNames;
-                end
-                if FileName == 0
-                    return
-                end
+            if ~FilterIndex
+                return
+            end
+
+            if iscell(FileNames) % If there are multiple FileNames, batch mode
+                app.IsBatchMode = 1;
+                FileName = FileNames{1};
+            else
+                app.IsBatchMode = 0;
+                FileName = FileNames;
             end
 
             % Run file initialization
