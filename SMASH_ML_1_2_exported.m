@@ -3,6 +3,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        SelectFileDescription           matlab.ui.control.Label
         ImageBackground                 matlab.ui.container.Panel
         UIAxes                          matlab.ui.control.UIAxes
         NonfiberClassificationPanel     matlab.ui.container.Panel
@@ -207,7 +208,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             figure(app.UIFigure)
 
             % Reset app menu bar
-            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
+            DisableMenuBarButtonsAndClearFileLabels(app);
             
             if FilterIndex
                 if FileName == 0
@@ -326,10 +327,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Display the image
             imshow(app.orig_img,'Parent',app.UIAxes);
 
-            if exist(MaskName,'file') && app.IsBatchMode == 0
+            % Enable the correct menu bar buttons
+            if ~exist(MaskName,'file')
+                % If no mask exists, the image first needs to be segmented
+                app.InitialSegmentationButton.Enable = 'on';
+            elseif app.IsBatchMode == 0
+                % If mask exists and batch mode is not enabled, enable all
+                % buttons
                 EnableMenuBarButtons(app);
             else
-                % Enable all the buttons to be used in batch mode
+                % In batch mode, only allow initial segmentation and fiber
+                % prediction
                 app.InitialSegmentationButton.Enable = 'on';
                 app.FiberPredictionButton.Enable = 'on';
             end
@@ -559,9 +567,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             if exist(app.Files{5},'file') 
                 app.NonfiberClassificationButton.Enable = 'on';
             end
+
+            app.SelectFileDescription.Visible = 'on';
         end
         
-        function DisableMenuBarButtonsAndClearSelectFileErrorLabel(app) % TODO - make all stages use this
+        function DisableMenuBarButtonsAndClearFileLabels(app) % TODO - make all stages use this
             app.SelectFilesButton.Enable = 'off';
             app.InitialSegmentationButton.Enable = 'off';
             app.FiberPredictionButton.Enable = 'off';
@@ -573,6 +583,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.Enable = 'off';
             app.NonfiberClassificationButton.Enable = 'off';
             app.SelectFileErrorLabel.Visible = 'off';
+            app.SelectFileDescription.Visible = 'off';
         end
 
         function SyncPixelSize(app)
@@ -1466,10 +1477,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: InitialSegmentationButton
         function InitialSegmentationButtonPushed(app, event)
-            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
+            DisableMenuBarButtonsAndClearFileLabels(app);
             app.ImageBackground.Visible = 'on';
             app.SegmentationParameters.Visible = 'on';
-            app.FiberOutlineChannelColorBox.Visible = 'on';
+            app.FiberOutlineChannelColorBox.Visible = 'on';            
 
             if app.IsBatchMode == 1
                 app.ImageBackground.Visible = 'on';
@@ -1480,7 +1491,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: ManualSegmentationButton
         function ManualSegmentationButtonPushed(app, event)
-            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
+            DisableMenuBarButtonsAndClearFileLabels(app);
             app.ImageBackground.Visible = 'on';
             app.ManualSegmentationControls.Visible = 'on';
             app.bw_obj = ReadMaskFromMaskFile(app);
@@ -1490,7 +1501,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: FiberPredictionButton
         function FiberPredictionButtonPushed(app, event)
             if app.IsBatchMode == 0
-                DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
+                DisableMenuBarButtonsAndClearFileLabels(app);
                 app.ImageBackground.Visible = 'on';
                 app.FiberPredictionControlPanel.Visible = 'on';
                 % acquire mask and show over image
@@ -1515,7 +1526,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: ManualFiberFilterButton
         function ManualFiberFilterButtonPushed(app, event)
-            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
+            DisableMenuBarButtonsAndClearFileLabels(app);
             app.ImageBackground.Visible = 'on';
             app.ManualFilterControls.Visible = 'on';
             app.RemoveObjectsButton.Enable = 'on';
@@ -1526,7 +1537,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FiberPropertiesButton
         function FiberPropertiesButtonPushed(app, event)
-            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
+            DisableMenuBarButtonsAndClearFileLabels(app);
             app.FiberPropertiesControlPanel.Visible = 'on';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             app.bw_obj = imclearborder(app.bw_obj,4);
@@ -1534,7 +1545,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CentralNucleiButton
         function CentralNucleiButtonPushed(app, event)
-            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
+            DisableMenuBarButtonsAndClearFileLabels(app);
 
             app.CentralNucleiControlPanel.Visible = 'on';
             app.CentralNucleiExcelWrite.Enable = 'off';
@@ -1545,7 +1556,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: FiberTypingButton
         function FiberTypingButtonPushed(app, event)
-            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
+            DisableMenuBarButtonsAndClearFileLabels(app);
 
             app.FiberTypingControlPanel.Visible = 'on';
             app.PixelSizeFiberTyping.Enable = 'on';
@@ -1558,7 +1569,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: NonfiberObjectsButton
         function NonfiberObjectsButtonPushed(app, event)
-            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
+            DisableMenuBarButtonsAndClearFileLabels(app);
             app.NonfiberControlPanel.Visible = 'on';
             app.WritetoExcelNonfiber.Enable = 'off';
             app.NonfiberChannelColorBox.Visible = 'on';
@@ -1792,7 +1803,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: NonfiberClassificationButton
         function NonfiberClassificationButtonPushed(app, event)
-            DisableMenuBarButtonsAndClearSelectFileErrorLabel(app);
+            DisableMenuBarButtonsAndClearFileLabels(app);
             app.NonfiberClassificationControlPanel.Visible = 'on';
             app.PixelSizeNonfiberClassification.Enable = 'on';
             app.NonfiberClassificationColorDropDown.Enable = 'on';
@@ -1960,9 +1971,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SelectFileErrorLabel = uilabel(app.UIFigure);
             app.SelectFileErrorLabel.VerticalAlignment = 'top';
             app.SelectFileErrorLabel.WordWrap = 'on';
+            app.SelectFileErrorLabel.FontName = 'Avenir';
             app.SelectFileErrorLabel.FontColor = [1 0 0];
             app.SelectFileErrorLabel.Visible = 'off';
-            app.SelectFileErrorLabel.Position = [40 52 235 549];
+            app.SelectFileErrorLabel.Position = [40 525 234 49];
             app.SelectFileErrorLabel.Text = {'Some Error Message Will Go Here When There Is An Error'; ''; ''};
 
             % Create CentralNucleiPanel
@@ -2031,13 +2043,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SelectFilesButton.ButtonPushedFcn = createCallbackFcn(app, @SelectFilesButtonPushed, true);
             app.SelectFilesButton.BackgroundColor = [1 1 1];
             app.SelectFilesButton.FontName = 'Avenir';
-            app.SelectFilesButton.Position = [38 612 109 32];
+            app.SelectFilesButton.Position = [36 585 109 32];
             app.SelectFilesButton.Text = 'Select File(s)';
 
             % Create FilenameLabel
             app.FilenameLabel = uilabel(app.UIFigure);
             app.FilenameLabel.FontName = 'Avenir';
-            app.FilenameLabel.Position = [156 617 130 22];
+            app.FilenameLabel.Position = [154 590 130 22];
             app.FilenameLabel.Text = 'Filename';
 
             % Create Prompt
@@ -2100,7 +2112,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualFilterControls.Visible = 'off';
             app.ManualFilterControls.BackgroundColor = [1 1 1];
             app.ManualFilterControls.FontName = 'Avenir';
-            app.ManualFilterControls.Position = [31 443 245 137];
+            app.ManualFilterControls.Position = [29 416 245 137];
 
             % Create RemoveObjectsButton
             app.RemoveObjectsButton = uibutton(app.ManualFilterControls, 'push');
@@ -2195,6 +2207,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualSegmentationButton.BackgroundColor = [0.9608 0.9608 0.9608];
             app.ManualSegmentationButton.FontName = 'Avenir';
             app.ManualSegmentationButton.Enable = 'off';
+            app.ManualSegmentationButton.Tooltip = {'Manually edit the fiber outlines generated in the "Initial Segmentation" stage as needed.'};
             app.ManualSegmentationButton.Position = [130 6 128 33];
             app.ManualSegmentationButton.Text = 'Manual Segmentation';
 
@@ -2204,6 +2217,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberPredictionButton.BackgroundColor = [0.9608 0.9608 0.9608];
             app.FiberPredictionButton.FontName = 'Avenir';
             app.FiberPredictionButton.Enable = 'off';
+            app.FiberPredictionButton.Tooltip = {'Predict fiber regions.'};
             app.FiberPredictionButton.Position = [262 6 120 33];
             app.FiberPredictionButton.Text = 'Fiber Prediction';
 
@@ -2212,6 +2226,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualFiberFilterButton.ButtonPushedFcn = createCallbackFcn(app, @ManualFiberFilterButtonPushed, true);
             app.ManualFiberFilterButton.FontName = 'Avenir';
             app.ManualFiberFilterButton.Enable = 'off';
+            app.ManualFiberFilterButton.Tooltip = {'Remove any image regions that were mispredicted as fibers.'};
             app.ManualFiberFilterButton.Position = [387 6 120 33];
             app.ManualFiberFilterButton.Text = 'Manual Fiber Filter';
 
@@ -2220,6 +2235,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberPropertiesButton.ButtonPushedFcn = createCallbackFcn(app, @FiberPropertiesButtonPushed, true);
             app.FiberPropertiesButton.FontName = 'Avenir';
             app.FiberPropertiesButton.Enable = 'off';
+            app.FiberPropertiesButton.Tooltip = {'Calculate minimum feret diameter and fiber area of fibers in the image.'};
             app.FiberPropertiesButton.Position = [511 6 120 33];
             app.FiberPropertiesButton.Text = 'Fiber Properties';
 
@@ -2228,6 +2244,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiButton.ButtonPushedFcn = createCallbackFcn(app, @CentralNucleiButtonPushed, true);
             app.CentralNucleiButton.FontName = 'Avenir';
             app.CentralNucleiButton.Enable = 'off';
+            app.CentralNucleiButton.Tooltip = {'Mark fibers with centrally located nuclei.'};
             app.CentralNucleiButton.Position = [636 6 120 33];
             app.CentralNucleiButton.Text = 'Central Nuclei';
 
@@ -2236,6 +2253,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingButton.ButtonPushedFcn = createCallbackFcn(app, @FiberTypingButtonPushed, true);
             app.FiberTypingButton.FontName = 'Avenir';
             app.FiberTypingButton.Enable = 'off';
+            app.FiberTypingButton.Tooltip = {'Detect fibers with intensity of a certain color channel greater than a threshold value.'};
             app.FiberTypingButton.Position = [761 6 120 33];
             app.FiberTypingButton.Text = 'Fiber Typing';
 
@@ -2244,6 +2262,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsButton.ButtonPushedFcn = createCallbackFcn(app, @NonfiberObjectsButtonPushed, true);
             app.NonfiberObjectsButton.FontName = 'Avenir';
             app.NonfiberObjectsButton.Enable = 'off';
+            app.NonfiberObjectsButton.Tooltip = {'Calculate and display objects that are not fibers.'};
             app.NonfiberObjectsButton.Position = [886 6 120 33];
             app.NonfiberObjectsButton.Text = 'Nonfiber Objects';
 
@@ -2253,6 +2272,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.InitialSegmentationButton.BackgroundColor = [0.9608 0.9608 0.9608];
             app.InitialSegmentationButton.FontName = 'Avenir';
             app.InitialSegmentationButton.Enable = 'off';
+            app.InitialSegmentationButton.Tooltip = {'Segment the image to extract muscle fiber features, such as fiber boundaries, from the image.'};
             app.InitialSegmentationButton.Position = [6 6 120 33];
             app.InitialSegmentationButton.Text = 'Initial Segmentation';
 
@@ -2261,6 +2281,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationButton.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationButtonPushed, true);
             app.NonfiberClassificationButton.FontName = 'Avenir';
             app.NonfiberClassificationButton.Enable = 'off';
+            app.NonfiberClassificationButton.Tooltip = {'Detect non-fibers with intensity of a certain color channel greater than a threshold value.'};
             app.NonfiberClassificationButton.Position = [1012 6 136 33];
             app.NonfiberClassificationButton.Text = 'Nonfiber Classification';
 
@@ -2270,7 +2291,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualSegmentationControls.BackgroundColor = [1 1 1];
             app.ManualSegmentationControls.FontName = 'Avenir';
             app.ManualSegmentationControls.FontWeight = 'bold';
-            app.ManualSegmentationControls.Position = [18 262 265 309];
+            app.ManualSegmentationControls.Position = [16 235 265 309];
 
             % Create StartDrawingButton
             app.StartDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
@@ -2383,7 +2404,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberPredictionControlPanel.Visible = 'off';
             app.FiberPredictionControlPanel.BackgroundColor = [1 1 1];
             app.FiberPredictionControlPanel.FontName = 'Avenir';
-            app.FiberPredictionControlPanel.Position = [12 315 263 243];
+            app.FiberPredictionControlPanel.Position = [10 288 263 243];
 
             % Create FilterButton
             app.FilterButton = uibutton(app.FiberPredictionControlPanel, 'push');
@@ -2421,7 +2442,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberControlPanel.Visible = 'off';
             app.NonfiberControlPanel.BackgroundColor = [1 1 1];
             app.NonfiberControlPanel.FontName = 'Avenir';
-            app.NonfiberControlPanel.Position = [16 279 258 301];
+            app.NonfiberControlPanel.Position = [14 252 258 301];
 
             % Create NonfiberChannelColorBox
             app.NonfiberChannelColorBox = uiaxes(app.NonfiberControlPanel);
@@ -2503,7 +2524,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiControlPanel.Visible = 'off';
             app.CentralNucleiControlPanel.BackgroundColor = [1 1 1];
             app.CentralNucleiControlPanel.FontName = 'Avenir';
-            app.CentralNucleiControlPanel.Position = [12 280 260 293];
+            app.CentralNucleiControlPanel.Position = [10 253 260 293];
 
             % Create CentralNucleiChannelColorBox
             app.CentralNucleiChannelColorBox = uiaxes(app.CentralNucleiControlPanel);
@@ -2610,7 +2631,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberPropertiesControlPanel.Visible = 'off';
             app.FiberPropertiesControlPanel.BackgroundColor = [1 1 1];
             app.FiberPropertiesControlPanel.FontName = 'Avenir';
-            app.FiberPropertiesControlPanel.Position = [17 284 251 275];
+            app.FiberPropertiesControlPanel.Position = [15 257 251 275];
 
             % Create WritetoExcelButton
             app.WritetoExcelButton = uibutton(app.FiberPropertiesControlPanel, 'push');
@@ -2665,7 +2686,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingControlPanel.Visible = 'off';
             app.FiberTypingControlPanel.BackgroundColor = [1 1 1];
             app.FiberTypingControlPanel.FontName = 'Avenir';
-            app.FiberTypingControlPanel.Position = [12 287 260 293];
+            app.FiberTypingControlPanel.Position = [10 260 260 293];
 
             % Create FiberTypingChannelColorBox
             app.FiberTypingChannelColorBox = uiaxes(app.FiberTypingControlPanel);
@@ -2789,7 +2810,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.BatchModeLabel = uilabel(app.UIFigure);
             app.BatchModeLabel.FontName = 'Avenir';
             app.BatchModeLabel.Visible = 'off';
-            app.BatchModeLabel.Position = [156 596 130 22];
+            app.BatchModeLabel.Position = [154 569 130 22];
             app.BatchModeLabel.Text = 'Batch Mode';
 
             % Create SegmentationParameters
@@ -2797,7 +2818,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SegmentationParameters.Visible = 'off';
             app.SegmentationParameters.BackgroundColor = [1 1 1];
             app.SegmentationParameters.FontName = 'Avenir';
-            app.SegmentationParameters.Position = [14 353 286 218];
+            app.SegmentationParameters.Position = [12 326 286 218];
 
             % Create FiberOutlineChannelColorBox
             app.FiberOutlineChannelColorBox = uiaxes(app.SegmentationParameters);
@@ -2868,7 +2889,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationControlPanel.Visible = 'off';
             app.NonfiberClassificationControlPanel.BackgroundColor = [1 1 1];
             app.NonfiberClassificationControlPanel.FontName = 'Avenir';
-            app.NonfiberClassificationControlPanel.Position = [15 298 260 293];
+            app.NonfiberClassificationControlPanel.Position = [13 271 260 293];
 
             % Create NonfiberClassificationChannelColorBox
             app.NonfiberClassificationChannelColorBox = uiaxes(app.NonfiberClassificationControlPanel);
@@ -3048,6 +3069,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIAxes.MinorGridColor = 'none';
             app.UIAxes.Box = 'on';
             app.UIAxes.Position = [7 -51 897 633];
+
+            % Create SelectFileDescription
+            app.SelectFileDescription = uilabel(app.UIFigure);
+            app.SelectFileDescription.FontName = 'Avenir';
+            app.SelectFileDescription.FontWeight = 'bold';
+            app.SelectFileDescription.Position = [35 626 237 22];
+            app.SelectFileDescription.Text = 'Please select an image to analyze:';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
