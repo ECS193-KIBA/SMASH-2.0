@@ -859,20 +859,30 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 for k=1:numberOfFilesSelected
                     % Retrieve the filename of the current file
                     currentFile = app.BatchModeFileNames{k};
-                    % Add the prompt at the top for indication that batch
-                    % mode is running on which file
-                    promptString = "Batch Mode - In Progress: " + int2str(k-1) + " out of " + int2str(numberOfFilesSelected) + " completed.";
-                    app.Prompt.Text = promptString;
-                    % Go through file initilization
-                    % In file initialization, it enables all the other buttons,
-                    % so you need to change this button to the initial page and
-                    % then continue
-                    FileInitialization(app, currentFile, app.BatchModePathName, app.BatchModeFilterIndex);
-                    % Run filter button functionality
-                    AquireMaskFiberPrediction(app);
-                    FiberPredictionWithMediumTree(app);
-                end
+                    % Check if the file type is correct, if not skip
+                    if ~IsFileAccepted(app, currentFile)
+                        % Add the prompt for warning that file type is not
+                        % acceped
+                        app.Prompt.FontColor = [1 1 0];
+                        promptString = "<Batch Mode - Warning: " + currentFile + " skipped because it is not a valid file type>";
+                        app.Prompt.Text = promptString;
+                    else
+                        % Add the prompt at the top for indication that
+                        % batch mode is running on which file
+                        promptString = "Batch Mode - In Progress: " + int2str(k-1) + " out of " + int2str(numberOfFilesSelected) + " completed.";
+                        app.Prompt.Text = promptString;
+                        % Go through file initilization
+                        % In file initialization, it enables all the other buttons,
+                        % so you need to change this button to the initial page and
+                        % then continue
+                        FileInitialization(app, currentFile, app.BatchModePathName, app.BatchModeFilterIndex);
+                        % Run filter button functionality
+                        AquireMaskFiberPrediction(app);
+                        FiberPredictionWithMediumTree(app);
 
+                    end
+                end
+                app.Prompt.FontColor = [0 0 0];
                 app.Prompt.Text = 'Batch Mode - Fiber Prediction Completed.';
             end
 
@@ -893,22 +903,31 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 for k=1:numberOfFilesSelected
                     % Retrieve the filename of the current file
                     currentFile = app.BatchModeFileNames{k};
-                    % Add the prompt at the top for indication that batch
-                    % mode is running on which file
-                    promptString = "Batch Mode - In Progress: " + int2str(k-1) + " out of " + int2str(numberOfFilesSelected) + " completed.";
-                    app.Prompt.Text = promptString;
-                    % Go through file initilization
-                    % In file initialization, it enables all the other buttons,
-                    % so you need to change this button to the initial page and
-                    % then continue
-                    FileInitialization(app, currentFile, app.BatchModePathName, app.BatchModeFilterIndex);
-                    % Run segment button functionality
-                    SegmentAndDisplayImage(app);
-                    % Accept segmentation
-                    label = bwlabel(~logical(app.bw_obj),4);
-                    SaveMaskToMaskFile(app, label);
+                    % Check if the file type is correct, if not skip
+                    if ~IsFileAccepted(app, currentFile)
+                        % Add the prompt for warning that file type is not
+                        % acceped
+                        promptString = "<Batch Mode - Warning: " + currentFile + " skipped because it is not a valid file type>";
+                        app.Prompt.FontColor = [1 1 0];
+                        app.Prompt.Text = promptString;
+                    else
+                        % Add the prompt at the top for indication that batch
+                        % mode is running on which file
+                        promptString = "Batch Mode - In Progress: " + int2str(k-1) + " out of " + int2str(numberOfFilesSelected) + " completed.";
+                        app.Prompt.Text = promptString;
+                        % Go through file initilization
+                        % In file initialization, it enables all the other buttons,
+                        % so you need to change this button to the initial page and
+                        % then continue
+                        FileInitialization(app, currentFile, app.BatchModePathName, app.BatchModeFilterIndex);
+                        % Run segment button functionality
+                        SegmentAndDisplayImage(app);
+                        % Accept segmentation
+                        label = bwlabel(~logical(app.bw_obj),4);
+                        SaveMaskToMaskFile(app, label);
+                    end
                 end
-
+                app.Prompt.FontColor = [0 0 0];
                 app.Prompt.Text = 'Batch Mode - Initial Segmentation Completed.';
                 app.FiberPredictionButton.Enable = 'on';
                 app.SegmentationParameters.Visible = 'off';
