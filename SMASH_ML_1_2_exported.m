@@ -3,6 +3,21 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        FiberPredictionControlPanel     matlab.ui.container.Panel
+        PixelSizeFiberPrediction        matlab.ui.control.NumericEditField
+        PizelSizeumpixelLabel           matlab.ui.control.Label
+        SortingThresholdSlider          matlab.ui.control.Slider
+        SortingThresholdHigherrequiresmoremanualsortingLabel  matlab.ui.control.Label
+        ManualSortingButton             matlab.ui.control.Button
+        FilterButton                    matlab.ui.control.Button
+        FiberPropertiesControlPanel     matlab.ui.container.Panel
+        CalculateFiberProperties        matlab.ui.control.Button
+        PixelSizeFiberProperties        matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditFieldLabel_2  matlab.ui.control.Label
+        FiberPropertiesDataOutputFolder  matlab.ui.control.EditField
+        DataOutputFolderEditFieldLabel  matlab.ui.control.Label
+        DoneFiberProperties             matlab.ui.control.Button
+        WritetoExcelButton              matlab.ui.control.Button
         SegmentationParameters          matlab.ui.container.Panel
         InitialSegmentationDirections   matlab.ui.control.Label
         InitialSegmentationDescription  matlab.ui.control.Label
@@ -57,14 +72,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeFiberTyping            matlab.ui.control.NumericEditField
         PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
         FiberTypingChannelColorBox      matlab.ui.control.UIAxes
-        FiberPropertiesControlPanel     matlab.ui.container.Panel
-        CalculateFiberProperties        matlab.ui.control.Button
-        PixelSizeFiberProperties        matlab.ui.control.NumericEditField
-        PixelSizeumpixelEditFieldLabel_2  matlab.ui.control.Label
-        FiberPropertiesDataOutputFolder  matlab.ui.control.EditField
-        DataOutputFolderEditFieldLabel  matlab.ui.control.Label
-        DoneFiberProperties             matlab.ui.control.Button
-        WritetoExcelButton              matlab.ui.control.Button
         CentralNucleiControlPanel       matlab.ui.container.Panel
         CentralNucleiDataOutputFolder   matlab.ui.control.EditField
         DataOutputFolderEditField_2Label  matlab.ui.control.Label
@@ -91,11 +98,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         NonfiberObjectsColorDropDown    matlab.ui.control.DropDown
         ObjectColorDropDownLabel        matlab.ui.control.Label
         NonfiberChannelColorBox         matlab.ui.control.UIAxes
-        FiberPredictionControlPanel     matlab.ui.container.Panel
-        SortingThresholdSlider          matlab.ui.control.Slider
-        SortingThresholdHigherrequiresmoremanualsortingLabel  matlab.ui.control.Label
-        ManualSortingButton             matlab.ui.control.Button
-        FilterButton                    matlab.ui.control.Button
         Image                           matlab.ui.control.Image
         Panel                           matlab.ui.container.Panel
         Hyperlink_2                     matlab.ui.control.Hyperlink
@@ -594,6 +596,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeFiberTyping.Value = app.pix_size;
             app.PixelSizeNonfiberObjects.Value = app.pix_size;
             app.PixelSizeNonfiberClassification.Value = app.pix_size;
+            app.PixelSizeFiberPrediction.Value = app.pix_size;
         end
 
         function filter = AcceptedFileExtensionsFilter(app)
@@ -1513,6 +1516,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
                 app.FilterButton.Enable = 'on';
                 app.SortingThresholdSlider.Enable = 'on';
+                app.pix_size = app.PixelSizeFiberProperties.Value;
             else
                 app.Prompt.Text = '';
                 app.ImageBackground.Visible = 'on';
@@ -1524,6 +1528,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.SortingThresholdSlider.Visible = 'on';
                 app.SortingThresholdSlider.Enable = 'off';
                 app.FilterButton.Enable = 'on';
+                app.pix_size = app.PixelSizeFiberProperties.Value;
             end
         end
 
@@ -1954,6 +1959,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Value changed function: PixelSizeNonfiberClassification
         function PixelSizeNonfiberClassificationValueChanged(app, event)
             app.pix_size = app.PixelSizeNonfiberClassification.Value;
+            SyncPixelSize(app);
+        end
+
+        % Value changed function: PixelSizeFiberPrediction
+        function PixelSizeFiberPredictionValueChanged(app, event)
+            app.pix_size = app.PixelSizeFiberPrediction.Value;
             SyncPixelSize(app);
         end
     end
@@ -2401,44 +2412,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Image.Position = [10 728 36 55];
             app.Image.ImageSource = 'screenshot.png';
 
-            % Create FiberPredictionControlPanel
-            app.FiberPredictionControlPanel = uipanel(app.UIFigure);
-            app.FiberPredictionControlPanel.Visible = 'off';
-            app.FiberPredictionControlPanel.BackgroundColor = [1 1 1];
-            app.FiberPredictionControlPanel.FontName = 'Avenir';
-            app.FiberPredictionControlPanel.Position = [10 212 263 243];
-
-            % Create FilterButton
-            app.FilterButton = uibutton(app.FiberPredictionControlPanel, 'push');
-            app.FilterButton.ButtonPushedFcn = createCallbackFcn(app, @FilterButtonPushed, true);
-            app.FilterButton.FontName = 'Avenir';
-            app.FilterButton.Position = [74 101 100 24];
-            app.FilterButton.Text = 'Filter';
-
-            % Create ManualSortingButton
-            app.ManualSortingButton = uibutton(app.FiberPredictionControlPanel, 'push');
-            app.ManualSortingButton.ButtonPushedFcn = createCallbackFcn(app, @ManualSortingButtonPushed, true);
-            app.ManualSortingButton.FontName = 'Avenir';
-            app.ManualSortingButton.Enable = 'off';
-            app.ManualSortingButton.Position = [75 52 100 24];
-            app.ManualSortingButton.Text = 'Manual Sorting';
-
-            % Create SortingThresholdHigherrequiresmoremanualsortingLabel
-            app.SortingThresholdHigherrequiresmoremanualsortingLabel = uilabel(app.FiberPredictionControlPanel);
-            app.SortingThresholdHigherrequiresmoremanualsortingLabel.HorizontalAlignment = 'center';
-            app.SortingThresholdHigherrequiresmoremanualsortingLabel.FontName = 'Avenir';
-            app.SortingThresholdHigherrequiresmoremanualsortingLabel.Position = [-28 160 209 48];
-            app.SortingThresholdHigherrequiresmoremanualsortingLabel.Text = {'Sorting Threshold'; '(Higher requires'; ' more manual sorting)'; ''};
-
-            % Create SortingThresholdSlider
-            app.SortingThresholdSlider = uislider(app.FiberPredictionControlPanel);
-            app.SortingThresholdSlider.Limits = [0 0.9];
-            app.SortingThresholdSlider.MajorTicks = [0 0.5 0.9];
-            app.SortingThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SortingThresholdSliderValueChanged, true);
-            app.SortingThresholdSlider.MinorTicks = [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9];
-            app.SortingThresholdSlider.FontName = 'Avenir';
-            app.SortingThresholdSlider.Position = [150 195 92 3];
-
             % Create NonfiberControlPanel
             app.NonfiberControlPanel = uipanel(app.UIFigure);
             app.NonfiberControlPanel.Visible = 'off';
@@ -2627,61 +2600,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiDataOutputFolder = uieditfield(app.CentralNucleiControlPanel, 'text');
             app.CentralNucleiDataOutputFolder.FontName = 'Avenir';
             app.CentralNucleiDataOutputFolder.Position = [139 128 109 22];
-
-            % Create FiberPropertiesControlPanel
-            app.FiberPropertiesControlPanel = uipanel(app.UIFigure);
-            app.FiberPropertiesControlPanel.Visible = 'off';
-            app.FiberPropertiesControlPanel.BackgroundColor = [1 1 1];
-            app.FiberPropertiesControlPanel.FontName = 'Avenir';
-            app.FiberPropertiesControlPanel.Position = [15 181 251 275];
-
-            % Create WritetoExcelButton
-            app.WritetoExcelButton = uibutton(app.FiberPropertiesControlPanel, 'push');
-            app.WritetoExcelButton.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelButtonPushed, true);
-            app.WritetoExcelButton.FontName = 'Avenir';
-            app.WritetoExcelButton.Enable = 'off';
-            app.WritetoExcelButton.Position = [27 63 100 24];
-            app.WritetoExcelButton.Text = 'Write to Excel';
-
-            % Create DoneFiberProperties
-            app.DoneFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
-            app.DoneFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @DoneFiberPropertiesPushed, true);
-            app.DoneFiberProperties.FontName = 'Avenir';
-            app.DoneFiberProperties.Position = [140 63 100 24];
-            app.DoneFiberProperties.Text = 'Done';
-
-            % Create DataOutputFolderEditFieldLabel
-            app.DataOutputFolderEditFieldLabel = uilabel(app.FiberPropertiesControlPanel);
-            app.DataOutputFolderEditFieldLabel.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditFieldLabel.FontName = 'Avenir';
-            app.DataOutputFolderEditFieldLabel.Position = [13 169 111 22];
-            app.DataOutputFolderEditFieldLabel.Text = 'Data Output Folder';
-
-            % Create FiberPropertiesDataOutputFolder
-            app.FiberPropertiesDataOutputFolder = uieditfield(app.FiberPropertiesControlPanel, 'text');
-            app.FiberPropertiesDataOutputFolder.FontName = 'Avenir';
-            app.FiberPropertiesDataOutputFolder.Position = [139 169 100 22];
-
-            % Create PixelSizeumpixelEditFieldLabel_2
-            app.PixelSizeumpixelEditFieldLabel_2 = uilabel(app.FiberPropertiesControlPanel);
-            app.PixelSizeumpixelEditFieldLabel_2.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditFieldLabel_2.FontName = 'Avenir';
-            app.PixelSizeumpixelEditFieldLabel_2.Position = [10 218 114 22];
-            app.PixelSizeumpixelEditFieldLabel_2.Text = 'Pixel Size (um/pixel)';
-
-            % Create PixelSizeFiberProperties
-            app.PixelSizeFiberProperties = uieditfield(app.FiberPropertiesControlPanel, 'numeric');
-            app.PixelSizeFiberProperties.Limits = [0 Inf];
-            app.PixelSizeFiberProperties.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPropertiesValueChanged, true);
-            app.PixelSizeFiberProperties.FontName = 'Avenir';
-            app.PixelSizeFiberProperties.Position = [139 218 100 22];
-
-            % Create CalculateFiberProperties
-            app.CalculateFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
-            app.CalculateFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberPropertiesPushed, true);
-            app.CalculateFiberProperties.FontName = 'Avenir';
-            app.CalculateFiberProperties.Position = [81 117 100 24];
-            app.CalculateFiberProperties.Text = 'Calculate';
 
             % Create FiberTypingControlPanel
             app.FiberTypingControlPanel = uipanel(app.UIFigure);
@@ -3092,6 +3010,111 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.InitialSegmentationDirections.FontWeight = 'bold';
             app.InitialSegmentationDirections.Position = [15 199 267 80];
             app.InitialSegmentationDirections.Text = {'Adjust the Fiber Outline Color, Pixel Size, '; 'and Segmentation Threshold to the desired '; 'values. Optionally, “Detect Value” can be'; 'used to predict a segmentation value. Select'; '“Segment” once the desired values are chosen.'};
+
+            % Create FiberPropertiesControlPanel
+            app.FiberPropertiesControlPanel = uipanel(app.UIFigure);
+            app.FiberPropertiesControlPanel.Visible = 'off';
+            app.FiberPropertiesControlPanel.BackgroundColor = [1 1 1];
+            app.FiberPropertiesControlPanel.FontName = 'Avenir';
+            app.FiberPropertiesControlPanel.Position = [15 181 251 275];
+
+            % Create WritetoExcelButton
+            app.WritetoExcelButton = uibutton(app.FiberPropertiesControlPanel, 'push');
+            app.WritetoExcelButton.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelButtonPushed, true);
+            app.WritetoExcelButton.FontName = 'Avenir';
+            app.WritetoExcelButton.Enable = 'off';
+            app.WritetoExcelButton.Position = [27 63 100 24];
+            app.WritetoExcelButton.Text = 'Write to Excel';
+
+            % Create DoneFiberProperties
+            app.DoneFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
+            app.DoneFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @DoneFiberPropertiesPushed, true);
+            app.DoneFiberProperties.FontName = 'Avenir';
+            app.DoneFiberProperties.Position = [140 63 100 24];
+            app.DoneFiberProperties.Text = 'Done';
+
+            % Create DataOutputFolderEditFieldLabel
+            app.DataOutputFolderEditFieldLabel = uilabel(app.FiberPropertiesControlPanel);
+            app.DataOutputFolderEditFieldLabel.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditFieldLabel.FontName = 'Avenir';
+            app.DataOutputFolderEditFieldLabel.Position = [13 169 111 22];
+            app.DataOutputFolderEditFieldLabel.Text = 'Data Output Folder';
+
+            % Create FiberPropertiesDataOutputFolder
+            app.FiberPropertiesDataOutputFolder = uieditfield(app.FiberPropertiesControlPanel, 'text');
+            app.FiberPropertiesDataOutputFolder.FontName = 'Avenir';
+            app.FiberPropertiesDataOutputFolder.Position = [139 169 100 22];
+
+            % Create PixelSizeumpixelEditFieldLabel_2
+            app.PixelSizeumpixelEditFieldLabel_2 = uilabel(app.FiberPropertiesControlPanel);
+            app.PixelSizeumpixelEditFieldLabel_2.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditFieldLabel_2.FontName = 'Avenir';
+            app.PixelSizeumpixelEditFieldLabel_2.Position = [10 218 114 22];
+            app.PixelSizeumpixelEditFieldLabel_2.Text = 'Pixel Size (um/pixel)';
+
+            % Create PixelSizeFiberProperties
+            app.PixelSizeFiberProperties = uieditfield(app.FiberPropertiesControlPanel, 'numeric');
+            app.PixelSizeFiberProperties.Limits = [0 Inf];
+            app.PixelSizeFiberProperties.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPropertiesValueChanged, true);
+            app.PixelSizeFiberProperties.FontName = 'Avenir';
+            app.PixelSizeFiberProperties.Position = [139 218 100 22];
+
+            % Create CalculateFiberProperties
+            app.CalculateFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
+            app.CalculateFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberPropertiesPushed, true);
+            app.CalculateFiberProperties.FontName = 'Avenir';
+            app.CalculateFiberProperties.Position = [81 117 100 24];
+            app.CalculateFiberProperties.Text = 'Calculate';
+
+            % Create FiberPredictionControlPanel
+            app.FiberPredictionControlPanel = uipanel(app.UIFigure);
+            app.FiberPredictionControlPanel.Visible = 'off';
+            app.FiberPredictionControlPanel.BackgroundColor = [1 1 1];
+            app.FiberPredictionControlPanel.FontName = 'Avenir';
+            app.FiberPredictionControlPanel.Position = [31 212 272 276];
+
+            % Create FilterButton
+            app.FilterButton = uibutton(app.FiberPredictionControlPanel, 'push');
+            app.FilterButton.ButtonPushedFcn = createCallbackFcn(app, @FilterButtonPushed, true);
+            app.FilterButton.FontName = 'Avenir';
+            app.FilterButton.Position = [74 95 100 24];
+            app.FilterButton.Text = 'Filter';
+
+            % Create ManualSortingButton
+            app.ManualSortingButton = uibutton(app.FiberPredictionControlPanel, 'push');
+            app.ManualSortingButton.ButtonPushedFcn = createCallbackFcn(app, @ManualSortingButtonPushed, true);
+            app.ManualSortingButton.FontName = 'Avenir';
+            app.ManualSortingButton.Enable = 'off';
+            app.ManualSortingButton.Position = [74 37 100 24];
+            app.ManualSortingButton.Text = 'Manual Sorting';
+
+            % Create SortingThresholdHigherrequiresmoremanualsortingLabel
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel = uilabel(app.FiberPredictionControlPanel);
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel.HorizontalAlignment = 'center';
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel.FontName = 'Avenir';
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel.Position = [-41 141 209 48];
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel.Text = {'Sorting Threshold'; '(Higher requires'; ' more manual sorting)'; ''};
+
+            % Create SortingThresholdSlider
+            app.SortingThresholdSlider = uislider(app.FiberPredictionControlPanel);
+            app.SortingThresholdSlider.Limits = [0 0.9];
+            app.SortingThresholdSlider.MajorTicks = [0 0.5 0.9];
+            app.SortingThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SortingThresholdSliderValueChanged, true);
+            app.SortingThresholdSlider.MinorTicks = [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9];
+            app.SortingThresholdSlider.FontName = 'Avenir';
+            app.SortingThresholdSlider.Position = [145 175 104 3];
+
+            % Create PizelSizeumpixelLabel
+            app.PizelSizeumpixelLabel = uilabel(app.FiberPredictionControlPanel);
+            app.PizelSizeumpixelLabel.HorizontalAlignment = 'right';
+            app.PizelSizeumpixelLabel.Position = [16 215 114 22];
+            app.PizelSizeumpixelLabel.Text = 'Pizel Size (um/pixel)';
+
+            % Create PixelSizeFiberPrediction
+            app.PixelSizeFiberPrediction = uieditfield(app.FiberPredictionControlPanel, 'numeric');
+            app.PixelSizeFiberPrediction.Limits = [0 Inf];
+            app.PixelSizeFiberPrediction.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPredictionValueChanged, true);
+            app.PixelSizeFiberPrediction.Position = [136 215 100 22];
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
