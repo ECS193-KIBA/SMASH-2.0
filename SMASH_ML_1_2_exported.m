@@ -3,22 +3,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
-        FiberPredictionControlPanel     matlab.ui.container.Panel
-        PixelSizeFiberPrediction        matlab.ui.control.NumericEditField
-        PizelSizeumpixelLabel           matlab.ui.control.Label
-        SortingThresholdSlider          matlab.ui.control.Slider
-        SortingThresholdHigherrequiresmoremanualsortingLabel  matlab.ui.control.Label
-        ManualSortingButton             matlab.ui.control.Button
-        FilterButton                    matlab.ui.control.Button
-        FiberPropertiesControlPanel     matlab.ui.container.Panel
-        CalculateFiberProperties        matlab.ui.control.Button
-        PixelSizeFiberProperties        matlab.ui.control.NumericEditField
-        PixelSizeumpixelEditFieldLabel_2  matlab.ui.control.Label
-        FiberPropertiesDataOutputFolder  matlab.ui.control.EditField
-        DataOutputFolderEditFieldLabel  matlab.ui.control.Label
-        DoneFiberProperties             matlab.ui.control.Button
-        WritetoExcelButton              matlab.ui.control.Button
         SegmentationParameters          matlab.ui.container.Panel
+        InitialSegmentationDescription_2  matlab.ui.control.Label
         InitialSegmentationDirections   matlab.ui.control.Label
         InitialSegmentationDescription  matlab.ui.control.Label
         DetectValueButton               matlab.ui.control.Button
@@ -29,6 +15,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         FiberOutlineColorDropDownLabel  matlab.ui.control.Label
         SegmentButton                   matlab.ui.control.Button
         FiberOutlineChannelColorBox     matlab.ui.control.UIAxes
+        FiberPropertiesControlPanel     matlab.ui.container.Panel
+        CalculateFiberProperties        matlab.ui.control.Button
+        PixelSizeFiberProperties        matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditFieldLabel_2  matlab.ui.control.Label
+        FiberPropertiesDataOutputFolder  matlab.ui.control.EditField
+        DataOutputFolderEditFieldLabel  matlab.ui.control.Label
+        DoneFiberProperties             matlab.ui.control.Button
+        WritetoExcelButton              matlab.ui.control.Button
         NonfiberClassificationControlPanel  matlab.ui.container.Panel
         NonfiberClassificationColorDropDown  matlab.ui.control.DropDown
         FiberTypeColorDropDown_2Label   matlab.ui.control.Label
@@ -98,6 +92,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         NonfiberObjectsColorDropDown    matlab.ui.control.DropDown
         ObjectColorDropDownLabel        matlab.ui.control.Label
         NonfiberChannelColorBox         matlab.ui.control.UIAxes
+        FiberPredictionControlPanel     matlab.ui.container.Panel
+        PixelSizeFiberPrediction        matlab.ui.control.NumericEditField
+        PizelSizeumpixelLabel           matlab.ui.control.Label
+        SortingThresholdSlider          matlab.ui.control.Slider
+        SortingThresholdHigherrequiresmoremanualsortingLabel  matlab.ui.control.Label
+        ManualSortingButton             matlab.ui.control.Button
+        FilterButton                    matlab.ui.control.Button
         Image                           matlab.ui.control.Image
         Panel                           matlab.ui.container.Panel
         Hyperlink_2                     matlab.ui.control.Hyperlink
@@ -2431,6 +2432,56 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Image.Position = [10 728 36 55];
             app.Image.ImageSource = 'screenshot.png';
 
+            % Create FiberPredictionControlPanel
+            app.FiberPredictionControlPanel = uipanel(app.UIFigure);
+            app.FiberPredictionControlPanel.Visible = 'off';
+            app.FiberPredictionControlPanel.BackgroundColor = [1 1 1];
+            app.FiberPredictionControlPanel.FontName = 'Avenir';
+            app.FiberPredictionControlPanel.Position = [31 212 272 276];
+
+            % Create FilterButton
+            app.FilterButton = uibutton(app.FiberPredictionControlPanel, 'push');
+            app.FilterButton.ButtonPushedFcn = createCallbackFcn(app, @FilterButtonPushed, true);
+            app.FilterButton.FontName = 'Avenir';
+            app.FilterButton.Position = [74 95 100 24];
+            app.FilterButton.Text = 'Filter';
+
+            % Create ManualSortingButton
+            app.ManualSortingButton = uibutton(app.FiberPredictionControlPanel, 'push');
+            app.ManualSortingButton.ButtonPushedFcn = createCallbackFcn(app, @ManualSortingButtonPushed, true);
+            app.ManualSortingButton.FontName = 'Avenir';
+            app.ManualSortingButton.Enable = 'off';
+            app.ManualSortingButton.Position = [74 37 100 24];
+            app.ManualSortingButton.Text = 'Manual Sorting';
+
+            % Create SortingThresholdHigherrequiresmoremanualsortingLabel
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel = uilabel(app.FiberPredictionControlPanel);
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel.HorizontalAlignment = 'center';
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel.FontName = 'Avenir';
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel.Position = [-41 141 209 48];
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel.Text = {'Sorting Threshold'; '(Higher requires'; ' more manual sorting)'; ''};
+
+            % Create SortingThresholdSlider
+            app.SortingThresholdSlider = uislider(app.FiberPredictionControlPanel);
+            app.SortingThresholdSlider.Limits = [0 0.9];
+            app.SortingThresholdSlider.MajorTicks = [0 0.5 0.9];
+            app.SortingThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SortingThresholdSliderValueChanged, true);
+            app.SortingThresholdSlider.MinorTicks = [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9];
+            app.SortingThresholdSlider.FontName = 'Avenir';
+            app.SortingThresholdSlider.Position = [145 175 104 3];
+
+            % Create PizelSizeumpixelLabel
+            app.PizelSizeumpixelLabel = uilabel(app.FiberPredictionControlPanel);
+            app.PizelSizeumpixelLabel.HorizontalAlignment = 'right';
+            app.PizelSizeumpixelLabel.Position = [16 215 114 22];
+            app.PizelSizeumpixelLabel.Text = 'Pizel Size (um/pixel)';
+
+            % Create PixelSizeFiberPrediction
+            app.PixelSizeFiberPrediction = uieditfield(app.FiberPredictionControlPanel, 'numeric');
+            app.PixelSizeFiberPrediction.Limits = [0 Inf];
+            app.PixelSizeFiberPrediction.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPredictionValueChanged, true);
+            app.PixelSizeFiberPrediction.Position = [136 215 100 22];
+
             % Create NonfiberControlPanel
             app.NonfiberControlPanel = uipanel(app.UIFigure);
             app.NonfiberControlPanel.Visible = 'off';
@@ -2735,15 +2786,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberAdjust = uibutton(app.NonfiberPanel, 'push');
             app.NonfiberAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAdjustButtonPushed, true);
             app.NonfiberAdjust.FontName = 'Avenir';
-            app.NonfiberAdjust.Position = [340 -71 256 104];
-            app.NonfiberAdjust.Text = {'Adjust the Fiber Outline Color, Pixel Size, '; 'and Segmentation Threshold to the desired '; 'values. Optionally, “Detect Value” can be'; 'used to predict a segmentation value. Select'; '“Segment” once the desired values are'; 'chosen.'};
+            app.NonfiberAdjust.Position = [418 9 100 24];
+            app.NonfiberAdjust.Text = 'Adjust';
 
             % Create NonfiberAccept
             app.NonfiberAccept = uibutton(app.NonfiberPanel, 'push');
             app.NonfiberAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAcceptButtonPushed, true);
             app.NonfiberAccept.FontName = 'Avenir';
-            app.NonfiberAccept.Position = [464 -72 256 104];
-            app.NonfiberAccept.Text = {'Adjust the Fiber Outline Color, Pixel Size, '; 'and Segmentation Threshold to the desired '; 'values. Optionally, “Detect Value” can be'; 'used to predict a segmentation value. Select'; '“Segment” once the desired values are'; 'chosen.'};
+            app.NonfiberAccept.Position = [542 8 100 24];
+            app.NonfiberAccept.Text = 'Accept';
 
             % Create BatchModeLabel
             app.BatchModeLabel = uilabel(app.UIFigure);
@@ -2945,97 +2996,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationColorDropDown.Position = [126 197 100 22];
             app.NonfiberClassificationColorDropDown.Value = '1';
 
-            % Create SegmentationParameters
-            app.SegmentationParameters = uipanel(app.UIFigure);
-            app.SegmentationParameters.Visible = 'off';
-            app.SegmentationParameters.BackgroundColor = [1 1 1];
-            app.SegmentationParameters.FontName = 'Avenir';
-            app.SegmentationParameters.Position = [15 251 288 335];
-
-            % Create FiberOutlineChannelColorBox
-            app.FiberOutlineChannelColorBox = uiaxes(app.SegmentationParameters);
-            app.FiberOutlineChannelColorBox.Toolbar.Visible = 'off';
-            app.FiberOutlineChannelColorBox.FontName = 'Avenir';
-            app.FiberOutlineChannelColorBox.XTick = [];
-            app.FiberOutlineChannelColorBox.YTick = [];
-            app.FiberOutlineChannelColorBox.Color = [0 1 1];
-            app.FiberOutlineChannelColorBox.Box = 'on';
-            app.FiberOutlineChannelColorBox.PickableParts = 'none';
-            app.FiberOutlineChannelColorBox.Position = [225 160 30 30];
-
-            % Create SegmentButton
-            app.SegmentButton = uibutton(app.SegmentationParameters, 'push');
-            app.SegmentButton.ButtonPushedFcn = createCallbackFcn(app, @SegmentButtonPushed, true);
-            app.SegmentButton.FontName = 'Avenir';
-            app.SegmentButton.Position = [148 58 100 24];
-            app.SegmentButton.Text = 'Segment';
-
-            % Create FiberOutlineColorDropDownLabel
-            app.FiberOutlineColorDropDownLabel = uilabel(app.SegmentationParameters);
-            app.FiberOutlineColorDropDownLabel.HorizontalAlignment = 'right';
-            app.FiberOutlineColorDropDownLabel.FontName = 'Avenir';
-            app.FiberOutlineColorDropDownLabel.Position = [10 164 109 22];
-            app.FiberOutlineColorDropDownLabel.Text = 'Fiber Outline Color';
-
-            % Create FiberOutlineColorDropDown
-            app.FiberOutlineColorDropDown = uidropdown(app.SegmentationParameters);
-            app.FiberOutlineColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.FiberOutlineColorDropDown.ItemsData = {'1', '2', '3'};
-            app.FiberOutlineColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberOutlineColorValueChanged, true);
-            app.FiberOutlineColorDropDown.FontName = 'Avenir';
-            app.FiberOutlineColorDropDown.Position = [121 164 100 22];
-            app.FiberOutlineColorDropDown.Value = '1';
-
-            % Create AcceptSegmentationButton
-            app.AcceptSegmentationButton = uibutton(app.SegmentationParameters, 'push');
-            app.AcceptSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptSegmentationButtonPushed, true);
-            app.AcceptSegmentationButton.FontName = 'Avenir';
-            app.AcceptSegmentationButton.Enable = 'off';
-            app.AcceptSegmentationButton.Position = [75 21 100 24];
-            app.AcceptSegmentationButton.Text = 'Accept';
-
-            % Create SegmentationThresholdSliderLabel
-            app.SegmentationThresholdSliderLabel = uilabel(app.SegmentationParameters);
-            app.SegmentationThresholdSliderLabel.HorizontalAlignment = 'center';
-            app.SegmentationThresholdSliderLabel.FontName = 'Avenir';
-            app.SegmentationThresholdSliderLabel.Position = [15 123 81 43];
-            app.SegmentationThresholdSliderLabel.Text = {'Segmentation'; 'Threshold'};
-
-            % Create SegmentationThresholdSlider
-            app.SegmentationThresholdSlider = uislider(app.SegmentationParameters);
-            app.SegmentationThresholdSlider.Limits = [0 50];
-            app.SegmentationThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SegmentationThresholdSliderValueChanged, true);
-            app.SegmentationThresholdSlider.FontName = 'Avenir';
-            app.SegmentationThresholdSlider.Position = [80 130 139 3];
-
-            % Create DetectValueButton
-            app.DetectValueButton = uibutton(app.SegmentationParameters, 'push');
-            app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
-            app.DetectValueButton.BackgroundColor = [0.902 0.902 0.902];
-            app.DetectValueButton.FontName = 'Avenir';
-            app.DetectValueButton.Position = [14 58 100 24];
-            app.DetectValueButton.Text = 'Detect Value';
-
-            % Create InitialSegmentationDescription
-            app.InitialSegmentationDescription = uilabel(app.SegmentationParameters);
-            app.InitialSegmentationDescription.FontName = 'Avenir';
-            app.InitialSegmentationDescription.FontWeight = 'bold';
-            app.InitialSegmentationDescription.Position = [15 295 237 39];
-            app.InitialSegmentationDescription.Text = {'This step segments the image to extract'; 'muscle fiber features from the image.'};
-
-            % Create InitialSegmentationDirections
-            app.InitialSegmentationDirections = uilabel(app.SegmentationParameters);
-            app.InitialSegmentationDirections.FontName = 'Avenir';
-            app.InitialSegmentationDirections.FontWeight = 'bold';
-            app.InitialSegmentationDirections.Position = [15 199 267 80];
-            app.InitialSegmentationDirections.Text = {'Adjust the Fiber Outline Color, Pixel Size, '; 'and Segmentation Threshold to the desired '; 'values. Optionally, “Detect Value” can be'; 'used to predict a segmentation value. Select'; '“Segment” once the desired values are chosen.'};
-
             % Create FiberPropertiesControlPanel
             app.FiberPropertiesControlPanel = uipanel(app.UIFigure);
             app.FiberPropertiesControlPanel.Visible = 'off';
             app.FiberPropertiesControlPanel.BackgroundColor = [1 1 1];
             app.FiberPropertiesControlPanel.FontName = 'Avenir';
-            app.FiberPropertiesControlPanel.Position = [15 181 251 275];
+            app.FiberPropertiesControlPanel.Position = [15 183 251 275];
 
             % Create WritetoExcelButton
             app.WritetoExcelButton = uibutton(app.FiberPropertiesControlPanel, 'push');
@@ -3085,55 +3051,97 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CalculateFiberProperties.Position = [81 117 100 24];
             app.CalculateFiberProperties.Text = 'Calculate';
 
-            % Create FiberPredictionControlPanel
-            app.FiberPredictionControlPanel = uipanel(app.UIFigure);
-            app.FiberPredictionControlPanel.Visible = 'off';
-            app.FiberPredictionControlPanel.BackgroundColor = [1 1 1];
-            app.FiberPredictionControlPanel.FontName = 'Avenir';
-            app.FiberPredictionControlPanel.Position = [31 212 272 276];
+            % Create SegmentationParameters
+            app.SegmentationParameters = uipanel(app.UIFigure);
+            app.SegmentationParameters.Visible = 'off';
+            app.SegmentationParameters.BackgroundColor = [1 1 1];
+            app.SegmentationParameters.FontName = 'Avenir';
+            app.SegmentationParameters.Position = [22 212 288 369];
 
-            % Create FilterButton
-            app.FilterButton = uibutton(app.FiberPredictionControlPanel, 'push');
-            app.FilterButton.ButtonPushedFcn = createCallbackFcn(app, @FilterButtonPushed, true);
-            app.FilterButton.FontName = 'Avenir';
-            app.FilterButton.Position = [74 95 100 24];
-            app.FilterButton.Text = 'Filter';
+            % Create FiberOutlineChannelColorBox
+            app.FiberOutlineChannelColorBox = uiaxes(app.SegmentationParameters);
+            app.FiberOutlineChannelColorBox.Toolbar.Visible = 'off';
+            app.FiberOutlineChannelColorBox.FontName = 'Avenir';
+            app.FiberOutlineChannelColorBox.XTick = [];
+            app.FiberOutlineChannelColorBox.YTick = [];
+            app.FiberOutlineChannelColorBox.Color = [0 1 1];
+            app.FiberOutlineChannelColorBox.Box = 'on';
+            app.FiberOutlineChannelColorBox.PickableParts = 'none';
+            app.FiberOutlineChannelColorBox.Position = [238 194 30 30];
 
-            % Create ManualSortingButton
-            app.ManualSortingButton = uibutton(app.FiberPredictionControlPanel, 'push');
-            app.ManualSortingButton.ButtonPushedFcn = createCallbackFcn(app, @ManualSortingButtonPushed, true);
-            app.ManualSortingButton.FontName = 'Avenir';
-            app.ManualSortingButton.Enable = 'off';
-            app.ManualSortingButton.Position = [74 37 100 24];
-            app.ManualSortingButton.Text = 'Manual Sorting';
+            % Create SegmentButton
+            app.SegmentButton = uibutton(app.SegmentationParameters, 'push');
+            app.SegmentButton.ButtonPushedFcn = createCallbackFcn(app, @SegmentButtonPushed, true);
+            app.SegmentButton.FontName = 'Avenir';
+            app.SegmentButton.Position = [152 92 100 24];
+            app.SegmentButton.Text = 'Segment';
 
-            % Create SortingThresholdHigherrequiresmoremanualsortingLabel
-            app.SortingThresholdHigherrequiresmoremanualsortingLabel = uilabel(app.FiberPredictionControlPanel);
-            app.SortingThresholdHigherrequiresmoremanualsortingLabel.HorizontalAlignment = 'center';
-            app.SortingThresholdHigherrequiresmoremanualsortingLabel.FontName = 'Avenir';
-            app.SortingThresholdHigherrequiresmoremanualsortingLabel.Position = [-41 141 209 48];
-            app.SortingThresholdHigherrequiresmoremanualsortingLabel.Text = {'Sorting Threshold'; '(Higher requires'; ' more manual sorting)'; ''};
+            % Create FiberOutlineColorDropDownLabel
+            app.FiberOutlineColorDropDownLabel = uilabel(app.SegmentationParameters);
+            app.FiberOutlineColorDropDownLabel.HorizontalAlignment = 'right';
+            app.FiberOutlineColorDropDownLabel.FontName = 'Avenir';
+            app.FiberOutlineColorDropDownLabel.Position = [6 198 109 22];
+            app.FiberOutlineColorDropDownLabel.Text = 'Fiber Outline Color';
 
-            % Create SortingThresholdSlider
-            app.SortingThresholdSlider = uislider(app.FiberPredictionControlPanel);
-            app.SortingThresholdSlider.Limits = [0 0.9];
-            app.SortingThresholdSlider.MajorTicks = [0 0.5 0.9];
-            app.SortingThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SortingThresholdSliderValueChanged, true);
-            app.SortingThresholdSlider.MinorTicks = [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9];
-            app.SortingThresholdSlider.FontName = 'Avenir';
-            app.SortingThresholdSlider.Position = [145 175 104 3];
+            % Create FiberOutlineColorDropDown
+            app.FiberOutlineColorDropDown = uidropdown(app.SegmentationParameters);
+            app.FiberOutlineColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.FiberOutlineColorDropDown.ItemsData = {'1', '2', '3'};
+            app.FiberOutlineColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberOutlineColorValueChanged, true);
+            app.FiberOutlineColorDropDown.FontName = 'Avenir';
+            app.FiberOutlineColorDropDown.Position = [126 198 106 22];
+            app.FiberOutlineColorDropDown.Value = '1';
 
-            % Create PizelSizeumpixelLabel
-            app.PizelSizeumpixelLabel = uilabel(app.FiberPredictionControlPanel);
-            app.PizelSizeumpixelLabel.HorizontalAlignment = 'right';
-            app.PizelSizeumpixelLabel.Position = [16 215 114 22];
-            app.PizelSizeumpixelLabel.Text = 'Pizel Size (um/pixel)';
+            % Create AcceptSegmentationButton
+            app.AcceptSegmentationButton = uibutton(app.SegmentationParameters, 'push');
+            app.AcceptSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptSegmentationButtonPushed, true);
+            app.AcceptSegmentationButton.FontName = 'Avenir';
+            app.AcceptSegmentationButton.Enable = 'off';
+            app.AcceptSegmentationButton.Position = [89 17 100 24];
+            app.AcceptSegmentationButton.Text = 'Accept';
 
-            % Create PixelSizeFiberPrediction
-            app.PixelSizeFiberPrediction = uieditfield(app.FiberPredictionControlPanel, 'numeric');
-            app.PixelSizeFiberPrediction.Limits = [0 Inf];
-            app.PixelSizeFiberPrediction.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPredictionValueChanged, true);
-            app.PixelSizeFiberPrediction.Position = [136 215 100 22];
+            % Create SegmentationThresholdSliderLabel
+            app.SegmentationThresholdSliderLabel = uilabel(app.SegmentationParameters);
+            app.SegmentationThresholdSliderLabel.HorizontalAlignment = 'center';
+            app.SegmentationThresholdSliderLabel.FontName = 'Avenir';
+            app.SegmentationThresholdSliderLabel.Position = [10 138 80 43];
+            app.SegmentationThresholdSliderLabel.Text = {'Segmentation'; 'Threshold'};
+
+            % Create SegmentationThresholdSlider
+            app.SegmentationThresholdSlider = uislider(app.SegmentationParameters);
+            app.SegmentationThresholdSlider.Limits = [0 50];
+            app.SegmentationThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SegmentationThresholdSliderValueChanged, true);
+            app.SegmentationThresholdSlider.FontName = 'Avenir';
+            app.SegmentationThresholdSlider.Position = [104 164 153 3];
+
+            % Create DetectValueButton
+            app.DetectValueButton = uibutton(app.SegmentationParameters, 'push');
+            app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
+            app.DetectValueButton.BackgroundColor = [0.902 0.902 0.902];
+            app.DetectValueButton.FontName = 'Avenir';
+            app.DetectValueButton.Position = [27 92 100 24];
+            app.DetectValueButton.Text = 'Detect Value';
+
+            % Create InitialSegmentationDescription
+            app.InitialSegmentationDescription = uilabel(app.SegmentationParameters);
+            app.InitialSegmentationDescription.FontName = 'Avenir';
+            app.InitialSegmentationDescription.FontWeight = 'bold';
+            app.InitialSegmentationDescription.Position = [15 329 237 39];
+            app.InitialSegmentationDescription.Text = {'This step segments the image to extract'; 'muscle fiber features from the image.'};
+
+            % Create InitialSegmentationDirections
+            app.InitialSegmentationDirections = uilabel(app.SegmentationParameters);
+            app.InitialSegmentationDirections.FontName = 'Avenir';
+            app.InitialSegmentationDirections.FontWeight = 'bold';
+            app.InitialSegmentationDirections.Position = [15 233 267 80];
+            app.InitialSegmentationDirections.Text = {'Adjust the Fiber Outline Color, Pixel Size, '; 'and Segmentation Threshold to the desired '; 'values. Optionally, “Detect Value” can be'; 'used to predict a segmentation value. Select'; '“Segment” once the desired values are chosen.'};
+
+            % Create InitialSegmentationDescription_2
+            app.InitialSegmentationDescription_2 = uilabel(app.SegmentationParameters);
+            app.InitialSegmentationDescription_2.FontName = 'Avenir';
+            app.InitialSegmentationDescription_2.FontWeight = 'bold';
+            app.InitialSegmentationDescription_2.Position = [17 37 287 39];
+            app.InitialSegmentationDescription_2.Text = {'Once the image is to your liking, select'; '"Accept":'};
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
