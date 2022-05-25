@@ -318,7 +318,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 ImageData = imread(FileName);
                 app.orig_img = ImageData;
                 app.orig_img_multispectral = ImageData;
-
+		
                 % Append RGB color channels to channelRGB for RGB images
                 % Add red, green, and blue to channelRGB
                 RedValue = [1 0 0];
@@ -330,6 +330,88 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Display the image
             imshow(app.orig_img,'Parent',app.UIAxes);
+	    %H&E image
+
+		%read image
+                HEImage = imread("example.jpg");
+                imshow(HEImage), title("H&E image");
+                text(size(HEImage,2),size(HEImage,1)+15, ...
+                "Image containing H&E", ...
+                "FontSize",7,"HorizontalAlignment","right");
+
+                %use k-means clustering to segment image in RGB color space
+                numColors = 3;
+                L = imsegkmeans(HEImage, numColors); %returns a label corresponding to each cluster
+                B = labeloverlay(HEImage,L);
+                imshow(B)
+                title("RGB")
+
+		%edge detection using canny edge detection
+		
+		% Obtain original image and display it 
+		[x,map]=gifread('example.jpg');               
+		convertToGrayScale=ind2gray(x,map);
+		figure(1);colormap(gray);
+		subplot(3,2,1);
+		imagesc(convertToGrayScale,200);
+		title('Image: example.jpg');
+
+		% edge detection for the X-axis direction
+		subplot(3,2,2);
+		filterx=d2dgauss(Nx1,Sigmax1,Nx2,Sigmax2,Theta1);
+		Ix= conv2(convertToGrayScale,filterx,'same');
+		imagesc(Ix);
+		title('edge detection for the X-axis direction');
+
+		% edge detection for the Y-axis direction
+		subplot(3,2,3)
+		filtery=d2dgauss(Ny1,Sigmay1,Ny2,Sigmay2,Theta2);
+		Iy=conv2(convertToGrayScale,filtery,'same'); 
+		imagesc(Iy);
+		title('edge detection for the Y-axis direction');
+		
+		% Combine the X and Y directional derivatives to get the norm of the gradient
+		subplot(3,2,4);
+		normOfGradient=sqrt(Ix.*Ix+Iy.*Iy);
+		imagesc(normOfGradient);
+		title('Norm of Gradient');
+
+		% Perform thresholding
+		maximumI=max(max(normOfGradient));
+		minimumI=min(min(normOfGradient));
+		level=alfa*(maximumI-minimumI)+minimumI;
+		subplot(3,2,5);
+		Ibw=max(normOfGradient,level.*ones(size(normOfGradient)));
+		imagesc(Ibw);
+		title('Image after thresholding has been applied');
+		
+		%Find pixels where norm of gradient is local maximum using interpolation
+		subplot(3,2,6);
+		[n,m]=size(Ibw);
+		for i=2:n-1,
+		for j=2:m-1,
+			if Ibw(i,j) > level,
+			X=[-1,0,+1;-1,0,+1;-1,0,+1];
+			Y=[-1,-1,-1;0,0,0;+1,+1,+1];
+			Z=[Ibw(i-1,j-1),Ibw(i-1,j),Ibw(i-1,j+1);
+	   		   Ibw(i,j-1),Ibw(i,j),Ibw(i,j+1);
+	      		   Ibw(i+1,j-1),Ibw(i+1,j),Ibw(i+1,j+1)];
+			XI=[Ix(i,j)/normOfGradient(i,j), -Ix(i,j)/normOfGradient(i,j)];
+			YI=[Iy(i,j)/normOfGradient(i,j), -Iy(i,j)/normOfGradient(i,j)];
+			ZI=interp2(X,Y,Z,XI,YI);
+				if Ibw(i,j) >= ZI(1) & Ibw(i,j) >= ZI(2)
+				temporaryI(i,j)=maximumI;
+				else
+				temporaryI(i,j)=minimumI;
+				end
+	   		else
+			temporaryI(i,j)=minimumI;
+			end
+		end
+		end
+		imagesc(temporaryI);
+		title('Image after thinning has been applied');
+		colormap(gray);
 
             % Enable the correct menu bar buttons
             if ~exist(MaskName,'file')
