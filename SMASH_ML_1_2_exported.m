@@ -330,6 +330,54 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Display the image
             imshow(app.orig_img,'Parent',app.UIAxes);
+	    % Robert Operator Edge Detection Technique
+	    
+	    % Read Input HE image
+	    HEImage = imread("example.jpg");
+            
+            % Display HE image
+            HEImage = uint8(HEImage);
+            figure, imshow(HEImage); title('HEImage');
+  
+           % Convert RGB image to a grayscale image
+           HEImage = rgb2gray(HEImage);
+  
+           % Convert the image to double
+	   HEImage = double(HEImage);
+  
+	   % put zeroes in the matrix
+	   filteredHEImage = zeros(size(HEImage));
+  
+           % Robert Operator Mask
+           Mx = [1 0; 0 -1];
+           My = [0 1; -1 0];
+  
+          % Edge Detection Process
+
+          for i = 1:size(HEImage, 1) - 1
+              for j = 1:size(HEImage, 2) - 1
+  
+                  % Gradient
+                  Gx = sum(sum(Mx.*HEImage(i:i+1, j:j+1)));
+                  Gy = sum(sum(My.*HEImage(i:i+1, j:j+1)));
+                 
+                  % magnitude of vector
+                  filteredHEImage(i, j) = sqrt(Gx.^2 + Gy.^2);   
+              end
+          end
+	  
+	  % Display Filtered HE Image
+          filteredHEImage = uint8(filteredHEImage);
+          figure, imshow(filteredHEImage); title('Filtered HE Image');
+  
+          % threshold value
+          thresholdValue = 100; % varies between [0 255]
+	  outputHEImage = max(filteredHEImage, thresholdValue);
+	  outputHEImage(outputHEImage == round(thresholdValue)) = 0;
+  
+         % Display Output HE Image
+         outputHEImage = im2bw(outputHEImage);
+         figure, imshow(outputHEImage); title('Edge Detected HE Image');
 
             % Enable the correct menu bar buttons
             if ~exist(MaskName,'file')
