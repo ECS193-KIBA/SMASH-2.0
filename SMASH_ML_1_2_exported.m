@@ -3264,8 +3264,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             % Create ManualFilterDescription_2
             app.ManualFilterDescription_2 = uilabel(app.ManualFilterControls);
             app.ManualFilterDescription_2.FontWeight = 'bold';
-            app.ManualFilterDescription_2.Position = [9 137 238 56];
-            app.ManualFilterDescription_2.Text = {'Select “Remove Objects” and select any'; 'nonfibers still seen on the image. A '; 'single-click removes the fiber and a '; 'double-click places the fiber back. '};
+            app.ManualFilterDescription_2.Position = [9 137 259 56];
+            app.ManualFilterDescription_2.Text = {'Click “Remove Nonfibers” and click on any '; 'misclassified fibers to remove them. If you '; 'accidentally remove a correctly classified'; 'fiber, click again to undo. '};
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
