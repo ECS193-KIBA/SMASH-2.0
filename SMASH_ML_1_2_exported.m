@@ -3,7 +3,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        ManualFilterControls            matlab.ui.container.Panel
+        ManualFilterDescription         matlab.ui.control.Label
+        FinishManualFilteringButton     matlab.ui.control.Button
+        RemoveNonfibersButton           matlab.ui.control.Button
         SegmentationParameters          matlab.ui.container.Panel
+        CloseInitialSegmentationButton  matlab.ui.control.Button
         InitialSegmentationDescription_2  matlab.ui.control.Label
         InitialSegmentationDirections   matlab.ui.control.Label
         InitialSegmentationDescription  matlab.ui.control.Label
@@ -141,9 +146,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         FThistL                         matlab.ui.control.UIAxes
         FTAxesR                         matlab.ui.control.UIAxes
         FTAxesL                         matlab.ui.control.UIAxes
-        ManualFilterControls            matlab.ui.container.Panel
-        FinishManualFilteringButton     matlab.ui.control.Button
-        RemoveObjectsButton             matlab.ui.control.Button
         SortingAxesPanel                matlab.ui.container.Panel
         MarkasfiberLabel                matlab.ui.control.Label
         NoButton                        matlab.ui.control.Button
@@ -965,14 +967,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: ManualSortingButton
         function ManualSortingButtonPushed(app, event)
+            app.FiberPredictionControlPanel.Visible = 'off';
             app.ManualSortingButton.Enable = 'off';
             app.ImageBackground.Visible = 'off';
             uiresume(app.UIFigure);
         end
 
-        % Button pushed function: RemoveObjectsButton
-        function RemoveObjectsButtonPushed(app, event)
-            app.RemoveObjectsButton.Enable = 'off';
+        % Button pushed function: RemoveNonfibersButton
+        function RemoveNonfibersButtonPushed(app, event)
+            app.RemoveNonfibersButton.Enable = 'off';
             app.FinishManualFilteringButton.Enable = 'on';
             label = bwlabel(app.bw_obj,4);
             bw_pos = app.bw_obj;
@@ -1027,7 +1030,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualFilterControls.Visible = 'off';
             EnableMenuBarButtons(app);
             app.Prompt.Text = '';
-            app.RemoveObjectsButton.Enable = 'on';
+            app.RemoveNonfibersButton.Enable = 'on';
         end
 
         % Button pushed function: FinishManualFilteringButton
@@ -1514,6 +1517,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function InitialSegmentationButtonPushed(app, event)
             DisableMenuBarButtonsAndClearFileLabels(app);
             app.ImageBackground.Visible = 'on';
+            app.AcceptSegmentationButton.Enable = 'off';
 
             % Display the image
             imshow(app.orig_img,'Parent',app.UIAxes);
@@ -1570,7 +1574,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             DisableMenuBarButtonsAndClearFileLabels(app);
             app.ImageBackground.Visible = 'on';
             app.ManualFilterControls.Visible = 'on';
-            app.RemoveObjectsButton.Enable = 'on';
+            app.RemoveNonfibersButton.Enable = 'on';
             app.FinishManualFilteringButton.Enable = 'off';
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
             imshow(flattenMaskOverlay(app.orig_img,app.bw_obj,0.5,'w'),'Parent',app.UIAxes);
@@ -2000,6 +2004,18 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.pix_size = app.PixelSizeFiberPrediction.Value;
             SyncPixelSize(app);
         end
+
+        % Button pushed function: CloseInitialSegmentationButton
+        function CloseInitialSegmentationButtonPushed(app, event)
+            if app.IsBatchMode == 0
+                app.SegmentationParameters.Visible = 'off';
+                EnableMenuBarButtons(app);
+            else
+                app.FiberPredictionButton.Enable = 'on';
+                app.InitialSegmentationButton.Enable = 'on';
+                app.SegmentationParameters.Visible = 'off';
+            end
+        end
     end
 
     % Component initialization
@@ -2154,28 +2170,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.MarkasfiberLabel.Position = [188 95 290 22];
             app.MarkasfiberLabel.Text = 'Mark as fiber?';
 
-            % Create ManualFilterControls
-            app.ManualFilterControls = uipanel(app.UIFigure);
-            app.ManualFilterControls.Visible = 'off';
-            app.ManualFilterControls.BackgroundColor = [1 1 1];
-            app.ManualFilterControls.FontName = 'Avenir';
-            app.ManualFilterControls.Position = [29 340 245 137];
-
-            % Create RemoveObjectsButton
-            app.RemoveObjectsButton = uibutton(app.ManualFilterControls, 'push');
-            app.RemoveObjectsButton.ButtonPushedFcn = createCallbackFcn(app, @RemoveObjectsButtonPushed, true);
-            app.RemoveObjectsButton.FontName = 'Avenir';
-            app.RemoveObjectsButton.Position = [73 76 104 24];
-            app.RemoveObjectsButton.Text = 'Remove Objects';
-
-            % Create FinishManualFilteringButton
-            app.FinishManualFilteringButton = uibutton(app.ManualFilterControls, 'push');
-            app.FinishManualFilteringButton.ButtonPushedFcn = createCallbackFcn(app, @FinishManualFilteringButtonPushed, true);
-            app.FinishManualFilteringButton.FontName = 'Avenir';
-            app.FinishManualFilteringButton.Enable = 'off';
-            app.FinishManualFilteringButton.Position = [58 26 136 24];
-            app.FinishManualFilteringButton.Text = 'Finish Manual Filtering';
-
             % Create FiberTypingPanel
             app.FiberTypingPanel = uipanel(app.UIFigure);
             app.FiberTypingPanel.Visible = 'off';
@@ -2273,7 +2267,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualFiberFilterButton.ButtonPushedFcn = createCallbackFcn(app, @ManualFiberFilterButtonPushed, true);
             app.ManualFiberFilterButton.FontName = 'Avenir';
             app.ManualFiberFilterButton.Enable = 'off';
-            app.ManualFiberFilterButton.Tooltip = {'Remove any image regions that were mispredicted as fibers.'};
+            app.ManualFiberFilterButton.Tooltip = {'Remove any image regions that were misclassified as fibers.'};
             app.ManualFiberFilterButton.Position = [387 6 120 33];
             app.ManualFiberFilterButton.Text = 'Manual Fiber Filter';
 
@@ -3127,7 +3121,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SegmentationParameters.BackgroundColor = [1 1 1];
             app.SegmentationParameters.FontName = 'Avenir';
             app.SegmentationParameters.FontSize = 14;
-            app.SegmentationParameters.Position = [22 198 288 369];
+            app.SegmentationParameters.Position = [22 168 288 399];
 
             % Create FiberOutlineChannelColorBox
             app.FiberOutlineChannelColorBox = uiaxes(app.SegmentationParameters);
@@ -3138,20 +3132,20 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberOutlineChannelColorBox.Color = [0 1 1];
             app.FiberOutlineChannelColorBox.Box = 'on';
             app.FiberOutlineChannelColorBox.PickableParts = 'none';
-            app.FiberOutlineChannelColorBox.Position = [238 194 30 30];
+            app.FiberOutlineChannelColorBox.Position = [238 224 30 30];
 
             % Create SegmentButton
             app.SegmentButton = uibutton(app.SegmentationParameters, 'push');
             app.SegmentButton.ButtonPushedFcn = createCallbackFcn(app, @SegmentButtonPushed, true);
             app.SegmentButton.FontName = 'Avenir';
-            app.SegmentButton.Position = [152 92 100 24];
+            app.SegmentButton.Position = [152 122 100 24];
             app.SegmentButton.Text = 'Segment';
 
             % Create FiberOutlineColorDropDownLabel
             app.FiberOutlineColorDropDownLabel = uilabel(app.SegmentationParameters);
             app.FiberOutlineColorDropDownLabel.HorizontalAlignment = 'right';
             app.FiberOutlineColorDropDownLabel.FontName = 'Avenir';
-            app.FiberOutlineColorDropDownLabel.Position = [6 198 109 22];
+            app.FiberOutlineColorDropDownLabel.Position = [6 228 109 22];
             app.FiberOutlineColorDropDownLabel.Text = 'Fiber Outline Color';
 
             % Create FiberOutlineColorDropDown
@@ -3160,7 +3154,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberOutlineColorDropDown.ItemsData = {'1', '2', '3'};
             app.FiberOutlineColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberOutlineColorValueChanged, true);
             app.FiberOutlineColorDropDown.FontName = 'Avenir';
-            app.FiberOutlineColorDropDown.Position = [126 198 106 22];
+            app.FiberOutlineColorDropDown.Position = [126 228 106 22];
             app.FiberOutlineColorDropDown.Value = '1';
 
             % Create AcceptSegmentationButton
@@ -3168,14 +3162,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AcceptSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptSegmentationButtonPushed, true);
             app.AcceptSegmentationButton.FontName = 'Avenir';
             app.AcceptSegmentationButton.Enable = 'off';
-            app.AcceptSegmentationButton.Position = [89 45 100 24];
+            app.AcceptSegmentationButton.Position = [89 75 100 24];
             app.AcceptSegmentationButton.Text = 'Accept';
 
             % Create SegmentationThresholdSliderLabel
             app.SegmentationThresholdSliderLabel = uilabel(app.SegmentationParameters);
             app.SegmentationThresholdSliderLabel.HorizontalAlignment = 'center';
             app.SegmentationThresholdSliderLabel.FontName = 'Avenir';
-            app.SegmentationThresholdSliderLabel.Position = [10 138 80 43];
+            app.SegmentationThresholdSliderLabel.Position = [10 168 80 43];
             app.SegmentationThresholdSliderLabel.Text = {'Segmentation'; 'Threshold'};
 
             % Create SegmentationThresholdSlider
@@ -3183,29 +3177,29 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SegmentationThresholdSlider.Limits = [0 50];
             app.SegmentationThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SegmentationThresholdSliderValueChanged, true);
             app.SegmentationThresholdSlider.FontName = 'Avenir';
-            app.SegmentationThresholdSlider.Position = [104 164 153 3];
+            app.SegmentationThresholdSlider.Position = [104 194 153 3];
 
             % Create DetectValueButton
             app.DetectValueButton = uibutton(app.SegmentationParameters, 'push');
             app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
             app.DetectValueButton.BackgroundColor = [0.902 0.902 0.902];
             app.DetectValueButton.FontName = 'Avenir';
-            app.DetectValueButton.Position = [27 92 100 24];
+            app.DetectValueButton.Position = [27 122 100 24];
             app.DetectValueButton.Text = 'Detect Value';
 
             % Create InitialSegmentationDescription
             app.InitialSegmentationDescription = uilabel(app.SegmentationParameters);
             app.InitialSegmentationDescription.FontName = 'Avenir';
             app.InitialSegmentationDescription.FontWeight = 'bold';
-            app.InitialSegmentationDescription.Position = [15 324 237 39];
+            app.InitialSegmentationDescription.Position = [15 354 237 39];
             app.InitialSegmentationDescription.Text = {'This step segments the image to extract'; 'muscle fiber features from the image.'};
 
             % Create InitialSegmentationDirections
             app.InitialSegmentationDirections = uilabel(app.SegmentationParameters);
             app.InitialSegmentationDirections.FontName = 'Avenir';
             app.InitialSegmentationDirections.FontWeight = 'bold';
-            app.InitialSegmentationDirections.Position = [15 233 267 80];
-            app.InitialSegmentationDirections.Text = {'Adjust the Fiber Outline Color, Pixel Size, '; 'and Segmentation Threshold to the desired '; 'values. Optionally, “Detect Value” can be'; 'used to predict a segmentation value. Select'; '“Segment” once the desired values are chosen.'};
+            app.InitialSegmentationDirections.Position = [15 259 267 84];
+            app.InitialSegmentationDirections.Text = {'Adjust the Fiber Outline Color, Pixel Size, '; 'and Segmentation Threshold to the desired '; 'values. Optionally, “Detect Value” can be'; 'used to predict a segmentation value. Select'; '“Segment” once the desired values are '; 'chosen, and click "Accept" to save changes.'};
 
             % Create InitialSegmentationDescription_2
             app.InitialSegmentationDescription_2 = uilabel(app.SegmentationParameters);
@@ -3213,8 +3207,43 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.InitialSegmentationDescription_2.FontSize = 14;
             app.InitialSegmentationDescription_2.FontWeight = 'bold';
             app.InitialSegmentationDescription_2.Visible = 'off';
-            app.InitialSegmentationDescription_2.Position = [17 37 287 39];
+            app.InitialSegmentationDescription_2.Position = [17 67 287 39];
             app.InitialSegmentationDescription_2.Text = {'Select "Start Merging" to begin merging '; 'over-segmented regions.'};
+
+            % Create CloseInitialSegmentationButton
+            app.CloseInitialSegmentationButton = uibutton(app.SegmentationParameters, 'push');
+            app.CloseInitialSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseInitialSegmentationButtonPushed, true);
+            app.CloseInitialSegmentationButton.FontName = 'Avenir';
+            app.CloseInitialSegmentationButton.Position = [89 38 100 24];
+            app.CloseInitialSegmentationButton.Text = 'Close';
+
+            % Create ManualFilterControls
+            app.ManualFilterControls = uipanel(app.UIFigure);
+            app.ManualFilterControls.Visible = 'off';
+            app.ManualFilterControls.BackgroundColor = [1 1 1];
+            app.ManualFilterControls.FontName = 'Avenir';
+            app.ManualFilterControls.Position = [29 373 259 188];
+
+            % Create RemoveNonfibersButton
+            app.RemoveNonfibersButton = uibutton(app.ManualFilterControls, 'push');
+            app.RemoveNonfibersButton.ButtonPushedFcn = createCallbackFcn(app, @RemoveNonfibersButtonPushed, true);
+            app.RemoveNonfibersButton.FontName = 'Avenir';
+            app.RemoveNonfibersButton.Position = [68 90 115 24];
+            app.RemoveNonfibersButton.Text = 'Remove Nonfibers';
+
+            % Create FinishManualFilteringButton
+            app.FinishManualFilteringButton = uibutton(app.ManualFilterControls, 'push');
+            app.FinishManualFilteringButton.ButtonPushedFcn = createCallbackFcn(app, @FinishManualFilteringButtonPushed, true);
+            app.FinishManualFilteringButton.FontName = 'Avenir';
+            app.FinishManualFilteringButton.Enable = 'off';
+            app.FinishManualFilteringButton.Position = [58 49 136 24];
+            app.FinishManualFilteringButton.Text = 'Finish Manual Filtering';
+
+            % Create ManualFilterDescription
+            app.ManualFilterDescription = uilabel(app.ManualFilterControls);
+            app.ManualFilterDescription.FontWeight = 'bold';
+            app.ManualFilterDescription.Position = [9 153 221 28];
+            app.ManualFilterDescription.Text = {'Remove any image regions that were '; 'misclassified as fibers.'};
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
