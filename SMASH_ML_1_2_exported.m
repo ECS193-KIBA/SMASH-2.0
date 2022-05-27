@@ -3,6 +3,24 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        CentralNucleiControlPanel       matlab.ui.container.Panel
+        CentralNucleiFileWriteStatusLabel  matlab.ui.control.Label
+        CentralNucleiDescription_2      matlab.ui.control.Label
+        CentralNucleiDescription        matlab.ui.control.Label
+        CentralNucleiDataOutputFolder   matlab.ui.control.EditField
+        DataOutputFolderEditField_2Label  matlab.ui.control.Label
+        MinimumNucleusSizeum2EditField  matlab.ui.control.NumericEditField
+        MinimumNucleusSizeum2EditFieldLabel  matlab.ui.control.Label
+        DistancefromborderEditField     matlab.ui.control.NumericEditField
+        DistancefromborderEditFieldLabel  matlab.ui.control.Label
+        DoneCentralNuclei               matlab.ui.control.Button
+        CentralNucleiExcelWrite         matlab.ui.control.Button
+        CalculateCentralNuclei          matlab.ui.control.Button
+        NucleiColorDropDown             matlab.ui.control.DropDown
+        NucleiColorDropDownLabel        matlab.ui.control.Label
+        PixelSizeCentralNuclei          matlab.ui.control.NumericEditField
+        PixelSizeumpixelLabel           matlab.ui.control.Label
+        CentralNucleiChannelColorBox    matlab.ui.control.UIAxes
         FiberPropertiesControlPanel     matlab.ui.container.Panel
         FiberPropertiesFileWriteStatusLabel  matlab.ui.control.Label
         FiberPropertiesDescription_2    matlab.ui.control.Label
@@ -27,23 +45,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeFiberTyping            matlab.ui.control.NumericEditField
         PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
         FiberTypingChannelColorBox      matlab.ui.control.UIAxes
-        CentralNucleiControlPanel       matlab.ui.container.Panel
-        CentralNucleiDescription_2      matlab.ui.control.Label
-        CentralNucleiDescription        matlab.ui.control.Label
-        CentralNucleiDataOutputFolder   matlab.ui.control.EditField
-        DataOutputFolderEditField_2Label  matlab.ui.control.Label
-        MinimumNucleusSizeum2EditField  matlab.ui.control.NumericEditField
-        MinimumNucleusSizeum2EditFieldLabel  matlab.ui.control.Label
-        DistancefromborderEditField     matlab.ui.control.NumericEditField
-        DistancefromborderEditFieldLabel  matlab.ui.control.Label
-        DoneCentralNuclei               matlab.ui.control.Button
-        CentralNucleiExcelWrite         matlab.ui.control.Button
-        CalculateCentralNuclei          matlab.ui.control.Button
-        NucleiColorDropDown             matlab.ui.control.DropDown
-        NucleiColorDropDownLabel        matlab.ui.control.Label
-        PixelSizeCentralNuclei          matlab.ui.control.NumericEditField
-        PixelSizeumpixelLabel           matlab.ui.control.Label
-        CentralNucleiChannelColorBox    matlab.ui.control.UIAxes
         ManualFilterControls            matlab.ui.container.Panel
         ManualFilterDescription_2       matlab.ui.control.Label
         ManualFilterDescription         matlab.ui.control.Label
@@ -1203,6 +1204,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CentralNucleiExcelWrite
         function CentralNucleiExcelWriteButtonPushed(app, event)
+            app.CentralNucleiFileWriteStatusLabel.Text = 'Writing to Excel...';
+
             % Create folder if directory does not exist for excel input
             CreateFolderIfDirectoryIsNonexistent(app, app.CentralNucleiDataOutputFolder.Value);
             cd(app.CentralNucleiDataOutputFolder.Value)
@@ -1248,7 +1251,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             data = cat(2,farea,app.cen_pix.*app.pix_size^2,app.cen_nuc) ;
             out = cat(1,header,num2cell(data));
             writecell(out,[app.Files{4} '_Properties.xlsx'],'Range','I1');
-            app.Prompt.Text = 'Write to Excel done';
+            app.CentralNucleiFileWriteStatusLabel.Text = 'Write to Excel done!';
             cd(app.Files{3})
             app.fprop = 0;
             app.cen_nuc = 0;
@@ -1613,6 +1616,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiControlPanel.Visible = 'on';
             app.CentralNucleiExcelWrite.Enable = 'off';
             app.CentralNucleiChannelColorBox.Visible = 'on';
+            app.CentralNucleiFileWriteStatusLabel.Text = '';
 
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
         end
@@ -3026,126 +3030,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualFilterDescription_2.Position = [9 137 259 56];
             app.ManualFilterDescription_2.Text = {'Click “Remove Nonfibers” and click on any '; 'misclassified fibers to remove them. If you '; 'accidentally remove a correctly classified'; 'fiber, click again to undo. '};
 
-            % Create CentralNucleiControlPanel
-            app.CentralNucleiControlPanel = uipanel(app.UIFigure);
-            app.CentralNucleiControlPanel.Visible = 'off';
-            app.CentralNucleiControlPanel.BackgroundColor = [1 1 1];
-            app.CentralNucleiControlPanel.FontName = 'Avenir';
-            app.CentralNucleiControlPanel.Position = [16 120 264 446];
-
-            % Create CentralNucleiChannelColorBox
-            app.CentralNucleiChannelColorBox = uiaxes(app.CentralNucleiControlPanel);
-            app.CentralNucleiChannelColorBox.Toolbar.Visible = 'off';
-            app.CentralNucleiChannelColorBox.FontName = 'Avenir';
-            app.CentralNucleiChannelColorBox.XTick = [];
-            app.CentralNucleiChannelColorBox.YTick = [];
-            app.CentralNucleiChannelColorBox.Color = [0 1 1];
-            app.CentralNucleiChannelColorBox.Box = 'on';
-            app.CentralNucleiChannelColorBox.Visible = 'off';
-            app.CentralNucleiChannelColorBox.PickableParts = 'none';
-            app.CentralNucleiChannelColorBox.Position = [228 237 30 30];
-
-            % Create PixelSizeumpixelLabel
-            app.PixelSizeumpixelLabel = uilabel(app.CentralNucleiControlPanel);
-            app.PixelSizeumpixelLabel.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelLabel.FontName = 'Avenir';
-            app.PixelSizeumpixelLabel.Position = [48 265 58 32];
-            app.PixelSizeumpixelLabel.Text = {'Pixel Size'; 'um/pixel'};
-
-            % Create PixelSizeCentralNuclei
-            app.PixelSizeCentralNuclei = uieditfield(app.CentralNucleiControlPanel, 'numeric');
-            app.PixelSizeCentralNuclei.Limits = [0 Inf];
-            app.PixelSizeCentralNuclei.ValueChangedFcn = createCallbackFcn(app, @PixelSizeCentralNucleiValueChanged, true);
-            app.PixelSizeCentralNuclei.FontName = 'Avenir';
-            app.PixelSizeCentralNuclei.Position = [121 275 100 22];
-
-            % Create NucleiColorDropDownLabel
-            app.NucleiColorDropDownLabel = uilabel(app.CentralNucleiControlPanel);
-            app.NucleiColorDropDownLabel.HorizontalAlignment = 'right';
-            app.NucleiColorDropDownLabel.FontName = 'Avenir';
-            app.NucleiColorDropDownLabel.Position = [37 240 73 22];
-            app.NucleiColorDropDownLabel.Text = 'Nuclei Color';
-
-            % Create NucleiColorDropDown
-            app.NucleiColorDropDown = uidropdown(app.CentralNucleiControlPanel);
-            app.NucleiColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.NucleiColorDropDown.ItemsData = {'1', '2', '3'};
-            app.NucleiColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NucleiColorValueChanged, true);
-            app.NucleiColorDropDown.FontName = 'Avenir';
-            app.NucleiColorDropDown.Position = [125 240 100 22];
-            app.NucleiColorDropDown.Value = '1';
-
-            % Create CalculateCentralNuclei
-            app.CalculateCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
-            app.CalculateCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @CalculateCentralNucleiPushed, true);
-            app.CalculateCentralNuclei.FontName = 'Avenir';
-            app.CalculateCentralNuclei.Position = [26 95 100 24];
-            app.CalculateCentralNuclei.Text = 'Calculate';
-
-            % Create CentralNucleiExcelWrite
-            app.CentralNucleiExcelWrite = uibutton(app.CentralNucleiControlPanel, 'push');
-            app.CentralNucleiExcelWrite.ButtonPushedFcn = createCallbackFcn(app, @CentralNucleiExcelWriteButtonPushed, true);
-            app.CentralNucleiExcelWrite.FontName = 'Avenir';
-            app.CentralNucleiExcelWrite.Position = [138 95 100 24];
-            app.CentralNucleiExcelWrite.Text = 'Write To Excel';
-
-            % Create DoneCentralNuclei
-            app.DoneCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
-            app.DoneCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @DoneCentralNucleiPushed, true);
-            app.DoneCentralNuclei.FontName = 'Avenir';
-            app.DoneCentralNuclei.Position = [79 42 100 24];
-            app.DoneCentralNuclei.Text = 'Close';
-
-            % Create DistancefromborderEditFieldLabel
-            app.DistancefromborderEditFieldLabel = uilabel(app.CentralNucleiControlPanel);
-            app.DistancefromborderEditFieldLabel.HorizontalAlignment = 'right';
-            app.DistancefromborderEditFieldLabel.FontName = 'Avenir';
-            app.DistancefromborderEditFieldLabel.Position = [14 208 119 22];
-            app.DistancefromborderEditFieldLabel.Text = 'Distance from border';
-
-            % Create DistancefromborderEditField
-            app.DistancefromborderEditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
-            app.DistancefromborderEditField.Limits = [0 Inf];
-            app.DistancefromborderEditField.FontName = 'Avenir';
-            app.DistancefromborderEditField.Position = [149 208 100 22];
-
-            % Create MinimumNucleusSizeum2EditFieldLabel
-            app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CentralNucleiControlPanel);
-            app.MinimumNucleusSizeum2EditFieldLabel.HorizontalAlignment = 'right';
-            app.MinimumNucleusSizeum2EditFieldLabel.FontName = 'Avenir';
-            app.MinimumNucleusSizeum2EditFieldLabel.Position = [8 167 127 32];
-            app.MinimumNucleusSizeum2EditFieldLabel.Text = {'Minimum Nucleus Size'; '(um^2)'};
-
-            % Create MinimumNucleusSizeum2EditField
-            app.MinimumNucleusSizeum2EditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
-            app.MinimumNucleusSizeum2EditField.Limits = [0 Inf];
-            app.MinimumNucleusSizeum2EditField.FontName = 'Avenir';
-            app.MinimumNucleusSizeum2EditField.Position = [150 177 100 22];
-
-            % Create DataOutputFolderEditField_2Label
-            app.DataOutputFolderEditField_2Label = uilabel(app.CentralNucleiControlPanel);
-            app.DataOutputFolderEditField_2Label.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_2Label.FontName = 'Avenir';
-            app.DataOutputFolderEditField_2Label.Position = [13 142 111 22];
-            app.DataOutputFolderEditField_2Label.Text = 'Data Output Folder';
-
-            % Create CentralNucleiDataOutputFolder
-            app.CentralNucleiDataOutputFolder = uieditfield(app.CentralNucleiControlPanel, 'text');
-            app.CentralNucleiDataOutputFolder.FontName = 'Avenir';
-            app.CentralNucleiDataOutputFolder.Position = [142 142 109 22];
-
-            % Create CentralNucleiDescription
-            app.CentralNucleiDescription = uilabel(app.CentralNucleiControlPanel);
-            app.CentralNucleiDescription.FontWeight = 'bold';
-            app.CentralNucleiDescription.Position = [9 407 238 22];
-            app.CentralNucleiDescription.Text = {'Mark fibers with centrally located nuclei.'; ''};
-
-            % Create CentralNucleiDescription_2
-            app.CentralNucleiDescription_2 = uilabel(app.CentralNucleiControlPanel);
-            app.CentralNucleiDescription_2.FontWeight = 'bold';
-            app.CentralNucleiDescription_2.Position = [9 310 258 70];
-            app.CentralNucleiDescription_2.Text = {'Set the field values below. Hover over the '; 'field names for more information. Press '; '"Calculate" to run calculate the fiber '; 'properties, and "Write to Excel" to save the '; 'data to Excel.'; ''};
-
             % Create FiberTypingControlPanel
             app.FiberTypingControlPanel = uipanel(app.UIFigure);
             app.FiberTypingControlPanel.Visible = 'off';
@@ -3314,6 +3198,131 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberPropertiesFileWriteStatusLabel = uilabel(app.FiberPropertiesControlPanel);
             app.FiberPropertiesFileWriteStatusLabel.Position = [26 77 211 22];
             app.FiberPropertiesFileWriteStatusLabel.Text = 'Fiber Properties File Write Status';
+
+            % Create CentralNucleiControlPanel
+            app.CentralNucleiControlPanel = uipanel(app.UIFigure);
+            app.CentralNucleiControlPanel.Visible = 'off';
+            app.CentralNucleiControlPanel.BackgroundColor = [1 1 1];
+            app.CentralNucleiControlPanel.FontName = 'Avenir';
+            app.CentralNucleiControlPanel.Position = [16 120 264 446];
+
+            % Create CentralNucleiChannelColorBox
+            app.CentralNucleiChannelColorBox = uiaxes(app.CentralNucleiControlPanel);
+            app.CentralNucleiChannelColorBox.Toolbar.Visible = 'off';
+            app.CentralNucleiChannelColorBox.FontName = 'Avenir';
+            app.CentralNucleiChannelColorBox.XTick = [];
+            app.CentralNucleiChannelColorBox.YTick = [];
+            app.CentralNucleiChannelColorBox.Color = [0 1 1];
+            app.CentralNucleiChannelColorBox.Box = 'on';
+            app.CentralNucleiChannelColorBox.Visible = 'off';
+            app.CentralNucleiChannelColorBox.PickableParts = 'none';
+            app.CentralNucleiChannelColorBox.Position = [228 237 30 30];
+
+            % Create PixelSizeumpixelLabel
+            app.PixelSizeumpixelLabel = uilabel(app.CentralNucleiControlPanel);
+            app.PixelSizeumpixelLabel.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelLabel.FontName = 'Avenir';
+            app.PixelSizeumpixelLabel.Position = [48 265 58 32];
+            app.PixelSizeumpixelLabel.Text = {'Pixel Size'; 'um/pixel'};
+
+            % Create PixelSizeCentralNuclei
+            app.PixelSizeCentralNuclei = uieditfield(app.CentralNucleiControlPanel, 'numeric');
+            app.PixelSizeCentralNuclei.Limits = [0 Inf];
+            app.PixelSizeCentralNuclei.ValueChangedFcn = createCallbackFcn(app, @PixelSizeCentralNucleiValueChanged, true);
+            app.PixelSizeCentralNuclei.FontName = 'Avenir';
+            app.PixelSizeCentralNuclei.Position = [121 275 100 22];
+
+            % Create NucleiColorDropDownLabel
+            app.NucleiColorDropDownLabel = uilabel(app.CentralNucleiControlPanel);
+            app.NucleiColorDropDownLabel.HorizontalAlignment = 'right';
+            app.NucleiColorDropDownLabel.FontName = 'Avenir';
+            app.NucleiColorDropDownLabel.Position = [37 240 73 22];
+            app.NucleiColorDropDownLabel.Text = 'Nuclei Color';
+
+            % Create NucleiColorDropDown
+            app.NucleiColorDropDown = uidropdown(app.CentralNucleiControlPanel);
+            app.NucleiColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.NucleiColorDropDown.ItemsData = {'1', '2', '3'};
+            app.NucleiColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NucleiColorValueChanged, true);
+            app.NucleiColorDropDown.FontName = 'Avenir';
+            app.NucleiColorDropDown.Position = [125 240 100 22];
+            app.NucleiColorDropDown.Value = '1';
+
+            % Create CalculateCentralNuclei
+            app.CalculateCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
+            app.CalculateCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @CalculateCentralNucleiPushed, true);
+            app.CalculateCentralNuclei.FontName = 'Avenir';
+            app.CalculateCentralNuclei.Position = [26 95 100 24];
+            app.CalculateCentralNuclei.Text = 'Calculate';
+
+            % Create CentralNucleiExcelWrite
+            app.CentralNucleiExcelWrite = uibutton(app.CentralNucleiControlPanel, 'push');
+            app.CentralNucleiExcelWrite.ButtonPushedFcn = createCallbackFcn(app, @CentralNucleiExcelWriteButtonPushed, true);
+            app.CentralNucleiExcelWrite.FontName = 'Avenir';
+            app.CentralNucleiExcelWrite.Position = [138 95 100 24];
+            app.CentralNucleiExcelWrite.Text = 'Write To Excel';
+
+            % Create DoneCentralNuclei
+            app.DoneCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
+            app.DoneCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @DoneCentralNucleiPushed, true);
+            app.DoneCentralNuclei.FontName = 'Avenir';
+            app.DoneCentralNuclei.Position = [79 42 100 24];
+            app.DoneCentralNuclei.Text = 'Close';
+
+            % Create DistancefromborderEditFieldLabel
+            app.DistancefromborderEditFieldLabel = uilabel(app.CentralNucleiControlPanel);
+            app.DistancefromborderEditFieldLabel.HorizontalAlignment = 'right';
+            app.DistancefromborderEditFieldLabel.FontName = 'Avenir';
+            app.DistancefromborderEditFieldLabel.Position = [14 208 119 22];
+            app.DistancefromborderEditFieldLabel.Text = 'Distance from border';
+
+            % Create DistancefromborderEditField
+            app.DistancefromborderEditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
+            app.DistancefromborderEditField.Limits = [0 Inf];
+            app.DistancefromborderEditField.FontName = 'Avenir';
+            app.DistancefromborderEditField.Position = [149 208 100 22];
+
+            % Create MinimumNucleusSizeum2EditFieldLabel
+            app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CentralNucleiControlPanel);
+            app.MinimumNucleusSizeum2EditFieldLabel.HorizontalAlignment = 'right';
+            app.MinimumNucleusSizeum2EditFieldLabel.FontName = 'Avenir';
+            app.MinimumNucleusSizeum2EditFieldLabel.Position = [8 167 127 32];
+            app.MinimumNucleusSizeum2EditFieldLabel.Text = {'Minimum Nucleus Size'; '(um^2)'};
+
+            % Create MinimumNucleusSizeum2EditField
+            app.MinimumNucleusSizeum2EditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
+            app.MinimumNucleusSizeum2EditField.Limits = [0 Inf];
+            app.MinimumNucleusSizeum2EditField.FontName = 'Avenir';
+            app.MinimumNucleusSizeum2EditField.Position = [150 177 100 22];
+
+            % Create DataOutputFolderEditField_2Label
+            app.DataOutputFolderEditField_2Label = uilabel(app.CentralNucleiControlPanel);
+            app.DataOutputFolderEditField_2Label.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_2Label.FontName = 'Avenir';
+            app.DataOutputFolderEditField_2Label.Position = [13 142 111 22];
+            app.DataOutputFolderEditField_2Label.Text = 'Data Output Folder';
+
+            % Create CentralNucleiDataOutputFolder
+            app.CentralNucleiDataOutputFolder = uieditfield(app.CentralNucleiControlPanel, 'text');
+            app.CentralNucleiDataOutputFolder.FontName = 'Avenir';
+            app.CentralNucleiDataOutputFolder.Position = [142 142 109 22];
+
+            % Create CentralNucleiDescription
+            app.CentralNucleiDescription = uilabel(app.CentralNucleiControlPanel);
+            app.CentralNucleiDescription.FontWeight = 'bold';
+            app.CentralNucleiDescription.Position = [9 407 238 22];
+            app.CentralNucleiDescription.Text = {'Mark fibers with centrally located nuclei.'; ''};
+
+            % Create CentralNucleiDescription_2
+            app.CentralNucleiDescription_2 = uilabel(app.CentralNucleiControlPanel);
+            app.CentralNucleiDescription_2.FontWeight = 'bold';
+            app.CentralNucleiDescription_2.Position = [9 310 258 70];
+            app.CentralNucleiDescription_2.Text = {'Set the field values below. Hover over the '; 'field names for more information. Press '; '"Calculate" to run calculate the fiber '; 'properties, and "Write to Excel" to save the '; 'data to Excel.'; ''};
+
+            % Create CentralNucleiFileWriteStatusLabel
+            app.CentralNucleiFileWriteStatusLabel = uilabel(app.CentralNucleiControlPanel);
+            app.CentralNucleiFileWriteStatusLabel.Position = [38 70 172 22];
+            app.CentralNucleiFileWriteStatusLabel.Text = 'Central Nuclei File Write Status';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
