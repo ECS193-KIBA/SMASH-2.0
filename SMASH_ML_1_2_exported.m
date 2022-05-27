@@ -4,6 +4,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
         NonfiberObjectsControlPanel     matlab.ui.container.Panel
+        NonfiberObjectsFileWriteStatusLabel  matlab.ui.control.Label
         PixelSizeNonfiberObjects        matlab.ui.control.NumericEditField
         PixelSizeumpixelLabel_2         matlab.ui.control.Label
         DoneNonfiber                    matlab.ui.control.Button
@@ -1505,6 +1506,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: WritetoExcelNonfiber
         function WritetoExcelNonfiberButtonPushed(app, event)
+            app.NonfiberObjectsFileWriteStatusLabel.Text = 'Writing to Excel...';
+
             % Create folder if directory does not exist for excel input
             CreateFolderIfDirectoryIsNonexistent(app, app.NonfiberObjectsDataOutputFolder.Value);
             cd(app.NonfiberObjectsDataOutputFolder.Value)
@@ -1521,7 +1524,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             out = cat(1,header,num2cell(app.nf_data));
             
             writecell(out, [app.Files{4} '_Properties.xlsx'], 'Range','P7');
-            app.Prompt.Text = 'Write to Excel done';
+            app.NonfiberObjectsFileWriteStatusLabel.Text = 'Write to Excel done!';
             cd(app.Files{3})
             
         end
@@ -1643,6 +1646,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: NonfiberObjectsButton
         function NonfiberObjectsButtonPushed(app, event)
             DisableMenuBarButtonsAndClearFileLabels(app);
+            app.NonfiberObjectsFileWriteStatusLabel.Text = '';
             app.NonfiberObjectsControlPanel.Visible = 'on';
             app.WritetoExcelNonfiber.Enable = 'off';
             app.NonfiberChannelColorBox.Visible = 'on';
@@ -3312,21 +3316,21 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CalculateNonfiberObjects = uibutton(app.NonfiberObjectsControlPanel, 'push');
             app.CalculateNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @CalculateNonfiberObjectsButtonPushed, true);
             app.CalculateNonfiberObjects.FontName = 'Avenir';
-            app.CalculateNonfiberObjects.Position = [82 67 100 24];
+            app.CalculateNonfiberObjects.Position = [82 94 100 24];
             app.CalculateNonfiberObjects.Text = 'Calculate';
 
             % Create WritetoExcelNonfiber
             app.WritetoExcelNonfiber = uibutton(app.NonfiberObjectsControlPanel, 'push');
             app.WritetoExcelNonfiber.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelNonfiberButtonPushed, true);
             app.WritetoExcelNonfiber.FontName = 'Avenir';
-            app.WritetoExcelNonfiber.Position = [20 24 100 24];
+            app.WritetoExcelNonfiber.Position = [20 46 100 24];
             app.WritetoExcelNonfiber.Text = 'Write to Excel';
 
             % Create DoneNonfiber
             app.DoneNonfiber = uibutton(app.NonfiberObjectsControlPanel, 'push');
             app.DoneNonfiber.ButtonPushedFcn = createCallbackFcn(app, @DoneNonfiberButtonPushed, true);
             app.DoneNonfiber.FontName = 'Avenir';
-            app.DoneNonfiber.Position = [144 25 100 24];
+            app.DoneNonfiber.Position = [144 46 100 24];
             app.DoneNonfiber.Text = 'Done';
 
             % Create PixelSizeumpixelLabel_2
@@ -3342,6 +3346,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeNonfiberObjects.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberObjectsValueChanged, true);
             app.PixelSizeNonfiberObjects.FontName = 'Avenir';
             app.PixelSizeNonfiberObjects.Position = [125 253 100 22];
+
+            % Create NonfiberObjectsFileWriteStatusLabel
+            app.NonfiberObjectsFileWriteStatusLabel = uilabel(app.NonfiberObjectsControlPanel);
+            app.NonfiberObjectsFileWriteStatusLabel.Position = [27 16 186 22];
+            app.NonfiberObjectsFileWriteStatusLabel.Text = 'Nonfiber Objects File Write Status';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
