@@ -156,14 +156,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         ThresholdEditFieldLabel         matlab.ui.control.Label
         FThistR                         matlab.ui.control.UIAxes
         FThistL                         matlab.ui.control.UIAxes
-        FTAxesR                         matlab.ui.control.UIAxes
-        FTAxesL                         matlab.ui.control.UIAxes
+        FiberTypingAxesR                matlab.ui.control.UIAxes
+        FiberTypingAxesL                matlab.ui.control.UIAxes
         SortingAxesPanel                matlab.ui.container.Panel
         MarkasfiberLabel                matlab.ui.control.Label
         NoButton                        matlab.ui.control.Button
         YesButton                       matlab.ui.control.Button
-        UIAxesR                         matlab.ui.control.UIAxes
-        UIAxesL                         matlab.ui.control.UIAxes
+        SortingAxesR                    matlab.ui.control.UIAxes
+        SortingAxesL                    matlab.ui.control.UIAxes
         Prompt                          matlab.ui.control.Label
         FilenameLabel                   matlab.ui.control.Label
         SelectFilesButton               matlab.ui.control.Button
@@ -683,7 +683,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsColorDropDown.Value = num2str(app.default{6,2});
             app.AcceptedFileExtensions = {'tif';'tiff';'jpg';'png';'bmp';'czi'};
             % TODO - default for nofiber classification
-            linkaxes([app.UIAxesL, app.UIAxesR],'xy')
+            linkaxes([app.SortingAxesL, app.SortingAxesR]);
         end
 
         % Button pushed function: SelectFilesButton
@@ -845,18 +845,18 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     for i = 1:length(maybe)
                         app.SortingAxesPanel.Title = [num2str(i) ' of ' num2str(length(maybe))];
                         app.notfiber = 0;
-                        imshow(codedim,'Parent',app.UIAxesL);
-                        hold(app.UIAxesL,'on');
-                        plot(cents(maybe(i),1),cents(maybe(i),2),'y*','Parent',app.UIAxesL)
-                        xlim(app.UIAxesL,[(cents(maybe(i),1)-100) (cents(maybe(i),1)+100)])
-                        ylim(app.UIAxesL,[(cents(maybe(i),2)-100) (cents(maybe(i),2)+100)])
+                        imshow(codedim,'Parent',app.SortingAxesL);
+                        hold(app.SortingAxesL,'on');
+                        plot(cents(maybe(i),1),cents(maybe(i),2),'y*','Parent',app.SortingAxesL)
+                        xlim(app.SortingAxesL,[(cents(maybe(i),1)-100) (cents(maybe(i),1)+100)])
+                        ylim(app.SortingAxesL,[(cents(maybe(i),2)-100) (cents(maybe(i),2)+100)])
                         
                     
-                        imshow(app.orig_img,'Parent',app.UIAxesR);
-                        hold(app.UIAxesR,'on');
-                        plot(cents(maybe(i),1),cents(maybe(i),2),'y*','Parent',app.UIAxesR)
-                        xlim(app.UIAxesR,[(cents(maybe(i),1)-100) (cents(maybe(i),1)+100)])
-                        ylim(app.UIAxesR,[(cents(maybe(i),2)-100) (cents(maybe(i),2)+100)])
+                        imshow(app.orig_img,'Parent',app.SortingAxesR);
+                        hold(app.SortingAxesR,'on');
+                        plot(cents(maybe(i),1),cents(maybe(i),2),'y*','Parent',app.SortingAxesR)
+                        xlim(app.SortingAxesR,[(cents(maybe(i),1)-100) (cents(maybe(i),1)+100)])
+                        ylim(app.SortingAxesR,[(cents(maybe(i),2)-100) (cents(maybe(i),2)+100)])
                     
                         uiwait(app.UIFigure);
                         
@@ -864,8 +864,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                             removeidx = Rprop(maybe(i),7);
                             tempmask(removeidx.PixelIdxList{1,1}) = 0;
                         end
-                        hold(app.UIAxesL,'off');
-                        hold(app.UIAxesR,'off');
+                        hold(app.SortingAxesL,'off');
+                        hold(app.SortingAxesR,'off');
                     end
                 
 
@@ -1320,8 +1320,10 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 [tot_n, cen] = histcounts((app.areas .* pix_area),20);
                 [pos_n, cen] = histcounts((app.areas(app.ponf) .* pix_area),cen);
                 
-                imshow(app.orig_img,'Parent',app.FTAxesL);
-                imshow(img_out,'Parent',app.FTAxesR);
+                imshow(app.orig_img,'Parent',app.FiberTypingAxesL);
+                imshow(img_out,'Parent',app.FiberTypingAxesR);
+                linkaxes([app.FiberTypingAxesL, app.FiberTypingAxesR]);
+
                 histogram(app.ave_g,255,'Parent',app.FThistL);
                 hold(app.FThistL,'on');
                 line(app.FThistL,x,y,'LineWidth',2,'Color','r');
@@ -2178,25 +2180,25 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SortingAxesPanel.FontName = 'Avenir';
             app.SortingAxesPanel.Position = [285 28 890 633];
 
-            % Create UIAxesL
-            app.UIAxesL = uiaxes(app.SortingAxesPanel);
-            xlabel(app.UIAxesL, 'X')
-            ylabel(app.UIAxesL, 'Y')
-            app.UIAxesL.PlotBoxAspectRatio = [1 1.04306220095694 1];
-            app.UIAxesL.FontName = 'Avenir';
-            app.UIAxesL.XColor = 'none';
-            app.UIAxesL.YColor = 'none';
-            app.UIAxesL.Position = [12 140 412 438];
+            % Create SortingAxesL
+            app.SortingAxesL = uiaxes(app.SortingAxesPanel);
+            xlabel(app.SortingAxesL, 'X')
+            ylabel(app.SortingAxesL, 'Y')
+            app.SortingAxesL.PlotBoxAspectRatio = [1 1.04306220095694 1];
+            app.SortingAxesL.FontName = 'Avenir';
+            app.SortingAxesL.XColor = 'none';
+            app.SortingAxesL.YColor = 'none';
+            app.SortingAxesL.Position = [12 140 412 438];
 
-            % Create UIAxesR
-            app.UIAxesR = uiaxes(app.SortingAxesPanel);
-            xlabel(app.UIAxesR, 'X')
-            ylabel(app.UIAxesR, 'Y')
-            app.UIAxesR.PlotBoxAspectRatio = [1 1.12082262210797 1];
-            app.UIAxesR.FontName = 'Avenir';
-            app.UIAxesR.XColor = 'none';
-            app.UIAxesR.YColor = 'none';
-            app.UIAxesR.Position = [467 140 412 438];
+            % Create SortingAxesR
+            app.SortingAxesR = uiaxes(app.SortingAxesPanel);
+            xlabel(app.SortingAxesR, 'X')
+            ylabel(app.SortingAxesR, 'Y')
+            app.SortingAxesR.PlotBoxAspectRatio = [1 1.12082262210797 1];
+            app.SortingAxesR.FontName = 'Avenir';
+            app.SortingAxesR.XColor = 'none';
+            app.SortingAxesR.YColor = 'none';
+            app.SortingAxesR.Position = [467 140 412 438];
 
             % Create YesButton
             app.YesButton = uibutton(app.SortingAxesPanel, 'push');
@@ -2225,21 +2227,21 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingPanel.FontName = 'Avenir';
             app.FiberTypingPanel.Position = [285 28 882 637];
 
-            % Create FTAxesL
-            app.FTAxesL = uiaxes(app.FiberTypingPanel);
-            app.FTAxesL.PlotBoxAspectRatio = [1.06832298136646 1 1];
-            app.FTAxesL.FontName = 'Avenir';
-            app.FTAxesL.XColor = 'none';
-            app.FTAxesL.YColor = 'none';
-            app.FTAxesL.Position = [22 276 414 332];
+            % Create FiberTypingAxesL
+            app.FiberTypingAxesL = uiaxes(app.FiberTypingPanel);
+            app.FiberTypingAxesL.PlotBoxAspectRatio = [1.06832298136646 1 1];
+            app.FiberTypingAxesL.FontName = 'Avenir';
+            app.FiberTypingAxesL.XColor = 'none';
+            app.FiberTypingAxesL.YColor = 'none';
+            app.FiberTypingAxesL.Position = [22 276 414 332];
 
-            % Create FTAxesR
-            app.FTAxesR = uiaxes(app.FiberTypingPanel);
-            app.FTAxesR.PlotBoxAspectRatio = [1.06832298136646 1 1];
-            app.FTAxesR.FontName = 'Avenir';
-            app.FTAxesR.XColor = 'none';
-            app.FTAxesR.YColor = 'none';
-            app.FTAxesR.Position = [450 276 416 335];
+            % Create FiberTypingAxesR
+            app.FiberTypingAxesR = uiaxes(app.FiberTypingPanel);
+            app.FiberTypingAxesR.PlotBoxAspectRatio = [1.06832298136646 1 1];
+            app.FiberTypingAxesR.FontName = 'Avenir';
+            app.FiberTypingAxesR.XColor = 'none';
+            app.FiberTypingAxesR.YColor = 'none';
+            app.FiberTypingAxesR.Position = [450 276 416 335];
 
             % Create FThistL
             app.FThistL = uiaxes(app.FiberTypingPanel);
