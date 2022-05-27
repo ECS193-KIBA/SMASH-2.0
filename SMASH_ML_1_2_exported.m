@@ -28,6 +28,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         DoneCentralNuclei               matlab.ui.control.Button
         CentralNucleiExcelWrite         matlab.ui.control.Button
         CalculateCentralNuclei          matlab.ui.control.Button
+        NucleiColorDropDown             matlab.ui.control.DropDown
+        NucleiColorDropDownLabel        matlab.ui.control.Label
+        PixelSizeCentralNuclei          matlab.ui.control.NumericEditField
+        PixelSizeumpixelLabel           matlab.ui.control.Label
+        CentralNucleiChannelColorBox    matlab.ui.control.UIAxes
         FiberPropertiesControlPanel     matlab.ui.container.Panel
         FiberPropertiesDescription_2    matlab.ui.control.Label
         FiberPropertiesDescription      matlab.ui.control.Label
@@ -38,11 +43,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         DataOutputFolderEditFieldLabel  matlab.ui.control.Label
         DoneFiberProperties             matlab.ui.control.Button
         WritetoExcelButton              matlab.ui.control.Button
-        NucleiColorDropDown             matlab.ui.control.DropDown
-        NucleiColorDropDownLabel        matlab.ui.control.Label
-        PixelSizeCentralNuclei          matlab.ui.control.NumericEditField
-        PixelSizeumpixelLabel           matlab.ui.control.Label
-        CentralNucleiChannelColorBox    matlab.ui.control.UIAxes
         ManualFilterControls            matlab.ui.container.Panel
         ManualFilterDescription_2       matlab.ui.control.Label
         ManualFilterDescription         matlab.ui.control.Label
@@ -273,6 +273,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             ColorMapDataForAllLayers = BioformatsData{1, 3};
             isMultilayerImage = ~isempty(ColorMapDataForAllLayers{1,1});
 
+            TotalColorDropDownItems = {};
+            TotalColorDropDownItemsData = {};
+
             if isMultilayerImage
                 LayerOnePixelData = PixelDataForAllLayers{1,1};
                 LayerSize = size(LayerOnePixelData);
@@ -280,8 +283,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
                 TotalRGB = zeros(RGBSize, 'uint8');
                 TotalMultiSpectral = [];
-                TotalColorDropDownItems = {};
-                TotalColorDropDownItemsData = {};
+
                 
                 % Channel RGB takes in all RGB values for the 
                 % different colors in the channels
@@ -322,20 +324,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     app.channelRGB = cat(1, app.channelRGB, RGBValues(1,:));
                 end
 
-                app.FiberOutlineColorDropDown.Items = TotalColorDropDownItems;
-                app.FiberOutlineColorDropDown.ItemsData = TotalColorDropDownItemsData;
-                app.NucleiColorDropDown.Items = TotalColorDropDownItems;
-                app.NucleiColorDropDown.ItemsData = TotalColorDropDownItemsData;
-                app.FiberTypeColorDropDown.Items = TotalColorDropDownItems;
-                app.FiberTypeColorDropDown.ItemsData = TotalColorDropDownItemsData;
-                app.NonfiberObjectsColorDropDown.Items = TotalColorDropDownItems;
-                app.NonfiberObjectsColorDropDown.ItemsData = TotalColorDropDownItemsData;
+
                 app.orig_img = TotalRGB;
                 app.orig_img_multispectral = TotalMultiSpectral;
             else
                 ImageData = imread(FileName);
                 app.orig_img = ImageData;
                 app.orig_img_multispectral = ImageData;
+
+                TotalColorDropDownItems = {'Red', 'Green', 'Blue'};
+                TotalColorDropDownItemsData = {'1', '2', '3'};
+
 
                 % Append RGB color channels to channelRGB for RGB images
                 % Add red, green, and blue to channelRGB
@@ -344,7 +343,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 BlueValue = [0 0 1];
                 app.channelRGB = [RedValue; GreenValue; BlueValue];
 
+
             end
+
+            app.FiberOutlineColorDropDown.Items = TotalColorDropDownItems;
+            app.FiberOutlineColorDropDown.ItemsData = TotalColorDropDownItemsData;
+            app.NucleiColorDropDown.Items = TotalColorDropDownItems;
+            app.NucleiColorDropDown.ItemsData = TotalColorDropDownItemsData;
+            app.FiberTypeColorDropDown.Items = TotalColorDropDownItems;
+            app.FiberTypeColorDropDown.ItemsData = TotalColorDropDownItemsData;
+            app.NonfiberObjectsColorDropDown.Items = TotalColorDropDownItems;
+            app.NonfiberObjectsColorDropDown.ItemsData = TotalColorDropDownItemsData;
 
             % Display the image
             imshow(app.orig_img,'Parent',app.UIAxes);
