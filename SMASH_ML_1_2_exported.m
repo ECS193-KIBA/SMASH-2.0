@@ -120,7 +120,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         NonfiberThreshold               matlab.ui.control.NumericEditField
         ThresholdEditField_2Label_2     matlab.ui.control.Label
         NonfiberAxes                    matlab.ui.control.UIAxes
-        NonfiberControlPanel            matlab.ui.container.Panel
+        NonfiberObjectsControlPanel     matlab.ui.container.Panel
         PixelSizeNonfiberObjects        matlab.ui.control.NumericEditField
         PixelSizeumpixelLabel_2         matlab.ui.control.Label
         DoneNonfiber                    matlab.ui.control.Button
@@ -1533,7 +1533,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.nf_data = 0;
             app.Prompt.Text = '';
             app.NonfiberPanel.Visible = 'off';
-            app.NonfiberControlPanel.Visible = 'off';
+            app.NonfiberObjectsControlPanel.Visible = 'off';
             SaveNFMaskToMaskFile(app, app.nf_bw_obj);
             EnableMenuBarButtons(app);
         end
@@ -1643,7 +1643,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: NonfiberObjectsButton
         function NonfiberObjectsButtonPushed(app, event)
             DisableMenuBarButtonsAndClearFileLabels(app);
-            app.NonfiberControlPanel.Visible = 'on';
+            app.NonfiberObjectsControlPanel.Visible = 'on';
             app.WritetoExcelNonfiber.Enable = 'off';
             app.NonfiberChannelColorBox.Visible = 'on';
         end
@@ -2412,15 +2412,15 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Image.Position = [10 728 36 55];
             app.Image.ImageSource = 'screenshot.png';
 
-            % Create NonfiberControlPanel
-            app.NonfiberControlPanel = uipanel(app.UIFigure);
-            app.NonfiberControlPanel.Visible = 'off';
-            app.NonfiberControlPanel.BackgroundColor = [1 1 1];
-            app.NonfiberControlPanel.FontName = 'Avenir';
-            app.NonfiberControlPanel.Position = [14 176 258 301];
+            % Create NonfiberObjectsControlPanel
+            app.NonfiberObjectsControlPanel = uipanel(app.UIFigure);
+            app.NonfiberObjectsControlPanel.Visible = 'off';
+            app.NonfiberObjectsControlPanel.BackgroundColor = [1 1 1];
+            app.NonfiberObjectsControlPanel.FontName = 'Avenir';
+            app.NonfiberObjectsControlPanel.Position = [14 176 258 301];
 
             % Create NonfiberChannelColorBox
-            app.NonfiberChannelColorBox = uiaxes(app.NonfiberControlPanel);
+            app.NonfiberChannelColorBox = uiaxes(app.NonfiberObjectsControlPanel);
             app.NonfiberChannelColorBox.Toolbar.Visible = 'off';
             app.NonfiberChannelColorBox.FontName = 'Avenir';
             app.NonfiberChannelColorBox.XTick = [];
@@ -2432,14 +2432,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberChannelColorBox.Position = [229 193 30 30];
 
             % Create ObjectColorDropDownLabel
-            app.ObjectColorDropDownLabel = uilabel(app.NonfiberControlPanel);
+            app.ObjectColorDropDownLabel = uilabel(app.NonfiberObjectsControlPanel);
             app.ObjectColorDropDownLabel.HorizontalAlignment = 'right';
             app.ObjectColorDropDownLabel.FontName = 'Avenir';
             app.ObjectColorDropDownLabel.Position = [35 197 75 22];
             app.ObjectColorDropDownLabel.Text = 'Object Color';
 
             % Create NonfiberObjectsColorDropDown
-            app.NonfiberObjectsColorDropDown = uidropdown(app.NonfiberControlPanel);
+            app.NonfiberObjectsColorDropDown = uidropdown(app.NonfiberObjectsControlPanel);
             app.NonfiberObjectsColorDropDown.Items = {'Red', 'Green', 'Blue'};
             app.NonfiberObjectsColorDropDown.ItemsData = {'1', '2', '3'};
             app.NonfiberObjectsColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NonfiberObjectsColorDropDownValueChanged, true);
@@ -2448,47 +2448,47 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsColorDropDown.Value = '1';
 
             % Create DataOutputFolderEditField_3Label_2
-            app.DataOutputFolderEditField_3Label_2 = uilabel(app.NonfiberControlPanel);
+            app.DataOutputFolderEditField_3Label_2 = uilabel(app.NonfiberObjectsControlPanel);
             app.DataOutputFolderEditField_3Label_2.HorizontalAlignment = 'right';
             app.DataOutputFolderEditField_3Label_2.FontName = 'Avenir';
             app.DataOutputFolderEditField_3Label_2.Position = [2 139 111 22];
             app.DataOutputFolderEditField_3Label_2.Text = 'Data Output Folder';
 
             % Create NonfiberObjectsDataOutputFolder
-            app.NonfiberObjectsDataOutputFolder = uieditfield(app.NonfiberControlPanel, 'text');
+            app.NonfiberObjectsDataOutputFolder = uieditfield(app.NonfiberObjectsControlPanel, 'text');
             app.NonfiberObjectsDataOutputFolder.FontName = 'Avenir';
             app.NonfiberObjectsDataOutputFolder.Position = [128 139 100 22];
 
             % Create CalculateNonfiberObjects
-            app.CalculateNonfiberObjects = uibutton(app.NonfiberControlPanel, 'push');
+            app.CalculateNonfiberObjects = uibutton(app.NonfiberObjectsControlPanel, 'push');
             app.CalculateNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @CalculateNonfiberObjectsButtonPushed, true);
             app.CalculateNonfiberObjects.FontName = 'Avenir';
             app.CalculateNonfiberObjects.Position = [82 67 100 24];
             app.CalculateNonfiberObjects.Text = 'Calculate';
 
             % Create WritetoExcelNonfiber
-            app.WritetoExcelNonfiber = uibutton(app.NonfiberControlPanel, 'push');
+            app.WritetoExcelNonfiber = uibutton(app.NonfiberObjectsControlPanel, 'push');
             app.WritetoExcelNonfiber.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelNonfiberButtonPushed, true);
             app.WritetoExcelNonfiber.FontName = 'Avenir';
             app.WritetoExcelNonfiber.Position = [20 24 100 24];
             app.WritetoExcelNonfiber.Text = 'Write to Excel';
 
             % Create DoneNonfiber
-            app.DoneNonfiber = uibutton(app.NonfiberControlPanel, 'push');
+            app.DoneNonfiber = uibutton(app.NonfiberObjectsControlPanel, 'push');
             app.DoneNonfiber.ButtonPushedFcn = createCallbackFcn(app, @DoneNonfiberButtonPushed, true);
             app.DoneNonfiber.FontName = 'Avenir';
             app.DoneNonfiber.Position = [144 25 100 24];
             app.DoneNonfiber.Text = 'Done';
 
             % Create PixelSizeumpixelLabel_2
-            app.PixelSizeumpixelLabel_2 = uilabel(app.NonfiberControlPanel);
+            app.PixelSizeumpixelLabel_2 = uilabel(app.NonfiberObjectsControlPanel);
             app.PixelSizeumpixelLabel_2.HorizontalAlignment = 'right';
             app.PixelSizeumpixelLabel_2.FontName = 'Avenir';
             app.PixelSizeumpixelLabel_2.Position = [51 243 59 32];
             app.PixelSizeumpixelLabel_2.Text = {'Pixel Size'; '(um/pixel)'};
 
             % Create PixelSizeNonfiberObjects
-            app.PixelSizeNonfiberObjects = uieditfield(app.NonfiberControlPanel, 'numeric');
+            app.PixelSizeNonfiberObjects = uieditfield(app.NonfiberObjectsControlPanel, 'numeric');
             app.PixelSizeNonfiberObjects.Limits = [0 Inf];
             app.PixelSizeNonfiberObjects.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberObjectsValueChanged, true);
             app.PixelSizeNonfiberObjects.FontName = 'Avenir';
