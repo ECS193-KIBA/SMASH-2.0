@@ -1937,6 +1937,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
                 % Display image
                 imshow(img_out,'Parent',app.NonfiberClassificationAxes_R);
+                linkaxes([app.NonfiberClassificationAxes_L, app.NonfiberClassificationAxes_R]);
 
                 app.NonfiberClassificationThreshold.Enable = 'on';
                 app.NonfiberClassificationThreshold.Editable = 'on';
