@@ -2051,6 +2051,19 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 app.SegmentationParameters.Visible = 'off';
             end
         end
+
+        % Value changed function: NonfiberClassificationColorDropDown
+        function NonfiberClassificationColorDropDownValueChanged(app, event)
+            % Retreive the index of the color channel
+            color_channel_index = str2double(app.NonfiberClassificationColorDropDown.Value);
+
+            % Get RGB values of color channel and convert to numeric matrix
+            RGBValueOfColorChannel = app.channelRGB(color_channel_index, :);
+            RGB1DValue = RGBValueOfColorChannel;
+
+            % Update color on color box
+            app.NonfiberClassificationChannelColorBox.Color = RGB1DValue;
+        end
     end
 
     % Component initialization
@@ -3256,6 +3269,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationColorDropDown = uidropdown(app.NonfiberClassificationControlPanel);
             app.NonfiberClassificationColorDropDown.Items = {'Red', 'Green', 'Blue'};
             app.NonfiberClassificationColorDropDown.ItemsData = {'1', '2', '3'};
+            app.NonfiberClassificationColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NonfiberClassificationColorDropDownValueChanged, true);
             app.NonfiberClassificationColorDropDown.FontName = 'Avenir';
             app.NonfiberClassificationColorDropDown.Position = [126 197 100 22];
             app.NonfiberClassificationColorDropDown.Value = '1';
