@@ -3,6 +3,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        NonfiberPanel                   matlab.ui.container.Panel
+        NonfiberAccept                  matlab.ui.control.Button
+        NonfiberAdjust                  matlab.ui.control.Button
+        NonfiberThreshold               matlab.ui.control.NumericEditField
+        ThresholdEditField_2Label_2     matlab.ui.control.Label
+        NonfiberAxes                    matlab.ui.control.UIAxes
         NonfiberObjectsControlPanel     matlab.ui.container.Panel
         NonfiberObjectsFileWriteStatusLabel  matlab.ui.control.Label
         PixelSizeNonfiberObjects        matlab.ui.control.NumericEditField
@@ -126,12 +132,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         NonfiberClassificationAxes_L    matlab.ui.control.UIAxes
         NonfiberClassificationAxes_R    matlab.ui.control.UIAxes
         BatchModeLabel                  matlab.ui.control.Label
-        NonfiberPanel                   matlab.ui.container.Panel
-        NonfiberAccept                  matlab.ui.control.Button
-        NonfiberAdjust                  matlab.ui.control.Button
-        NonfiberThreshold               matlab.ui.control.NumericEditField
-        ThresholdEditField_2Label_2     matlab.ui.control.Label
-        NonfiberAxes                    matlab.ui.control.UIAxes
         Image                           matlab.ui.control.Image
         Panel                           matlab.ui.container.Panel
         Hyperlink_2                     matlab.ui.control.Hyperlink
@@ -2432,50 +2432,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Image.Position = [10 728 36 55];
             app.Image.ImageSource = 'screenshot.png';
 
-            % Create NonfiberPanel
-            app.NonfiberPanel = uipanel(app.UIFigure);
-            app.NonfiberPanel.Visible = 'off';
-            app.NonfiberPanel.BackgroundColor = [1 1 1];
-            app.NonfiberPanel.FontName = 'Avenir';
-            app.NonfiberPanel.Position = [293 53 876 605];
-
-            % Create NonfiberAxes
-            app.NonfiberAxes = uiaxes(app.NonfiberPanel);
-            xlabel(app.NonfiberAxes, 'X')
-            ylabel(app.NonfiberAxes, 'Y')
-            app.NonfiberAxes.PlotBoxAspectRatio = [1.35976789168279 1 1];
-            app.NonfiberAxes.FontName = 'Avenir';
-            app.NonfiberAxes.XColor = 'none';
-            app.NonfiberAxes.YColor = 'none';
-            app.NonfiberAxes.Position = [38 -20 844 553];
-
-            % Create ThresholdEditField_2Label_2
-            app.ThresholdEditField_2Label_2 = uilabel(app.NonfiberPanel);
-            app.ThresholdEditField_2Label_2.HorizontalAlignment = 'right';
-            app.ThresholdEditField_2Label_2.FontName = 'Avenir';
-            app.ThresholdEditField_2Label_2.Position = [204 10 59 22];
-            app.ThresholdEditField_2Label_2.Text = 'Threshold';
-
-            % Create NonfiberThreshold
-            app.NonfiberThreshold = uieditfield(app.NonfiberPanel, 'numeric');
-            app.NonfiberThreshold.Limits = [0 Inf];
-            app.NonfiberThreshold.FontName = 'Avenir';
-            app.NonfiberThreshold.Position = [278 10 100 22];
-
-            % Create NonfiberAdjust
-            app.NonfiberAdjust = uibutton(app.NonfiberPanel, 'push');
-            app.NonfiberAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAdjustButtonPushed, true);
-            app.NonfiberAdjust.FontName = 'Avenir';
-            app.NonfiberAdjust.Position = [418 9 100 24];
-            app.NonfiberAdjust.Text = 'Adjust';
-
-            % Create NonfiberAccept
-            app.NonfiberAccept = uibutton(app.NonfiberPanel, 'push');
-            app.NonfiberAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAcceptButtonPushed, true);
-            app.NonfiberAccept.FontName = 'Avenir';
-            app.NonfiberAccept.Position = [542 8 100 24];
-            app.NonfiberAccept.Text = 'Accept';
-
             % Create BatchModeLabel
             app.BatchModeLabel = uilabel(app.UIFigure);
             app.BatchModeLabel.FontName = 'Avenir';
@@ -3368,6 +3324,50 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsFileWriteStatusLabel = uilabel(app.NonfiberObjectsControlPanel);
             app.NonfiberObjectsFileWriteStatusLabel.Position = [27 16 186 22];
             app.NonfiberObjectsFileWriteStatusLabel.Text = 'Nonfiber Objects File Write Status';
+
+            % Create NonfiberPanel
+            app.NonfiberPanel = uipanel(app.UIFigure);
+            app.NonfiberPanel.Visible = 'off';
+            app.NonfiberPanel.BackgroundColor = [1 1 1];
+            app.NonfiberPanel.FontName = 'Avenir';
+            app.NonfiberPanel.Position = [293 53 876 605];
+
+            % Create NonfiberAxes
+            app.NonfiberAxes = uiaxes(app.NonfiberPanel);
+            xlabel(app.NonfiberAxes, 'X')
+            ylabel(app.NonfiberAxes, 'Y')
+            app.NonfiberAxes.PlotBoxAspectRatio = [1.35976789168279 1 1];
+            app.NonfiberAxes.FontName = 'Avenir';
+            app.NonfiberAxes.XColor = 'none';
+            app.NonfiberAxes.YColor = 'none';
+            app.NonfiberAxes.Position = [38 -20 844 553];
+
+            % Create ThresholdEditField_2Label_2
+            app.ThresholdEditField_2Label_2 = uilabel(app.NonfiberPanel);
+            app.ThresholdEditField_2Label_2.HorizontalAlignment = 'right';
+            app.ThresholdEditField_2Label_2.FontName = 'Avenir';
+            app.ThresholdEditField_2Label_2.Position = [204 10 59 22];
+            app.ThresholdEditField_2Label_2.Text = 'Threshold';
+
+            % Create NonfiberThreshold
+            app.NonfiberThreshold = uieditfield(app.NonfiberPanel, 'numeric');
+            app.NonfiberThreshold.Limits = [0 Inf];
+            app.NonfiberThreshold.FontName = 'Avenir';
+            app.NonfiberThreshold.Position = [278 10 100 22];
+
+            % Create NonfiberAdjust
+            app.NonfiberAdjust = uibutton(app.NonfiberPanel, 'push');
+            app.NonfiberAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAdjustButtonPushed, true);
+            app.NonfiberAdjust.FontName = 'Avenir';
+            app.NonfiberAdjust.Position = [418 9 100 24];
+            app.NonfiberAdjust.Text = 'Adjust';
+
+            % Create NonfiberAccept
+            app.NonfiberAccept = uibutton(app.NonfiberPanel, 'push');
+            app.NonfiberAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberAcceptButtonPushed, true);
+            app.NonfiberAccept.FontName = 'Avenir';
+            app.NonfiberAccept.Position = [542 8 100 24];
+            app.NonfiberAccept.Text = 'Accept';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
