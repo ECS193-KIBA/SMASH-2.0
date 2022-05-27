@@ -8,7 +8,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         NonfiberAdjust                  matlab.ui.control.Button
         NonfiberThreshold               matlab.ui.control.NumericEditField
         ThresholdEditField_2Label_2     matlab.ui.control.Label
-        NonfiberAxes                    matlab.ui.control.UIAxes
+        NonfiberAxesL                   matlab.ui.control.UIAxes
+        NonfiberAxesR                   matlab.ui.control.UIAxes
         NonfiberObjectsControlPanel     matlab.ui.container.Panel
         NonfiberObjectsFileWriteStatusLabel  matlab.ui.control.Label
         PixelSizeNonfiberObjects        matlab.ui.control.NumericEditField
@@ -1468,9 +1469,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             
             app.Obj_Adj = 1;
             
+            imshow(app.orig_img, 'Parent', app.NonfiberAxesL);
             while app.Obj_Adj
                 ch_bw = imbinarize(ch_fil,app.thresh_nf);
-                imshow(ch_bw,'Parent',app.NonfiberAxes);
+                imshow(ch_bw,'Parent',app.NonfiberAxesR);
+                linkaxes([app.NonfiberAxesL, app.NonfiberAxesR]);
                 
                 app.nf_bw_obj = ch_bw;
                 uiwait(app.UIFigure);
@@ -3332,15 +3335,25 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberPanel.FontName = 'Avenir';
             app.NonfiberPanel.Position = [293 53 876 605];
 
-            % Create NonfiberAxes
-            app.NonfiberAxes = uiaxes(app.NonfiberPanel);
-            xlabel(app.NonfiberAxes, 'X')
-            ylabel(app.NonfiberAxes, 'Y')
-            app.NonfiberAxes.PlotBoxAspectRatio = [1.35976789168279 1 1];
-            app.NonfiberAxes.FontName = 'Avenir';
-            app.NonfiberAxes.XColor = 'none';
-            app.NonfiberAxes.YColor = 'none';
-            app.NonfiberAxes.Position = [38 -20 844 553];
+            % Create NonfiberAxesR
+            app.NonfiberAxesR = uiaxes(app.NonfiberPanel);
+            xlabel(app.NonfiberAxesR, 'X')
+            ylabel(app.NonfiberAxesR, 'Y')
+            app.NonfiberAxesR.PlotBoxAspectRatio = [1.35976789168279 1 1];
+            app.NonfiberAxesR.FontName = 'Avenir';
+            app.NonfiberAxesR.XColor = 'none';
+            app.NonfiberAxesR.YColor = 'none';
+            app.NonfiberAxesR.Position = [442 92 401 427];
+
+            % Create NonfiberAxesL
+            app.NonfiberAxesL = uiaxes(app.NonfiberPanel);
+            xlabel(app.NonfiberAxesL, 'X')
+            ylabel(app.NonfiberAxesL, 'Y')
+            app.NonfiberAxesL.PlotBoxAspectRatio = [1.35976789168279 1 1];
+            app.NonfiberAxesL.FontName = 'Avenir';
+            app.NonfiberAxesL.XColor = 'none';
+            app.NonfiberAxesL.YColor = 'none';
+            app.NonfiberAxesL.Position = [28 92 401 427];
 
             % Create ThresholdEditField_2Label_2
             app.ThresholdEditField_2Label_2 = uilabel(app.NonfiberPanel);
