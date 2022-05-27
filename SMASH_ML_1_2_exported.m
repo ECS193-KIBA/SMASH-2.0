@@ -3,11 +3,18 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
-        ManualFilterControls            matlab.ui.container.Panel
-        ManualFilterDescription_2       matlab.ui.control.Label
-        ManualFilterDescription         matlab.ui.control.Label
-        FinishManualFilteringButton     matlab.ui.control.Button
-        RemoveNonfibersButton           matlab.ui.control.Button
+        CentralNucleiControlPanel       matlab.ui.container.Panel
+        CentralNucleiDescription_2      matlab.ui.control.Label
+        CentralNucleiDescription        matlab.ui.control.Label
+        CentralNucleiDataOutputFolder   matlab.ui.control.EditField
+        DataOutputFolderEditField_2Label  matlab.ui.control.Label
+        MinimumNucleusSizeum2EditField  matlab.ui.control.NumericEditField
+        MinimumNucleusSizeum2EditFieldLabel  matlab.ui.control.Label
+        DistancefromborderEditField     matlab.ui.control.NumericEditField
+        DistancefromborderEditFieldLabel  matlab.ui.control.Label
+        DoneCentralNuclei               matlab.ui.control.Button
+        CentralNucleiExcelWrite         matlab.ui.control.Button
+        CalculateCentralNuclei          matlab.ui.control.Button
         FiberPropertiesControlPanel     matlab.ui.container.Panel
         FiberPropertiesDescription_2    matlab.ui.control.Label
         FiberPropertiesDescription      matlab.ui.control.Label
@@ -18,6 +25,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         DataOutputFolderEditFieldLabel  matlab.ui.control.Label
         DoneFiberProperties             matlab.ui.control.Button
         WritetoExcelButton              matlab.ui.control.Button
+        NucleiColorDropDown             matlab.ui.control.DropDown
+        NucleiColorDropDownLabel        matlab.ui.control.Label
+        PixelSizeCentralNuclei          matlab.ui.control.NumericEditField
+        PixelSizeumpixelLabel           matlab.ui.control.Label
+        CentralNucleiChannelColorBox    matlab.ui.control.UIAxes
+        ManualFilterControls            matlab.ui.container.Panel
+        ManualFilterDescription_2       matlab.ui.control.Label
+        ManualFilterDescription         matlab.ui.control.Label
+        FinishManualFilteringButton     matlab.ui.control.Button
+        RemoveNonfibersButton           matlab.ui.control.Button
         SegmentationParameters          matlab.ui.container.Panel
         CloseInitialSegmentationButton  matlab.ui.control.Button
         InitialSegmentationDescription_2  matlab.ui.control.Label
@@ -97,21 +114,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeFiberTyping            matlab.ui.control.NumericEditField
         PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
         FiberTypingChannelColorBox      matlab.ui.control.UIAxes
-        CentralNucleiControlPanel       matlab.ui.container.Panel
-        CentralNucleiDataOutputFolder   matlab.ui.control.EditField
-        DataOutputFolderEditField_2Label  matlab.ui.control.Label
-        MinimumNucleusSizeum2EditField  matlab.ui.control.NumericEditField
-        MinimumNucleusSizeum2EditFieldLabel  matlab.ui.control.Label
-        DistancefromborderEditField     matlab.ui.control.NumericEditField
-        DistancefromborderEditFieldLabel  matlab.ui.control.Label
-        DoneCentralNuclei               matlab.ui.control.Button
-        CentralNucleiExcelWrite         matlab.ui.control.Button
-        CalculateCentralNuclei          matlab.ui.control.Button
-        NucleiColorDropDown             matlab.ui.control.DropDown
-        NucleiColorDropDownLabel        matlab.ui.control.Label
-        PixelSizeCentralNuclei          matlab.ui.control.NumericEditField
-        PixelSizeumpixelLabel           matlab.ui.control.Label
-        CentralNucleiChannelColorBox    matlab.ui.control.UIAxes
         NonfiberControlPanel            matlab.ui.container.Panel
         PixelSizeNonfiberObjects        matlab.ui.control.NumericEditField
         PixelSizeumpixelLabel_2         matlab.ui.control.Label
@@ -2466,114 +2468,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeNonfiberObjects.FontName = 'Avenir';
             app.PixelSizeNonfiberObjects.Position = [125 253 100 22];
 
-            % Create CentralNucleiControlPanel
-            app.CentralNucleiControlPanel = uipanel(app.UIFigure);
-            app.CentralNucleiControlPanel.Visible = 'off';
-            app.CentralNucleiControlPanel.BackgroundColor = [1 1 1];
-            app.CentralNucleiControlPanel.FontName = 'Avenir';
-            app.CentralNucleiControlPanel.Position = [10 177 260 293];
-
-            % Create CentralNucleiChannelColorBox
-            app.CentralNucleiChannelColorBox = uiaxes(app.CentralNucleiControlPanel);
-            app.CentralNucleiChannelColorBox.Toolbar.Visible = 'off';
-            app.CentralNucleiChannelColorBox.FontName = 'Avenir';
-            app.CentralNucleiChannelColorBox.XTick = [];
-            app.CentralNucleiChannelColorBox.YTick = [];
-            app.CentralNucleiChannelColorBox.Color = [0 1 1];
-            app.CentralNucleiChannelColorBox.Box = 'on';
-            app.CentralNucleiChannelColorBox.Visible = 'off';
-            app.CentralNucleiChannelColorBox.PickableParts = 'none';
-            app.CentralNucleiChannelColorBox.Position = [11 87 234 42];
-
-            % Create PixelSizeumpixelLabel
-            app.PixelSizeumpixelLabel = uilabel(app.CentralNucleiControlPanel);
-            app.PixelSizeumpixelLabel.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelLabel.FontName = 'Avenir';
-            app.PixelSizeumpixelLabel.Position = [48 251 58 32];
-            app.PixelSizeumpixelLabel.Text = {'Pixel Size'; 'um/pixel'};
-
-            % Create PixelSizeCentralNuclei
-            app.PixelSizeCentralNuclei = uieditfield(app.CentralNucleiControlPanel, 'numeric');
-            app.PixelSizeCentralNuclei.Limits = [0 Inf];
-            app.PixelSizeCentralNuclei.ValueChangedFcn = createCallbackFcn(app, @PixelSizeCentralNucleiValueChanged, true);
-            app.PixelSizeCentralNuclei.FontName = 'Avenir';
-            app.PixelSizeCentralNuclei.Position = [121 261 100 22];
-
-            % Create NucleiColorDropDownLabel
-            app.NucleiColorDropDownLabel = uilabel(app.CentralNucleiControlPanel);
-            app.NucleiColorDropDownLabel.HorizontalAlignment = 'right';
-            app.NucleiColorDropDownLabel.FontName = 'Avenir';
-            app.NucleiColorDropDownLabel.Position = [37 226 73 22];
-            app.NucleiColorDropDownLabel.Text = 'Nuclei Color';
-
-            % Create NucleiColorDropDown
-            app.NucleiColorDropDown = uidropdown(app.CentralNucleiControlPanel);
-            app.NucleiColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.NucleiColorDropDown.ItemsData = {'1', '2', '3'};
-            app.NucleiColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NucleiColorValueChanged, true);
-            app.NucleiColorDropDown.FontName = 'Avenir';
-            app.NucleiColorDropDown.Position = [125 226 100 22];
-            app.NucleiColorDropDown.Value = '1';
-
-            % Create CalculateCentralNuclei
-            app.CalculateCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
-            app.CalculateCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @CalculateCentralNucleiPushed, true);
-            app.CalculateCentralNuclei.FontName = 'Avenir';
-            app.CalculateCentralNuclei.Position = [85 64 100 24];
-            app.CalculateCentralNuclei.Text = 'Calculate';
-
-            % Create CentralNucleiExcelWrite
-            app.CentralNucleiExcelWrite = uibutton(app.CentralNucleiControlPanel, 'push');
-            app.CentralNucleiExcelWrite.ButtonPushedFcn = createCallbackFcn(app, @CentralNucleiExcelWriteButtonPushed, true);
-            app.CentralNucleiExcelWrite.FontName = 'Avenir';
-            app.CentralNucleiExcelWrite.Position = [24 31 100 24];
-            app.CentralNucleiExcelWrite.Text = 'Write To Excel';
-
-            % Create DoneCentralNuclei
-            app.DoneCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
-            app.DoneCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @DoneCentralNucleiPushed, true);
-            app.DoneCentralNuclei.FontName = 'Avenir';
-            app.DoneCentralNuclei.Position = [142 31 100 24];
-            app.DoneCentralNuclei.Text = 'Done';
-
-            % Create DistancefromborderEditFieldLabel
-            app.DistancefromborderEditFieldLabel = uilabel(app.CentralNucleiControlPanel);
-            app.DistancefromborderEditFieldLabel.HorizontalAlignment = 'right';
-            app.DistancefromborderEditFieldLabel.FontName = 'Avenir';
-            app.DistancefromborderEditFieldLabel.Position = [14 194 119 22];
-            app.DistancefromborderEditFieldLabel.Text = 'Distance from border';
-
-            % Create DistancefromborderEditField
-            app.DistancefromborderEditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
-            app.DistancefromborderEditField.Limits = [0 Inf];
-            app.DistancefromborderEditField.FontName = 'Avenir';
-            app.DistancefromborderEditField.Position = [148 194 100 22];
-
-            % Create MinimumNucleusSizeum2EditFieldLabel
-            app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CentralNucleiControlPanel);
-            app.MinimumNucleusSizeum2EditFieldLabel.HorizontalAlignment = 'right';
-            app.MinimumNucleusSizeum2EditFieldLabel.FontName = 'Avenir';
-            app.MinimumNucleusSizeum2EditFieldLabel.Position = [8 153 127 32];
-            app.MinimumNucleusSizeum2EditFieldLabel.Text = {'Minimum Nucleus Size'; '(um^2)'};
-
-            % Create MinimumNucleusSizeum2EditField
-            app.MinimumNucleusSizeum2EditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
-            app.MinimumNucleusSizeum2EditField.Limits = [0 Inf];
-            app.MinimumNucleusSizeum2EditField.FontName = 'Avenir';
-            app.MinimumNucleusSizeum2EditField.Position = [150 163 100 22];
-
-            % Create DataOutputFolderEditField_2Label
-            app.DataOutputFolderEditField_2Label = uilabel(app.CentralNucleiControlPanel);
-            app.DataOutputFolderEditField_2Label.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_2Label.FontName = 'Avenir';
-            app.DataOutputFolderEditField_2Label.Position = [13 128 111 22];
-            app.DataOutputFolderEditField_2Label.Text = 'Data Output Folder';
-
-            % Create CentralNucleiDataOutputFolder
-            app.CentralNucleiDataOutputFolder = uieditfield(app.CentralNucleiControlPanel, 'text');
-            app.CentralNucleiDataOutputFolder.FontName = 'Avenir';
-            app.CentralNucleiDataOutputFolder.Position = [139 128 109 22];
-
             % Create FiberTypingControlPanel
             app.FiberTypingControlPanel = uipanel(app.UIFigure);
             app.FiberTypingControlPanel.Visible = 'off';
@@ -3166,73 +3060,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CloseInitialSegmentationButton.Position = [89 38 100 24];
             app.CloseInitialSegmentationButton.Text = 'Close';
 
-            % Create FiberPropertiesControlPanel
-            app.FiberPropertiesControlPanel = uipanel(app.UIFigure);
-            app.FiberPropertiesControlPanel.Visible = 'off';
-            app.FiberPropertiesControlPanel.BackgroundColor = [1 1 1];
-            app.FiberPropertiesControlPanel.FontName = 'Avenir';
-            app.FiberPropertiesControlPanel.Position = [33 211 262 350];
-
-            % Create WritetoExcelButton
-            app.WritetoExcelButton = uibutton(app.FiberPropertiesControlPanel, 'push');
-            app.WritetoExcelButton.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelButtonPushed, true);
-            app.WritetoExcelButton.FontName = 'Avenir';
-            app.WritetoExcelButton.Enable = 'off';
-            app.WritetoExcelButton.Position = [140 123 100 24];
-            app.WritetoExcelButton.Text = 'Write to Excel';
-
-            % Create DoneFiberProperties
-            app.DoneFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
-            app.DoneFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @DoneFiberPropertiesPushed, true);
-            app.DoneFiberProperties.FontName = 'Avenir';
-            app.DoneFiberProperties.Position = [79 53 100 24];
-            app.DoneFiberProperties.Text = 'Close';
-
-            % Create DataOutputFolderEditFieldLabel
-            app.DataOutputFolderEditFieldLabel = uilabel(app.FiberPropertiesControlPanel);
-            app.DataOutputFolderEditFieldLabel.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditFieldLabel.FontName = 'Avenir';
-            app.DataOutputFolderEditFieldLabel.Position = [13 163 111 22];
-            app.DataOutputFolderEditFieldLabel.Text = 'Data Output Folder';
-
-            % Create FiberPropertiesDataOutputFolder
-            app.FiberPropertiesDataOutputFolder = uieditfield(app.FiberPropertiesControlPanel, 'text');
-            app.FiberPropertiesDataOutputFolder.FontName = 'Avenir';
-            app.FiberPropertiesDataOutputFolder.Position = [139 163 100 22];
-
-            % Create PixelSizeumpixelEditFieldLabel_2
-            app.PixelSizeumpixelEditFieldLabel_2 = uilabel(app.FiberPropertiesControlPanel);
-            app.PixelSizeumpixelEditFieldLabel_2.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditFieldLabel_2.FontName = 'Avenir';
-            app.PixelSizeumpixelEditFieldLabel_2.Position = [10 195 114 22];
-            app.PixelSizeumpixelEditFieldLabel_2.Text = 'Pixel Size (um/pixel)';
-
-            % Create PixelSizeFiberProperties
-            app.PixelSizeFiberProperties = uieditfield(app.FiberPropertiesControlPanel, 'numeric');
-            app.PixelSizeFiberProperties.Limits = [0 Inf];
-            app.PixelSizeFiberProperties.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPropertiesValueChanged, true);
-            app.PixelSizeFiberProperties.FontName = 'Avenir';
-            app.PixelSizeFiberProperties.Position = [139 195 100 22];
-
-            % Create CalculateFiberProperties
-            app.CalculateFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
-            app.CalculateFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberPropertiesPushed, true);
-            app.CalculateFiberProperties.FontName = 'Avenir';
-            app.CalculateFiberProperties.Position = [18 123 100 24];
-            app.CalculateFiberProperties.Text = 'Calculate';
-
-            % Create FiberPropertiesDescription
-            app.FiberPropertiesDescription = uilabel(app.FiberPropertiesControlPanel);
-            app.FiberPropertiesDescription.FontWeight = 'bold';
-            app.FiberPropertiesDescription.Position = [11 311 228 28];
-            app.FiberPropertiesDescription.Text = {'Calculate minimum feret diameter and '; 'fiber area of fibers in the image.'};
-
-            % Create FiberPropertiesDescription_2
-            app.FiberPropertiesDescription_2 = uilabel(app.FiberPropertiesControlPanel);
-            app.FiberPropertiesDescription_2.FontWeight = 'bold';
-            app.FiberPropertiesDescription_2.Position = [11 222 258 56];
-            app.FiberPropertiesDescription_2.Text = {'Input the Pixel Size and Data Output'; 'Folder. Press "Calculate" to run calculate'; 'the fiber properties, and "Write to Excel" to '; 'save the data to Excel.'};
-
             % Create ManualFilterControls
             app.ManualFilterControls = uipanel(app.UIFigure);
             app.ManualFilterControls.Visible = 'off';
@@ -3266,6 +3093,195 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualFilterDescription_2.FontWeight = 'bold';
             app.ManualFilterDescription_2.Position = [9 137 259 56];
             app.ManualFilterDescription_2.Text = {'Click “Remove Nonfibers” and click on any '; 'misclassified fibers to remove them. If you '; 'accidentally remove a correctly classified'; 'fiber, click again to undo. '};
+
+            % Create FiberPropertiesControlPanel
+            app.FiberPropertiesControlPanel = uipanel(app.UIFigure);
+            app.FiberPropertiesControlPanel.Visible = 'off';
+            app.FiberPropertiesControlPanel.BackgroundColor = [1 1 1];
+            app.FiberPropertiesControlPanel.FontName = 'Avenir';
+            app.FiberPropertiesControlPanel.Position = [31 224 250 337];
+
+            % Create WritetoExcelButton
+            app.WritetoExcelButton = uibutton(app.FiberPropertiesControlPanel, 'push');
+            app.WritetoExcelButton.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelButtonPushed, true);
+            app.WritetoExcelButton.FontName = 'Avenir';
+            app.WritetoExcelButton.Enable = 'off';
+            app.WritetoExcelButton.Position = [136 105 100 24];
+            app.WritetoExcelButton.Text = 'Write to Excel';
+
+            % Create DoneFiberProperties
+            app.DoneFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
+            app.DoneFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @DoneFiberPropertiesPushed, true);
+            app.DoneFiberProperties.FontName = 'Avenir';
+            app.DoneFiberProperties.Position = [79 48 100 24];
+            app.DoneFiberProperties.Text = 'Close';
+
+            % Create DataOutputFolderEditFieldLabel
+            app.DataOutputFolderEditFieldLabel = uilabel(app.FiberPropertiesControlPanel);
+            app.DataOutputFolderEditFieldLabel.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditFieldLabel.FontName = 'Avenir';
+            app.DataOutputFolderEditFieldLabel.Position = [13 145 111 22];
+            app.DataOutputFolderEditFieldLabel.Text = 'Data Output Folder';
+
+            % Create FiberPropertiesDataOutputFolder
+            app.FiberPropertiesDataOutputFolder = uieditfield(app.FiberPropertiesControlPanel, 'text');
+            app.FiberPropertiesDataOutputFolder.FontName = 'Avenir';
+            app.FiberPropertiesDataOutputFolder.Position = [139 145 100 22];
+
+            % Create PixelSizeumpixelEditFieldLabel_2
+            app.PixelSizeumpixelEditFieldLabel_2 = uilabel(app.FiberPropertiesControlPanel);
+            app.PixelSizeumpixelEditFieldLabel_2.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditFieldLabel_2.FontName = 'Avenir';
+            app.PixelSizeumpixelEditFieldLabel_2.Visible = 'off';
+            app.PixelSizeumpixelEditFieldLabel_2.Position = [10 177 114 22];
+            app.PixelSizeumpixelEditFieldLabel_2.Text = 'Pixel Size (um/pixel)';
+
+            % Create PixelSizeFiberProperties
+            app.PixelSizeFiberProperties = uieditfield(app.FiberPropertiesControlPanel, 'numeric');
+            app.PixelSizeFiberProperties.Limits = [0 Inf];
+            app.PixelSizeFiberProperties.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPropertiesValueChanged, true);
+            app.PixelSizeFiberProperties.FontName = 'Avenir';
+            app.PixelSizeFiberProperties.Visible = 'off';
+            app.PixelSizeFiberProperties.Position = [139 177 100 22];
+
+            % Create CalculateFiberProperties
+            app.CalculateFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
+            app.CalculateFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberPropertiesPushed, true);
+            app.CalculateFiberProperties.FontName = 'Avenir';
+            app.CalculateFiberProperties.Position = [21 105 100 24];
+            app.CalculateFiberProperties.Text = 'Calculate';
+
+            % Create FiberPropertiesDescription
+            app.FiberPropertiesDescription = uilabel(app.FiberPropertiesControlPanel);
+            app.FiberPropertiesDescription.FontWeight = 'bold';
+            app.FiberPropertiesDescription.Position = [11 298 228 28];
+            app.FiberPropertiesDescription.Text = {'Calculate minimum feret diameter and '; 'fiber area of fibers in the image.'};
+
+            % Create FiberPropertiesDescription_2
+            app.FiberPropertiesDescription_2 = uilabel(app.FiberPropertiesControlPanel);
+            app.FiberPropertiesDescription_2.FontWeight = 'bold';
+            app.FiberPropertiesDescription_2.Position = [11 209 243 56];
+            app.FiberPropertiesDescription_2.Text = {'Input the Pixel Size and Data Output'; 'Folder. Press "Calculate" to run calculate'; 'the fiber properties, and "Write to Excel"'; 'to save the data to Excel.'};
+
+            % Create CentralNucleiControlPanel
+            app.CentralNucleiControlPanel = uipanel(app.UIFigure);
+            app.CentralNucleiControlPanel.Visible = 'off';
+            app.CentralNucleiControlPanel.BackgroundColor = [1 1 1];
+            app.CentralNucleiControlPanel.FontName = 'Avenir';
+            app.CentralNucleiControlPanel.Position = [16 120 264 446];
+
+            % Create CentralNucleiChannelColorBox
+            app.CentralNucleiChannelColorBox = uiaxes(app.CentralNucleiControlPanel);
+            app.CentralNucleiChannelColorBox.Toolbar.Visible = 'off';
+            app.CentralNucleiChannelColorBox.FontName = 'Avenir';
+            app.CentralNucleiChannelColorBox.XTick = [];
+            app.CentralNucleiChannelColorBox.YTick = [];
+            app.CentralNucleiChannelColorBox.Color = [0 1 1];
+            app.CentralNucleiChannelColorBox.Box = 'on';
+            app.CentralNucleiChannelColorBox.Visible = 'off';
+            app.CentralNucleiChannelColorBox.PickableParts = 'none';
+            app.CentralNucleiChannelColorBox.Position = [228 237 30 30];
+
+            % Create PixelSizeumpixelLabel
+            app.PixelSizeumpixelLabel = uilabel(app.CentralNucleiControlPanel);
+            app.PixelSizeumpixelLabel.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelLabel.FontName = 'Avenir';
+            app.PixelSizeumpixelLabel.Position = [48 265 58 32];
+            app.PixelSizeumpixelLabel.Text = {'Pixel Size'; 'um/pixel'};
+
+            % Create PixelSizeCentralNuclei
+            app.PixelSizeCentralNuclei = uieditfield(app.CentralNucleiControlPanel, 'numeric');
+            app.PixelSizeCentralNuclei.Limits = [0 Inf];
+            app.PixelSizeCentralNuclei.ValueChangedFcn = createCallbackFcn(app, @PixelSizeCentralNucleiValueChanged, true);
+            app.PixelSizeCentralNuclei.FontName = 'Avenir';
+            app.PixelSizeCentralNuclei.Position = [121 275 100 22];
+
+            % Create NucleiColorDropDownLabel
+            app.NucleiColorDropDownLabel = uilabel(app.CentralNucleiControlPanel);
+            app.NucleiColorDropDownLabel.HorizontalAlignment = 'right';
+            app.NucleiColorDropDownLabel.FontName = 'Avenir';
+            app.NucleiColorDropDownLabel.Position = [37 240 73 22];
+            app.NucleiColorDropDownLabel.Text = 'Nuclei Color';
+
+            % Create NucleiColorDropDown
+            app.NucleiColorDropDown = uidropdown(app.CentralNucleiControlPanel);
+            app.NucleiColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.NucleiColorDropDown.ItemsData = {'1', '2', '3'};
+            app.NucleiColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NucleiColorValueChanged, true);
+            app.NucleiColorDropDown.FontName = 'Avenir';
+            app.NucleiColorDropDown.Position = [125 240 100 22];
+            app.NucleiColorDropDown.Value = '1';
+
+            % Create CalculateCentralNuclei
+            app.CalculateCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
+            app.CalculateCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @CalculateCentralNucleiPushed, true);
+            app.CalculateCentralNuclei.FontName = 'Avenir';
+            app.CalculateCentralNuclei.Position = [26 95 100 24];
+            app.CalculateCentralNuclei.Text = 'Calculate';
+
+            % Create CentralNucleiExcelWrite
+            app.CentralNucleiExcelWrite = uibutton(app.CentralNucleiControlPanel, 'push');
+            app.CentralNucleiExcelWrite.ButtonPushedFcn = createCallbackFcn(app, @CentralNucleiExcelWriteButtonPushed, true);
+            app.CentralNucleiExcelWrite.FontName = 'Avenir';
+            app.CentralNucleiExcelWrite.Position = [138 95 100 24];
+            app.CentralNucleiExcelWrite.Text = 'Write To Excel';
+
+            % Create DoneCentralNuclei
+            app.DoneCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
+            app.DoneCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @DoneCentralNucleiPushed, true);
+            app.DoneCentralNuclei.FontName = 'Avenir';
+            app.DoneCentralNuclei.Position = [79 42 100 24];
+            app.DoneCentralNuclei.Text = 'Close';
+
+            % Create DistancefromborderEditFieldLabel
+            app.DistancefromborderEditFieldLabel = uilabel(app.CentralNucleiControlPanel);
+            app.DistancefromborderEditFieldLabel.HorizontalAlignment = 'right';
+            app.DistancefromborderEditFieldLabel.FontName = 'Avenir';
+            app.DistancefromborderEditFieldLabel.Position = [14 208 119 22];
+            app.DistancefromborderEditFieldLabel.Text = 'Distance from border';
+
+            % Create DistancefromborderEditField
+            app.DistancefromborderEditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
+            app.DistancefromborderEditField.Limits = [0 Inf];
+            app.DistancefromborderEditField.FontName = 'Avenir';
+            app.DistancefromborderEditField.Position = [149 208 100 22];
+
+            % Create MinimumNucleusSizeum2EditFieldLabel
+            app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CentralNucleiControlPanel);
+            app.MinimumNucleusSizeum2EditFieldLabel.HorizontalAlignment = 'right';
+            app.MinimumNucleusSizeum2EditFieldLabel.FontName = 'Avenir';
+            app.MinimumNucleusSizeum2EditFieldLabel.Position = [8 167 127 32];
+            app.MinimumNucleusSizeum2EditFieldLabel.Text = {'Minimum Nucleus Size'; '(um^2)'};
+
+            % Create MinimumNucleusSizeum2EditField
+            app.MinimumNucleusSizeum2EditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
+            app.MinimumNucleusSizeum2EditField.Limits = [0 Inf];
+            app.MinimumNucleusSizeum2EditField.FontName = 'Avenir';
+            app.MinimumNucleusSizeum2EditField.Position = [150 177 100 22];
+
+            % Create DataOutputFolderEditField_2Label
+            app.DataOutputFolderEditField_2Label = uilabel(app.CentralNucleiControlPanel);
+            app.DataOutputFolderEditField_2Label.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_2Label.FontName = 'Avenir';
+            app.DataOutputFolderEditField_2Label.Position = [13 142 111 22];
+            app.DataOutputFolderEditField_2Label.Text = 'Data Output Folder';
+
+            % Create CentralNucleiDataOutputFolder
+            app.CentralNucleiDataOutputFolder = uieditfield(app.CentralNucleiControlPanel, 'text');
+            app.CentralNucleiDataOutputFolder.FontName = 'Avenir';
+            app.CentralNucleiDataOutputFolder.Position = [142 142 109 22];
+
+            % Create CentralNucleiDescription
+            app.CentralNucleiDescription = uilabel(app.CentralNucleiControlPanel);
+            app.CentralNucleiDescription.FontWeight = 'bold';
+            app.CentralNucleiDescription.Position = [9 407 238 22];
+            app.CentralNucleiDescription.Text = {'Mark fibers with centrally located nuclei.'; ''};
+
+            % Create CentralNucleiDescription_2
+            app.CentralNucleiDescription_2 = uilabel(app.CentralNucleiControlPanel);
+            app.CentralNucleiDescription_2.FontWeight = 'bold';
+            app.CentralNucleiDescription_2.Position = [9 310 258 70];
+            app.CentralNucleiDescription_2.Text = {'Set the field values below. Hover over the '; 'field names for more information. Press '; '"Calculate" to run calculate the fiber '; 'properties, and "Write to Excel" to save the '; 'data to Excel.'; ''};
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
