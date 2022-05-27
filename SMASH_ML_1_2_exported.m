@@ -4,6 +4,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
         NonfiberClassificationControlPanel  matlab.ui.container.Panel
+        NonfiberClassificationFileWriteStatusLabel  matlab.ui.control.Label
         NonfiberClassificationColorDropDown  matlab.ui.control.DropDown
         FiberTypeColorDropDown_2Label   matlab.ui.control.Label
         DoneNonfiberClassification      matlab.ui.control.Button
@@ -1876,6 +1877,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: NonfiberClassificationButton
         function NonfiberClassificationButtonPushed(app, event)
             DisableMenuBarButtonsAndClearFileLabels(app);
+            app.NonfiberClassificationFileWriteStatusLabel.Text = '';
             app.NonfiberClassificationControlPanel.Visible = 'on';
             app.PixelSizeNonfiberClassification.Enable = 'on';
             app.NonfiberClassificationColorDropDown.Enable = 'on';
@@ -1960,6 +1962,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: WritetoExcelNonfiberClassification
         function WritetoExcelNonfiberClassificationButtonPushed(app, event)
+            app.NonfiberClassificationFileWriteStatusLabel.Text = 'Writing to Excel...';
+
             % Create folder if directory does not exist for excel input
             CreateFolderIfDirectoryIsNonexistent(app, app.NonfiberClassificationDataOutputFolder.Value);
             cd(app.NonfiberClassificationDataOutputFolder.Value)
@@ -2001,7 +2005,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             out_file = cat(1,header,num2cell(out_data));
             
             writecell(out_file, [app.Files{4} '_Properties.xlsx'], 'Range','S1');
-            app.Prompt.Text = 'Write to Excel done';
+            app.NonfiberClassificationFileWriteStatusLabel.Text = 'Write to Excel done!';
             cd(app.Files{3})
             app.classified_nonfiber_ponf = 0;
             app.classified_nonfiber_ave_g = 0;
@@ -3333,6 +3337,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationColorDropDown.FontName = 'Avenir';
             app.NonfiberClassificationColorDropDown.Position = [126 197 100 22];
             app.NonfiberClassificationColorDropDown.Value = '1';
+
+            % Create NonfiberClassificationFileWriteStatusLabel
+            app.NonfiberClassificationFileWriteStatusLabel = uilabel(app.NonfiberClassificationControlPanel);
+            app.NonfiberClassificationFileWriteStatusLabel.Position = [45 4 125 28];
+            app.NonfiberClassificationFileWriteStatusLabel.Text = {'Nonfiber Classification'; ' File Write Status'};
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
