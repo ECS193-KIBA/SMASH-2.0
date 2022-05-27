@@ -4,6 +4,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
         FiberTypingControlPanel         matlab.ui.container.Panel
+        FiberTypingFileWriteStatusLabel  matlab.ui.control.Label
         FiberTypingDescription_2        matlab.ui.control.Label
         FiberTypingDescription          matlab.ui.control.Label
         DoneFiberTyping                 matlab.ui.control.Button
@@ -1351,6 +1352,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: WritetoExcelFT
         function WritetoExcelFTButtonPushed(app, event)
+            app.FiberTypingFileWriteStatusLabel.Text = 'Writing to Excel...';
+
             % Create folder if directory does not exist for excel input
             CreateFolderIfDirectoryIsNonexistent(app, app.FiberTypingDataOutputFolder.Value);
             cd(app.FiberTypingDataOutputFolder.Value)
@@ -1397,7 +1400,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             elseif str2double(app.FiberTypeColorDropDown.Value) == 3
                 writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','R1');
             end
-            app.Prompt.Text = 'Write to Excel done';
+            app.FiberTypingFileWriteStatusLabel.Text = 'Write to Excel done!';
+
             cd(app.Files{3})
             app.ponf = 0;
             app.ave_g = 0;
@@ -1625,6 +1629,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function FiberTypingButtonPushed(app, event)
             DisableMenuBarButtonsAndClearFileLabels(app);
 
+            app.FiberTypingFileWriteStatusLabel.Text = '';
             app.FiberTypingControlPanel.Visible = 'on';
             app.PixelSizeFiberTyping.Enable = 'on';
             app.FiberTypeColorDropDown.Enable = 'on';
@@ -3309,7 +3314,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DoneFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
             app.DoneFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @DoneFiberTypingButtonPushed, true);
             app.DoneFiberTyping.FontName = 'Avenir';
-            app.DoneFiberTyping.Position = [87 48 100 24];
+            app.DoneFiberTyping.Position = [87 26 100 24];
             app.DoneFiberTyping.Text = 'Close';
 
             % Create FiberTypingDescription
@@ -3323,6 +3328,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingDescription_2.FontWeight = 'bold';
             app.FiberTypingDescription_2.Position = [9 252 241 56];
             app.FiberTypingDescription_2.Text = {'Set the field values below. Hover over '; 'the field names for more information. '; 'Press "Calculate" and "Write to Excel" to'; 'save the data to Excel.'; ''};
+
+            % Create FiberTypingFileWriteStatusLabel
+            app.FiberTypingFileWriteStatusLabel = uilabel(app.FiberTypingControlPanel);
+            app.FiberTypingFileWriteStatusLabel.Position = [34 65 162 22];
+            app.FiberTypingFileWriteStatusLabel.Text = 'Fiber Typing File Write Status';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
