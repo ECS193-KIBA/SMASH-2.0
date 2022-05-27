@@ -3,6 +3,20 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        FiberTypingControlPanel         matlab.ui.container.Panel
+        FiberTypingFileWriteStatusLabel  matlab.ui.control.Label
+        FiberTypingDescription_2        matlab.ui.control.Label
+        FiberTypingDescription          matlab.ui.control.Label
+        DoneFiberTyping                 matlab.ui.control.Button
+        WritetoExcelFT                  matlab.ui.control.Button
+        CalculateFiberTyping            matlab.ui.control.Button
+        FiberTypeColorDropDown          matlab.ui.control.DropDown
+        FiberTypeColorDropDownLabel     matlab.ui.control.Label
+        FiberTypingDataOutputFolder     matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label  matlab.ui.control.Label
+        PixelSizeFiberTyping            matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
+        FiberTypingChannelColorBox      matlab.ui.control.UIAxes
         CentralNucleiControlPanel       matlab.ui.container.Panel
         CentralNucleiFileWriteStatusLabel  matlab.ui.control.Label
         CentralNucleiDescription_2      matlab.ui.control.Label
@@ -32,19 +46,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         DataOutputFolderEditFieldLabel  matlab.ui.control.Label
         DoneFiberProperties             matlab.ui.control.Button
         WritetoExcelButton              matlab.ui.control.Button
-        FiberTypingControlPanel         matlab.ui.container.Panel
-        FiberTypingDescription_2        matlab.ui.control.Label
-        FiberTypingDescription          matlab.ui.control.Label
-        DoneFiberTyping                 matlab.ui.control.Button
-        WritetoExcelFT                  matlab.ui.control.Button
-        CalculateFiberTyping            matlab.ui.control.Button
-        FiberTypeColorDropDown          matlab.ui.control.DropDown
-        FiberTypeColorDropDownLabel     matlab.ui.control.Label
-        FiberTypingDataOutputFolder     matlab.ui.control.EditField
-        DataOutputFolderEditField_3Label  matlab.ui.control.Label
-        PixelSizeFiberTyping            matlab.ui.control.NumericEditField
-        PixelSizeumpixelEditField_3Label  matlab.ui.control.Label
-        FiberTypingChannelColorBox      matlab.ui.control.UIAxes
         ManualFilterControls            matlab.ui.container.Panel
         ManualFilterDescription_2       matlab.ui.control.Label
         ManualFilterDescription         matlab.ui.control.Label
@@ -1351,6 +1352,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: WritetoExcelFT
         function WritetoExcelFTButtonPushed(app, event)
+            app.FiberTypingFileWriteStatusLabel.Text = 'Writing to Excel...';
+
             % Create folder if directory does not exist for excel input
             CreateFolderIfDirectoryIsNonexistent(app, app.FiberTypingDataOutputFolder.Value);
             cd(app.FiberTypingDataOutputFolder.Value)
@@ -1397,7 +1400,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             elseif str2double(app.FiberTypeColorDropDown.Value) == 3
                 writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','R1');
             end
-            app.Prompt.Text = 'Write to Excel done';
+            app.FiberTypingFileWriteStatusLabel.Text = 'Write to Excel done!';
+
             cd(app.Files{3})
             app.ponf = 0;
             app.ave_g = 0;
@@ -1625,6 +1629,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function FiberTypingButtonPushed(app, event)
             DisableMenuBarButtonsAndClearFileLabels(app);
 
+            app.FiberTypingFileWriteStatusLabel.Text = '';
             app.FiberTypingControlPanel.Visible = 'on';
             app.PixelSizeFiberTyping.Enable = 'on';
             app.FiberTypeColorDropDown.Enable = 'on';
@@ -3030,99 +3035,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualFilterDescription_2.Position = [9 137 259 56];
             app.ManualFilterDescription_2.Text = {'Click “Remove Nonfibers” and click on any '; 'misclassified fibers to remove them. If you '; 'accidentally remove a correctly classified'; 'fiber, click again to undo. '};
 
-            % Create FiberTypingControlPanel
-            app.FiberTypingControlPanel = uipanel(app.UIFigure);
-            app.FiberTypingControlPanel.Visible = 'off';
-            app.FiberTypingControlPanel.BackgroundColor = [1 1 1];
-            app.FiberTypingControlPanel.FontName = 'Avenir';
-            app.FiberTypingControlPanel.Position = [10 176 260 385];
-
-            % Create FiberTypingChannelColorBox
-            app.FiberTypingChannelColorBox = uiaxes(app.FiberTypingControlPanel);
-            app.FiberTypingChannelColorBox.Toolbar.Visible = 'off';
-            app.FiberTypingChannelColorBox.FontName = 'Avenir';
-            app.FiberTypingChannelColorBox.XTick = [];
-            app.FiberTypingChannelColorBox.YTick = [];
-            app.FiberTypingChannelColorBox.Color = [0 1 1];
-            app.FiberTypingChannelColorBox.Box = 'on';
-            app.FiberTypingChannelColorBox.Position = [229 181 30 30];
-
-            % Create PixelSizeumpixelEditField_3Label
-            app.PixelSizeumpixelEditField_3Label = uilabel(app.FiberTypingControlPanel);
-            app.PixelSizeumpixelEditField_3Label.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditField_3Label.FontName = 'Avenir';
-            app.PixelSizeumpixelEditField_3Label.Position = [44 212 59 32];
-            app.PixelSizeumpixelEditField_3Label.Text = {'Pixel Size'; '(um/pixel)'};
-
-            % Create PixelSizeFiberTyping
-            app.PixelSizeFiberTyping = uieditfield(app.FiberTypingControlPanel, 'numeric');
-            app.PixelSizeFiberTyping.Limits = [0 Inf];
-            app.PixelSizeFiberTyping.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberTypingValueChanged, true);
-            app.PixelSizeFiberTyping.FontName = 'Avenir';
-            app.PixelSizeFiberTyping.Position = [118 222 100 22];
-
-            % Create DataOutputFolderEditField_3Label
-            app.DataOutputFolderEditField_3Label = uilabel(app.FiberTypingControlPanel);
-            app.DataOutputFolderEditField_3Label.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_3Label.FontName = 'Avenir';
-            app.DataOutputFolderEditField_3Label.Position = [16 149 111 22];
-            app.DataOutputFolderEditField_3Label.Text = 'Data Output Folder';
-
-            % Create FiberTypingDataOutputFolder
-            app.FiberTypingDataOutputFolder = uieditfield(app.FiberTypingControlPanel, 'text');
-            app.FiberTypingDataOutputFolder.FontName = 'Avenir';
-            app.FiberTypingDataOutputFolder.Position = [142 149 100 22];
-
-            % Create FiberTypeColorDropDownLabel
-            app.FiberTypeColorDropDownLabel = uilabel(app.FiberTypingControlPanel);
-            app.FiberTypeColorDropDownLabel.HorizontalAlignment = 'right';
-            app.FiberTypeColorDropDownLabel.FontName = 'Avenir';
-            app.FiberTypeColorDropDownLabel.Position = [16 184 95 22];
-            app.FiberTypeColorDropDownLabel.Text = 'Fiber Type Color';
-
-            % Create FiberTypeColorDropDown
-            app.FiberTypeColorDropDown = uidropdown(app.FiberTypingControlPanel);
-            app.FiberTypeColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.FiberTypeColorDropDown.ItemsData = {'1', '2', '3'};
-            app.FiberTypeColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberTypeColorValueChanged, true);
-            app.FiberTypeColorDropDown.FontName = 'Avenir';
-            app.FiberTypeColorDropDown.Position = [126 184 100 22];
-            app.FiberTypeColorDropDown.Value = '1';
-
-            % Create CalculateFiberTyping
-            app.CalculateFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
-            app.CalculateFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberTypingButtonPushed, true);
-            app.CalculateFiberTyping.FontName = 'Avenir';
-            app.CalculateFiberTyping.Position = [30 96 100 24];
-            app.CalculateFiberTyping.Text = 'Calculate';
-
-            % Create WritetoExcelFT
-            app.WritetoExcelFT = uibutton(app.FiberTypingControlPanel, 'push');
-            app.WritetoExcelFT.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelFTButtonPushed, true);
-            app.WritetoExcelFT.FontName = 'Avenir';
-            app.WritetoExcelFT.Enable = 'off';
-            app.WritetoExcelFT.Position = [138 96 100 24];
-            app.WritetoExcelFT.Text = 'Write to Excel';
-
-            % Create DoneFiberTyping
-            app.DoneFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
-            app.DoneFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @DoneFiberTypingButtonPushed, true);
-            app.DoneFiberTyping.FontName = 'Avenir';
-            app.DoneFiberTyping.Position = [87 48 100 24];
-            app.DoneFiberTyping.Text = 'Close';
-
-            % Create FiberTypingDescription
-            app.FiberTypingDescription = uilabel(app.FiberTypingControlPanel);
-            app.FiberTypingDescription.FontWeight = 'bold';
-            app.FiberTypingDescription.Position = [9 321 231 42];
-            app.FiberTypingDescription.Text = {'Detect fibers with intensity of a certain '; 'color channel greater than a threshold '; 'value. '};
-
-            % Create FiberTypingDescription_2
-            app.FiberTypingDescription_2 = uilabel(app.FiberTypingControlPanel);
-            app.FiberTypingDescription_2.FontWeight = 'bold';
-            app.FiberTypingDescription_2.Position = [9 252 241 56];
-            app.FiberTypingDescription_2.Text = {'Set the field values below. Hover over '; 'the field names for more information. '; 'Press "Calculate" and "Write to Excel" to'; 'save the data to Excel.'; ''};
-
             % Create FiberPropertiesControlPanel
             app.FiberPropertiesControlPanel = uipanel(app.UIFigure);
             app.FiberPropertiesControlPanel.Visible = 'off';
@@ -3323,6 +3235,104 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiFileWriteStatusLabel = uilabel(app.CentralNucleiControlPanel);
             app.CentralNucleiFileWriteStatusLabel.Position = [38 70 172 22];
             app.CentralNucleiFileWriteStatusLabel.Text = 'Central Nuclei File Write Status';
+
+            % Create FiberTypingControlPanel
+            app.FiberTypingControlPanel = uipanel(app.UIFigure);
+            app.FiberTypingControlPanel.Visible = 'off';
+            app.FiberTypingControlPanel.BackgroundColor = [1 1 1];
+            app.FiberTypingControlPanel.FontName = 'Avenir';
+            app.FiberTypingControlPanel.Position = [10 176 260 385];
+
+            % Create FiberTypingChannelColorBox
+            app.FiberTypingChannelColorBox = uiaxes(app.FiberTypingControlPanel);
+            app.FiberTypingChannelColorBox.Toolbar.Visible = 'off';
+            app.FiberTypingChannelColorBox.FontName = 'Avenir';
+            app.FiberTypingChannelColorBox.XTick = [];
+            app.FiberTypingChannelColorBox.YTick = [];
+            app.FiberTypingChannelColorBox.Color = [0 1 1];
+            app.FiberTypingChannelColorBox.Box = 'on';
+            app.FiberTypingChannelColorBox.Position = [229 181 30 30];
+
+            % Create PixelSizeumpixelEditField_3Label
+            app.PixelSizeumpixelEditField_3Label = uilabel(app.FiberTypingControlPanel);
+            app.PixelSizeumpixelEditField_3Label.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditField_3Label.FontName = 'Avenir';
+            app.PixelSizeumpixelEditField_3Label.Position = [44 212 59 32];
+            app.PixelSizeumpixelEditField_3Label.Text = {'Pixel Size'; '(um/pixel)'};
+
+            % Create PixelSizeFiberTyping
+            app.PixelSizeFiberTyping = uieditfield(app.FiberTypingControlPanel, 'numeric');
+            app.PixelSizeFiberTyping.Limits = [0 Inf];
+            app.PixelSizeFiberTyping.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberTypingValueChanged, true);
+            app.PixelSizeFiberTyping.FontName = 'Avenir';
+            app.PixelSizeFiberTyping.Position = [118 222 100 22];
+
+            % Create DataOutputFolderEditField_3Label
+            app.DataOutputFolderEditField_3Label = uilabel(app.FiberTypingControlPanel);
+            app.DataOutputFolderEditField_3Label.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_3Label.FontName = 'Avenir';
+            app.DataOutputFolderEditField_3Label.Position = [16 149 111 22];
+            app.DataOutputFolderEditField_3Label.Text = 'Data Output Folder';
+
+            % Create FiberTypingDataOutputFolder
+            app.FiberTypingDataOutputFolder = uieditfield(app.FiberTypingControlPanel, 'text');
+            app.FiberTypingDataOutputFolder.FontName = 'Avenir';
+            app.FiberTypingDataOutputFolder.Position = [142 149 100 22];
+
+            % Create FiberTypeColorDropDownLabel
+            app.FiberTypeColorDropDownLabel = uilabel(app.FiberTypingControlPanel);
+            app.FiberTypeColorDropDownLabel.HorizontalAlignment = 'right';
+            app.FiberTypeColorDropDownLabel.FontName = 'Avenir';
+            app.FiberTypeColorDropDownLabel.Position = [16 184 95 22];
+            app.FiberTypeColorDropDownLabel.Text = 'Fiber Type Color';
+
+            % Create FiberTypeColorDropDown
+            app.FiberTypeColorDropDown = uidropdown(app.FiberTypingControlPanel);
+            app.FiberTypeColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.FiberTypeColorDropDown.ItemsData = {'1', '2', '3'};
+            app.FiberTypeColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberTypeColorValueChanged, true);
+            app.FiberTypeColorDropDown.FontName = 'Avenir';
+            app.FiberTypeColorDropDown.Position = [126 184 100 22];
+            app.FiberTypeColorDropDown.Value = '1';
+
+            % Create CalculateFiberTyping
+            app.CalculateFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
+            app.CalculateFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberTypingButtonPushed, true);
+            app.CalculateFiberTyping.FontName = 'Avenir';
+            app.CalculateFiberTyping.Position = [30 96 100 24];
+            app.CalculateFiberTyping.Text = 'Calculate';
+
+            % Create WritetoExcelFT
+            app.WritetoExcelFT = uibutton(app.FiberTypingControlPanel, 'push');
+            app.WritetoExcelFT.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelFTButtonPushed, true);
+            app.WritetoExcelFT.FontName = 'Avenir';
+            app.WritetoExcelFT.Enable = 'off';
+            app.WritetoExcelFT.Position = [138 96 100 24];
+            app.WritetoExcelFT.Text = 'Write to Excel';
+
+            % Create DoneFiberTyping
+            app.DoneFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
+            app.DoneFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @DoneFiberTypingButtonPushed, true);
+            app.DoneFiberTyping.FontName = 'Avenir';
+            app.DoneFiberTyping.Position = [87 26 100 24];
+            app.DoneFiberTyping.Text = 'Close';
+
+            % Create FiberTypingDescription
+            app.FiberTypingDescription = uilabel(app.FiberTypingControlPanel);
+            app.FiberTypingDescription.FontWeight = 'bold';
+            app.FiberTypingDescription.Position = [9 321 231 42];
+            app.FiberTypingDescription.Text = {'Detect fibers with intensity of a certain '; 'color channel greater than a threshold '; 'value. '};
+
+            % Create FiberTypingDescription_2
+            app.FiberTypingDescription_2 = uilabel(app.FiberTypingControlPanel);
+            app.FiberTypingDescription_2.FontWeight = 'bold';
+            app.FiberTypingDescription_2.Position = [9 252 241 56];
+            app.FiberTypingDescription_2.Text = {'Set the field values below. Hover over '; 'the field names for more information. '; 'Press "Calculate" and "Write to Excel" to'; 'save the data to Excel.'; ''};
+
+            % Create FiberTypingFileWriteStatusLabel
+            app.FiberTypingFileWriteStatusLabel = uilabel(app.FiberTypingControlPanel);
+            app.FiberTypingFileWriteStatusLabel.Position = [34 65 162 22];
+            app.FiberTypingFileWriteStatusLabel.Text = 'Fiber Typing File Write Status';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
