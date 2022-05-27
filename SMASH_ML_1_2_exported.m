@@ -4,6 +4,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
         CentralNucleiControlPanel       matlab.ui.container.Panel
+        CentralNucleiFileWriteStatusLabel  matlab.ui.control.Label
         CentralNucleiDescription_2      matlab.ui.control.Label
         CentralNucleiDescription        matlab.ui.control.Label
         CentralNucleiDataOutputFolder   matlab.ui.control.EditField
@@ -1203,6 +1204,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: CentralNucleiExcelWrite
         function CentralNucleiExcelWriteButtonPushed(app, event)
+            app.CentralNucleiFileWriteStatusLabel.Text = 'Writing to Excel...';
+
             % Create folder if directory does not exist for excel input
             CreateFolderIfDirectoryIsNonexistent(app, app.CentralNucleiDataOutputFolder.Value);
             cd(app.CentralNucleiDataOutputFolder.Value)
@@ -1248,7 +1251,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             data = cat(2,farea,app.cen_pix.*app.pix_size^2,app.cen_nuc) ;
             out = cat(1,header,num2cell(data));
             writecell(out,[app.Files{4} '_Properties.xlsx'],'Range','I1');
-            app.Prompt.Text = 'Write to Excel done';
+            app.CentralNucleiFileWriteStatusLabel.Text = 'Write to Excel done!';
             cd(app.Files{3})
             app.fprop = 0;
             app.cen_nuc = 0;
@@ -1613,6 +1616,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiControlPanel.Visible = 'on';
             app.CentralNucleiExcelWrite.Enable = 'off';
             app.CentralNucleiChannelColorBox.Visible = 'on';
+            app.CentralNucleiFileWriteStatusLabel.Text = '';
 
             app.bw_obj = imcomplement(ReadMaskFromMaskFile(app));
         end
@@ -3314,6 +3318,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiDescription_2.FontWeight = 'bold';
             app.CentralNucleiDescription_2.Position = [9 310 258 70];
             app.CentralNucleiDescription_2.Text = {'Set the field values below. Hover over the '; 'field names for more information. Press '; '"Calculate" to run calculate the fiber '; 'properties, and "Write to Excel" to save the '; 'data to Excel.'; ''};
+
+            % Create CentralNucleiFileWriteStatusLabel
+            app.CentralNucleiFileWriteStatusLabel = uilabel(app.CentralNucleiControlPanel);
+            app.CentralNucleiFileWriteStatusLabel.Position = [38 70 172 22];
+            app.CentralNucleiFileWriteStatusLabel.Text = 'Central Nuclei File Write Status';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
