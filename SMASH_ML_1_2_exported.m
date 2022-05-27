@@ -683,6 +683,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsColorDropDown.Value = num2str(app.default{6,2});
             app.AcceptedFileExtensions = {'tif';'tiff';'jpg';'png';'bmp';'czi'};
             % TODO - default for nofiber classification
+            linkaxes([app.UIAxesL, app.UIAxesR],'xy')
         end
 
         % Button pushed function: SelectFilesButton
