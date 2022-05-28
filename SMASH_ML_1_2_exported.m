@@ -280,80 +280,65 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             BioformatsData = bfopen(FileName);
             PixelDataForAllLayers = BioformatsData{1,1};
             ColorMapDataForAllLayers = BioformatsData{1, 3};
-            isMultilayerImage = ~isempty(ColorMapDataForAllLayers{1,1});
 
             TotalColorDropDownItems = {};
             TotalColorDropDownItemsData = {};
 
-            if isMultilayerImage
-                LayerOnePixelData = PixelDataForAllLayers{1,1};
-                LayerSize = size(LayerOnePixelData);
-                RGBSize = [LayerSize 3];
-
-                TotalRGB = zeros(RGBSize, 'uint8');
-                TotalMultiSpectral = [];
-
-                
-                % Channel RGB takes in all RGB values for the 
-                % different colors in the channels
-                app.channelRGB = [];
-
-                NumLayers = length(PixelDataForAllLayers);
-                for Layer = 1:NumLayers
-                    PixelsGrayscale = PixelDataForAllLayers{Layer, 1};
-                    ColorMap = ColorMapDataForAllLayers{1, Layer};
-                    PixelsRGBAsDouble = ind2rgb(PixelsGrayscale, ColorMap);
-                    PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
-                    PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
-
-                    % Retrieve color name from the RGB values
-                    RGBValues = ColorMap(end,:);
-                    ConvertedRGB = colornames('HTML4', RGBValues,'RGB');
-                    ColorName = char(ConvertedRGB);
-
-                    % Autoscaling - scale the pixel intensity for each channel
-                    MaxIntensity = max(PixelsGrayscaleUInt8,[],'all');
-                    MinIntensity = min(PixelsGrayscaleUInt8,[],'all');
-                    ActualRange = MaxIntensity - MinIntensity;
-                    UInt8Range = 255;
-                    ScalingFactor = UInt8Range / ActualRange;
-                    PixelsGrayscaleUInt8 = ScalingFactor * PixelsGrayscaleUInt8;
-                    PixelsRGBAsUInt8 = ScalingFactor * PixelsRGBAsUInt8;
-
-                    TotalMultiSpectral = cat(3, TotalMultiSpectral, PixelsGrayscaleUInt8);
-                    TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
-
-                    % Include only color name in the channel drop down menu
-                    TotalColorDropDownItems = cat(2, TotalColorDropDownItems, ColorName);
-                    TotalColorDropDownItemsData  = cat(2, TotalColorDropDownItemsData, {num2str(Layer)});
-
-                    % Add the RGB values of the channel color 
-                    % Convert from cell array to double matrix when
-                    % appending
-                    app.channelRGB = cat(1, app.channelRGB, RGBValues(1,:));
-                end
-
-
-                app.orig_img = TotalRGB;
-                app.orig_img_multispectral = TotalMultiSpectral;
-            else
-                ImageData = imread(FileName);
-                app.orig_img = ImageData;
-                app.orig_img_multispectral = ImageData;
-
-                TotalColorDropDownItems = {'Red', 'Green', 'Blue'};
-                TotalColorDropDownItemsData = {'1', '2', '3'};
-
-
-                % Append RGB color channels to channelRGB for RGB images
-                % Add red, green, and blue to channelRGB
-                RedValue = [1 0 0];
-                GreenValue = [0 1 0];
-                BlueValue = [0 0 1];
-                app.channelRGB = [RedValue; GreenValue; BlueValue];
-
-
+            if isempty(ColorMapDataForAllLayers{1,1})
+                ColorMapDataForAllLayers = app.GetDefaultColorMap(class(PixelDataForAllLayers{1,1}));
             end
+
+            LayerOnePixelData = PixelDataForAllLayers{1,1};
+            LayerSize = size(LayerOnePixelData);
+            RGBSize = [LayerSize 3];
+
+            TotalRGB = zeros(RGBSize, 'uint8');
+            TotalMultiSpectral = [];
+
+            
+            % Channel RGB takes in all RGB values for the 
+            % different colors in the channels
+            app.channelRGB = [];
+
+            NumLayers = length(PixelDataForAllLayers);
+            for Layer = 1:NumLayers
+                PixelsGrayscale = PixelDataForAllLayers{Layer, 1};
+                ColorMap = ColorMapDataForAllLayers{1, Layer};
+                PixelsRGBAsDouble = ind2rgb(PixelsGrayscale, ColorMap);
+                PixelsRGBAsUInt8 = im2uint8(PixelsRGBAsDouble);
+                PixelsGrayscaleUInt8 = im2uint8(PixelsGrayscale);
+
+                % Retrieve color name from the RGB values
+                RGBValues = ColorMap(end,:);
+                ConvertedRGB = colornames('MATLAB', RGBValues,'RGB');
+                ColorName = char(ConvertedRGB);
+
+                % Autoscaling - scale the pixel intensity for each channel
+                MaxIntensity = max(PixelsGrayscaleUInt8,[],'all');
+                MinIntensity = min(PixelsGrayscaleUInt8,[],'all');
+                ActualRange = MaxIntensity - MinIntensity;
+                UInt8Range = 255;
+                ScalingFactor = UInt8Range / ActualRange;
+                PixelsGrayscaleUInt8 = ScalingFactor * PixelsGrayscaleUInt8;
+                PixelsRGBAsUInt8 = ScalingFactor * PixelsRGBAsUInt8;
+
+                TotalMultiSpectral = cat(3, TotalMultiSpectral, PixelsGrayscaleUInt8);
+                TotalRGB = imadd(TotalRGB, PixelsRGBAsUInt8);
+
+                % Include only color name in the channel drop down menu
+                TotalColorDropDownItems = cat(2, TotalColorDropDownItems, ColorName);
+                TotalColorDropDownItemsData  = cat(2, TotalColorDropDownItemsData, {num2str(Layer)});
+
+                % Add the RGB values of the channel color
+                % Convert from cell array to double matrix when
+                % appending
+                app.channelRGB = cat(1, app.channelRGB, RGBValues(1,:));
+            end
+
+
+            app.orig_img = TotalRGB;
+            app.orig_img_multispectral = TotalMultiSpectral;
+
 
             app.FiberOutlineColorDropDown.Items = TotalColorDropDownItems;
             app.FiberOutlineColorDropDown.ItemsData = TotalColorDropDownItemsData;
@@ -666,6 +651,29 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         function message = GetFileExtensionErrorMessage(app, filename)
             acceptedFileTypeString = join(app.AcceptedFileExtensions, ', ');
             message = [filename, ' does not have one of the appropriate file extensions: ', acceptedFileTypeString{1}];
+        end
+
+        function results = GetDefaultColorMap(~, classname)
+            % GetDefaultColorMap  Returns a Bio-Formats formatted RGB map
+            % for RGB case
+            %
+            %  Example return value:
+            %
+            %   3×3 cell array
+            %
+            %    {255×3 single}    {255×3 single}    {255×3 single}
+            %    {  0×0 double}    {  0×0 double}    {  0×0 double}
+            %    {  0×0 double}    {  0×0 double}    {  0×0 double}
+
+            allNumsColumn = reshape(1:intmax(classname),[], 1);
+            allNumsColumnScaled = single(double(allNumsColumn) / double(intmax(classname)));
+            allZerosColumn = zeros(size(allNumsColumnScaled, 1), 1);
+            redMap = [allNumsColumnScaled allZerosColumn allZerosColumn];
+            greenMap = [allZerosColumn allNumsColumnScaled allZerosColumn];
+            blueMap = [allZerosColumn allZerosColumn allNumsColumnScaled];
+
+            results = cell(3,3);
+            results(1,:) = {redMap, greenMap, blueMap};
         end
     end
 
