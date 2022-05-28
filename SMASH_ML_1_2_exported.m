@@ -255,9 +255,11 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             
             if app.IsBatchMode == 1
                 numberOfFilesForBatchMode = length(app.BatchModeFileNames);
-                fileNameString = "Batch Mode (" + int2str(numberOfFilesForBatchMode) + " files)";
-                app.BatchModeLabel.Text = strcat(fileNameString);
+                batchModeLabelString = "Batch Mode (" + int2str(numberOfFilesForBatchMode) + " files)";
+                app.BatchModeLabel.Text = strcat(batchModeLabelString);
                 app.BatchModeLabel.Visible = 'on';
+            else
+                app.BatchModeLabel.Visible = 'off';
             end
 
             app.FilenameLabel.Text = FileNameS;
@@ -381,6 +383,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             end
             
             UpdateColorChannelBox(app)
+
+            % Allow user to select different files.
+            app.SelectFilesButton.Enable = 'on';
         end
 
         function UpdateColorChannelBox(app)
@@ -1594,7 +1599,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             else
                 app.Prompt.Text = '';
                 app.ImageBackground.Visible = 'on';
-                app.SelectFilesButton.Enable = 'off';
                 app.InitialSegmentationButton.Enable = 'off';
                 app.FiberPredictionControlPanel.Visible = 'on';
                 app.ManualSortingButton.Enable = 'off';
