@@ -285,6 +285,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             TotalColorDropDownItemsData = {};
 
             if isempty(ColorMapDataForAllLayers{1,1})
+                % BioFormats does not assign a color map for RGB images.
+                % To keep code for multilayer and RGB case consistent, we
+                % create our own colormap for the RGB case.
                 ColorMapDataForAllLayers = app.GetDefaultColorMap(class(PixelDataForAllLayers{1,1}));
             end
 
