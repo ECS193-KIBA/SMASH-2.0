@@ -3,6 +3,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        CentralNucleiPanel              matlab.ui.container.Panel
+        AcceptCentralNuclei             matlab.ui.control.Button
+        AdjustCentralNuclei             matlab.ui.control.Button
+        ThresholdCentralNuclei          matlab.ui.control.NumericEditField
+        ThresholdEditField_2Label       matlab.ui.control.Label
+        CentralNucleiAxes               matlab.ui.control.UIAxes
         NonfiberPanel                   matlab.ui.container.Panel
         NonfiberAccept                  matlab.ui.control.Button
         NonfiberAdjust                  matlab.ui.control.Button
@@ -171,12 +177,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PropertiesPanel                 matlab.ui.container.Panel
         FiberSizeAxes                   matlab.ui.control.UIAxes
         FeretAxes                       matlab.ui.control.UIAxes
-        CentralNucleiPanel              matlab.ui.container.Panel
-        AcceptCentralNuclei             matlab.ui.control.Button
-        AdjustCentralNuclei             matlab.ui.control.Button
-        ThresholdCentralNuclei          matlab.ui.control.NumericEditField
-        ThresholdEditField_2Label       matlab.ui.control.Label
-        CentralNucleiAxes               matlab.ui.control.UIAxes
         SelectFileErrorLabel            matlab.ui.control.Label
     end
 
@@ -2095,47 +2095,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SelectFileErrorLabel.Position = [40 536 234 49];
             app.SelectFileErrorLabel.Text = {'Some Error Message Will Go Here When There Is An Error'; ''; ''};
 
-            % Create CentralNucleiPanel
-            app.CentralNucleiPanel = uipanel(app.UIFigure);
-            app.CentralNucleiPanel.Visible = 'off';
-            app.CentralNucleiPanel.FontName = 'Avenir';
-            app.CentralNucleiPanel.Position = [285 28 882 634];
-
-            % Create CentralNucleiAxes
-            app.CentralNucleiAxes = uiaxes(app.CentralNucleiPanel);
-            app.CentralNucleiAxes.PlotBoxAspectRatio = [1.34971644612476 1 1];
-            app.CentralNucleiAxes.FontName = 'Avenir';
-            app.CentralNucleiAxes.XColor = 'none';
-            app.CentralNucleiAxes.YColor = 'none';
-            app.CentralNucleiAxes.Position = [72 70 743 555];
-
-            % Create ThresholdEditField_2Label
-            app.ThresholdEditField_2Label = uilabel(app.CentralNucleiPanel);
-            app.ThresholdEditField_2Label.HorizontalAlignment = 'right';
-            app.ThresholdEditField_2Label.FontName = 'Avenir';
-            app.ThresholdEditField_2Label.Position = [206 38 59 22];
-            app.ThresholdEditField_2Label.Text = 'Threshold';
-
-            % Create ThresholdCentralNuclei
-            app.ThresholdCentralNuclei = uieditfield(app.CentralNucleiPanel, 'numeric');
-            app.ThresholdCentralNuclei.Limits = [0 Inf];
-            app.ThresholdCentralNuclei.FontName = 'Avenir';
-            app.ThresholdCentralNuclei.Position = [280 38 100 22];
-
-            % Create AdjustCentralNuclei
-            app.AdjustCentralNuclei = uibutton(app.CentralNucleiPanel, 'push');
-            app.AdjustCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @AdjustCentralNucleiButtonPushed, true);
-            app.AdjustCentralNuclei.FontName = 'Avenir';
-            app.AdjustCentralNuclei.Position = [424 37 100 24];
-            app.AdjustCentralNuclei.Text = 'Adjust';
-
-            % Create AcceptCentralNuclei
-            app.AcceptCentralNuclei = uibutton(app.CentralNucleiPanel, 'push');
-            app.AcceptCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @AcceptCentralNucleiButtonPushed, true);
-            app.AcceptCentralNuclei.FontName = 'Avenir';
-            app.AcceptCentralNuclei.Position = [555 37 100 24];
-            app.AcceptCentralNuclei.Text = 'Accept';
-
             % Create PropertiesPanel
             app.PropertiesPanel = uipanel(app.UIFigure);
             app.PropertiesPanel.Visible = 'off';
@@ -3382,6 +3341,47 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberAccept.FontName = 'Avenir';
             app.NonfiberAccept.Position = [542 8 100 24];
             app.NonfiberAccept.Text = 'Accept';
+
+            % Create CentralNucleiPanel
+            app.CentralNucleiPanel = uipanel(app.UIFigure);
+            app.CentralNucleiPanel.Visible = 'off';
+            app.CentralNucleiPanel.FontName = 'Avenir';
+            app.CentralNucleiPanel.Position = [285 28 882 634];
+
+            % Create CentralNucleiAxes
+            app.CentralNucleiAxes = uiaxes(app.CentralNucleiPanel);
+            app.CentralNucleiAxes.PlotBoxAspectRatio = [1.34971644612476 1 1];
+            app.CentralNucleiAxes.FontName = 'Avenir';
+            app.CentralNucleiAxes.XColor = 'none';
+            app.CentralNucleiAxes.YColor = 'none';
+            app.CentralNucleiAxes.Position = [72 70 743 555];
+
+            % Create ThresholdEditField_2Label
+            app.ThresholdEditField_2Label = uilabel(app.CentralNucleiPanel);
+            app.ThresholdEditField_2Label.HorizontalAlignment = 'right';
+            app.ThresholdEditField_2Label.FontName = 'Avenir';
+            app.ThresholdEditField_2Label.Position = [206 38 59 22];
+            app.ThresholdEditField_2Label.Text = 'Threshold';
+
+            % Create ThresholdCentralNuclei
+            app.ThresholdCentralNuclei = uieditfield(app.CentralNucleiPanel, 'numeric');
+            app.ThresholdCentralNuclei.Limits = [0 Inf];
+            app.ThresholdCentralNuclei.FontName = 'Avenir';
+            app.ThresholdCentralNuclei.Position = [280 38 100 22];
+
+            % Create AdjustCentralNuclei
+            app.AdjustCentralNuclei = uibutton(app.CentralNucleiPanel, 'push');
+            app.AdjustCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @AdjustCentralNucleiButtonPushed, true);
+            app.AdjustCentralNuclei.FontName = 'Avenir';
+            app.AdjustCentralNuclei.Position = [424 37 100 24];
+            app.AdjustCentralNuclei.Text = 'Adjust';
+
+            % Create AcceptCentralNuclei
+            app.AcceptCentralNuclei = uibutton(app.CentralNucleiPanel, 'push');
+            app.AcceptCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @AcceptCentralNucleiButtonPushed, true);
+            app.AcceptCentralNuclei.FontName = 'Avenir';
+            app.AcceptCentralNuclei.Position = [555 37 100 24];
+            app.AcceptCentralNuclei.Text = 'Accept';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
