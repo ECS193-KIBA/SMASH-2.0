@@ -8,7 +8,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         AdjustCentralNuclei             matlab.ui.control.Button
         ThresholdCentralNuclei          matlab.ui.control.NumericEditField
         ThresholdEditField_2Label       matlab.ui.control.Label
-        CentralNucleiAxes               matlab.ui.control.UIAxes
+        CentralNucleiAxesL              matlab.ui.control.UIAxes
+        CentralNucleiAxesR              matlab.ui.control.UIAxes
         NonfiberPanel                   matlab.ui.container.Panel
         NonfiberAccept                  matlab.ui.control.Button
         NonfiberAdjust                  matlab.ui.control.Button
@@ -1184,6 +1185,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             
             app.CentralNucleiAdj = 1;
             
+            imshow(app.orig_img, 'Parent', app.CentralNucleiAxesL);
             while app.CentralNucleiAdj
                 nuc_bw = imbinarize(nuc_fil,app.thresh_nuc);
                 nuc_cen = nuc_bw.*inv_brd;
@@ -1201,7 +1203,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                 central_nuclei_img(vertcat(app.fprop(app.cen_nuc).PixelIdxList)) = 1;
 
                 pos_img = flattenMaskOverlay(central_nuclei_img,nuc_bw,0.6,'b');
-                imshow(pos_img,'Parent',app.CentralNucleiAxes);
+                imshow(pos_img,'Parent',app.CentralNucleiAxesR);
+                linkaxes([app.CentralNucleiAxesL, app.CentralNucleiAxesR]);
                 uiwait(app.UIFigure);
             end
             
@@ -3348,13 +3351,21 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.CentralNucleiPanel.FontName = 'Avenir';
             app.CentralNucleiPanel.Position = [285 28 882 634];
 
-            % Create CentralNucleiAxes
-            app.CentralNucleiAxes = uiaxes(app.CentralNucleiPanel);
-            app.CentralNucleiAxes.PlotBoxAspectRatio = [1.34971644612476 1 1];
-            app.CentralNucleiAxes.FontName = 'Avenir';
-            app.CentralNucleiAxes.XColor = 'none';
-            app.CentralNucleiAxes.YColor = 'none';
-            app.CentralNucleiAxes.Position = [72 70 743 555];
+            % Create CentralNucleiAxesR
+            app.CentralNucleiAxesR = uiaxes(app.CentralNucleiPanel);
+            app.CentralNucleiAxesR.PlotBoxAspectRatio = [1.34971644612476 1 1];
+            app.CentralNucleiAxesR.FontName = 'Avenir';
+            app.CentralNucleiAxesR.XColor = 'none';
+            app.CentralNucleiAxesR.YColor = 'none';
+            app.CentralNucleiAxesR.Position = [428 171 448 432];
+
+            % Create CentralNucleiAxesL
+            app.CentralNucleiAxesL = uiaxes(app.CentralNucleiPanel);
+            app.CentralNucleiAxesL.PlotBoxAspectRatio = [1.34971644612476 1 1];
+            app.CentralNucleiAxesL.FontName = 'Avenir';
+            app.CentralNucleiAxesL.XColor = 'none';
+            app.CentralNucleiAxesL.YColor = 'none';
+            app.CentralNucleiAxesL.Position = [1 171 448 432];
 
             % Create ThresholdEditField_2Label
             app.ThresholdEditField_2Label = uilabel(app.CentralNucleiPanel);
