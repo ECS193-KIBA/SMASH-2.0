@@ -699,7 +699,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.MinimumNucleusSizeum2EditField.Value = app.default{15,2};
             app.FiberTypeColorDropDown.Value = num2str(app.default{5,2});
             app.NonfiberObjectsColorDropDown.Value = num2str(app.default{6,2});
-            app.AcceptedFileExtensions = {'tif';'tiff';'jpg';'png';'bmp';'czi'};
+            app.AcceptedFileExtensions = {'tif';'tiff';'lif';'jpg';'png';'bmp';'czi'};
             % TODO - default for nofiber classification
             linkaxes([app.SortingAxesL, app.SortingAxesR]);
         end
