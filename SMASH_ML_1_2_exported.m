@@ -707,8 +707,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: SelectFilesButton
         function SelectFilesButtonPushed(app, event)
             % Allow user to select multiple files
-            [FileNames,PathName,FilterIndex] = uigetfile(app.AcceptedFileExtensionsFilter(),'File Selector - dont select mask', 'MultiSelect','on');
-            
+            if ismac()
+                [FileNames,PathName,FilterIndex] = uigetfile("*",'File Selector - dont select mask', 'MultiSelect','on');
+            else
+                [FileNames,PathName,FilterIndex] = uigetfile(app.AcceptedFileExtensionsFilter(),'File Selector - dont select mask', 'MultiSelect','on');
+            end
+
             % Set pathname and filter index, 
             app.BatchModePathName = PathName;
             app.BatchModeFilterIndex = FilterIndex;
