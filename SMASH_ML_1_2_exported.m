@@ -3,6 +3,18 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        NonfiberClassificationControlPanel  matlab.ui.container.Panel
+        NonfiberClassificationFileWriteStatusLabel  matlab.ui.control.Label
+        NonfiberClassificationColorDropDown  matlab.ui.control.DropDown
+        ClassificationColorLabel        matlab.ui.control.Label
+        DoneNonfiberClassification      matlab.ui.control.Button
+        WritetoExcelNonfiberClassification  matlab.ui.control.Button
+        ClassifyNonfiberObjects         matlab.ui.control.Button
+        NonfiberClassificationDataOutputFolder  matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label_3  matlab.ui.control.Label
+        PixelSizeNonfiberClassification  matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditField_3Label_2  matlab.ui.control.Label
+        NonfiberClassificationChannelColorBox  matlab.ui.control.UIAxes
         CentralNucleiPanel              matlab.ui.container.Panel
         AcceptCentralNuclei             matlab.ui.control.Button
         AdjustCentralNuclei             matlab.ui.control.Button
@@ -29,18 +41,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         NonfiberObjectsColorDropDown    matlab.ui.control.DropDown
         ObjectColorDropDownLabel        matlab.ui.control.Label
         NonfiberChannelColorBox         matlab.ui.control.UIAxes
-        NonfiberClassificationControlPanel  matlab.ui.container.Panel
-        NonfiberClassificationFileWriteStatusLabel  matlab.ui.control.Label
-        NonfiberClassificationColorDropDown  matlab.ui.control.DropDown
-        FiberTypeColorDropDown_2Label   matlab.ui.control.Label
-        DoneNonfiberClassification      matlab.ui.control.Button
-        WritetoExcelNonfiberClassification  matlab.ui.control.Button
-        ClassifyNonfiberObjects         matlab.ui.control.Button
-        NonfiberClassificationDataOutputFolder  matlab.ui.control.EditField
-        DataOutputFolderEditField_3Label_3  matlab.ui.control.Label
-        PixelSizeNonfiberClassification  matlab.ui.control.NumericEditField
-        PixelSizeumpixelEditField_3Label_2  matlab.ui.control.Label
-        NonfiberClassificationChannelColorBox  matlab.ui.control.UIAxes
         FiberTypingControlPanel         matlab.ui.container.Panel
         FiberTypingFileWriteStatusLabel  matlab.ui.control.Label
         FiberTypingDescription_2        matlab.ui.control.Label
@@ -351,6 +351,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypeColorDropDown.ItemsData = TotalColorDropDownItemsData;
             app.NonfiberObjectsColorDropDown.Items = TotalColorDropDownItems;
             app.NonfiberObjectsColorDropDown.ItemsData = TotalColorDropDownItemsData;
+            app.NonfiberClassificationColorDropDown.Items = TotalColorDropDownItems;
+            app.NonfiberClassificationColorDropDown.ItemsData = TotalColorDropDownItemsData;
 
             % Display the image
             imshow(app.orig_img,'Parent',app.UIAxes);
@@ -2092,6 +2094,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Update color on color box
             app.NonfiberClassificationChannelColorBox.Color = RGB1DValue;
+            
         end
     end
 
@@ -3137,92 +3140,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingFileWriteStatusLabel.Position = [34 65 162 22];
             app.FiberTypingFileWriteStatusLabel.Text = 'Fiber Typing File Write Status';
 
-            % Create NonfiberClassificationControlPanel
-            app.NonfiberClassificationControlPanel = uipanel(app.UIFigure);
-            app.NonfiberClassificationControlPanel.Visible = 'off';
-            app.NonfiberClassificationControlPanel.BackgroundColor = [1 1 1];
-            app.NonfiberClassificationControlPanel.FontName = 'Avenir';
-            app.NonfiberClassificationControlPanel.Position = [13 195 260 293];
-
-            % Create NonfiberClassificationChannelColorBox
-            app.NonfiberClassificationChannelColorBox = uiaxes(app.NonfiberClassificationControlPanel);
-            app.NonfiberClassificationChannelColorBox.Toolbar.Visible = 'off';
-            app.NonfiberClassificationChannelColorBox.FontName = 'Avenir';
-            app.NonfiberClassificationChannelColorBox.XTick = [];
-            app.NonfiberClassificationChannelColorBox.YTick = [];
-            app.NonfiberClassificationChannelColorBox.Color = [0 1 1];
-            app.NonfiberClassificationChannelColorBox.Box = 'on';
-            app.NonfiberClassificationChannelColorBox.Position = [229 193 30 30];
-
-            % Create PixelSizeumpixelEditField_3Label_2
-            app.PixelSizeumpixelEditField_3Label_2 = uilabel(app.NonfiberClassificationControlPanel);
-            app.PixelSizeumpixelEditField_3Label_2.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditField_3Label_2.FontName = 'Avenir';
-            app.PixelSizeumpixelEditField_3Label_2.Position = [44 232 59 32];
-            app.PixelSizeumpixelEditField_3Label_2.Text = {'Pixel Size'; '(um/pixel)'};
-
-            % Create PixelSizeNonfiberClassification
-            app.PixelSizeNonfiberClassification = uieditfield(app.NonfiberClassificationControlPanel, 'numeric');
-            app.PixelSizeNonfiberClassification.Limits = [0 Inf];
-            app.PixelSizeNonfiberClassification.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberClassificationValueChanged, true);
-            app.PixelSizeNonfiberClassification.FontName = 'Avenir';
-            app.PixelSizeNonfiberClassification.Position = [118 242 100 22];
-
-            % Create DataOutputFolderEditField_3Label_3
-            app.DataOutputFolderEditField_3Label_3 = uilabel(app.NonfiberClassificationControlPanel);
-            app.DataOutputFolderEditField_3Label_3.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_3Label_3.FontName = 'Avenir';
-            app.DataOutputFolderEditField_3Label_3.Position = [16 144 111 22];
-            app.DataOutputFolderEditField_3Label_3.Text = 'Data Output Folder';
-
-            % Create NonfiberClassificationDataOutputFolder
-            app.NonfiberClassificationDataOutputFolder = uieditfield(app.NonfiberClassificationControlPanel, 'text');
-            app.NonfiberClassificationDataOutputFolder.FontName = 'Avenir';
-            app.NonfiberClassificationDataOutputFolder.Position = [142 144 100 22];
-
-            % Create ClassifyNonfiberObjects
-            app.ClassifyNonfiberObjects = uibutton(app.NonfiberClassificationControlPanel, 'push');
-            app.ClassifyNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @ClassifyNonfiberObjectsButtonPushed, true);
-            app.ClassifyNonfiberObjects.FontName = 'Avenir';
-            app.ClassifyNonfiberObjects.Position = [80 88 100 24];
-            app.ClassifyNonfiberObjects.Text = 'Calculate';
-
-            % Create WritetoExcelNonfiberClassification
-            app.WritetoExcelNonfiberClassification = uibutton(app.NonfiberClassificationControlPanel, 'push');
-            app.WritetoExcelNonfiberClassification.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelNonfiberClassificationButtonPushed, true);
-            app.WritetoExcelNonfiberClassification.FontName = 'Avenir';
-            app.WritetoExcelNonfiberClassification.Enable = 'off';
-            app.WritetoExcelNonfiberClassification.Position = [26 43 100 24];
-            app.WritetoExcelNonfiberClassification.Text = 'Write to Excel';
-
-            % Create DoneNonfiberClassification
-            app.DoneNonfiberClassification = uibutton(app.NonfiberClassificationControlPanel, 'push');
-            app.DoneNonfiberClassification.ButtonPushedFcn = createCallbackFcn(app, @DoneNonfiberClassificationButtonPushed, true);
-            app.DoneNonfiberClassification.FontName = 'Avenir';
-            app.DoneNonfiberClassification.Position = [145 43 100 24];
-            app.DoneNonfiberClassification.Text = 'Done';
-
-            % Create FiberTypeColorDropDown_2Label
-            app.FiberTypeColorDropDown_2Label = uilabel(app.NonfiberClassificationControlPanel);
-            app.FiberTypeColorDropDown_2Label.HorizontalAlignment = 'right';
-            app.FiberTypeColorDropDown_2Label.FontName = 'Avenir';
-            app.FiberTypeColorDropDown_2Label.Position = [16 197 95 22];
-            app.FiberTypeColorDropDown_2Label.Text = 'Fiber Type Color';
-
-            % Create NonfiberClassificationColorDropDown
-            app.NonfiberClassificationColorDropDown = uidropdown(app.NonfiberClassificationControlPanel);
-            app.NonfiberClassificationColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.NonfiberClassificationColorDropDown.ItemsData = {'1', '2', '3'};
-            app.NonfiberClassificationColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NonfiberClassificationColorDropDownValueChanged, true);
-            app.NonfiberClassificationColorDropDown.FontName = 'Avenir';
-            app.NonfiberClassificationColorDropDown.Position = [126 197 100 22];
-            app.NonfiberClassificationColorDropDown.Value = '1';
-
-            % Create NonfiberClassificationFileWriteStatusLabel
-            app.NonfiberClassificationFileWriteStatusLabel = uilabel(app.NonfiberClassificationControlPanel);
-            app.NonfiberClassificationFileWriteStatusLabel.Position = [45 4 125 28];
-            app.NonfiberClassificationFileWriteStatusLabel.Text = {'Nonfiber Classification'; ' File Write Status'};
-
             % Create NonfiberObjectsControlPanel
             app.NonfiberObjectsControlPanel = uipanel(app.UIFigure);
             app.NonfiberObjectsControlPanel.Visible = 'off';
@@ -3412,6 +3329,92 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AcceptCentralNuclei.FontName = 'Avenir';
             app.AcceptCentralNuclei.Position = [555 37 100 24];
             app.AcceptCentralNuclei.Text = 'Accept';
+
+            % Create NonfiberClassificationControlPanel
+            app.NonfiberClassificationControlPanel = uipanel(app.UIFigure);
+            app.NonfiberClassificationControlPanel.Visible = 'off';
+            app.NonfiberClassificationControlPanel.BackgroundColor = [1 1 1];
+            app.NonfiberClassificationControlPanel.FontName = 'Avenir';
+            app.NonfiberClassificationControlPanel.Position = [13 187 260 293];
+
+            % Create NonfiberClassificationChannelColorBox
+            app.NonfiberClassificationChannelColorBox = uiaxes(app.NonfiberClassificationControlPanel);
+            app.NonfiberClassificationChannelColorBox.Toolbar.Visible = 'off';
+            app.NonfiberClassificationChannelColorBox.FontName = 'Avenir';
+            app.NonfiberClassificationChannelColorBox.XTick = [];
+            app.NonfiberClassificationChannelColorBox.YTick = [];
+            app.NonfiberClassificationChannelColorBox.Color = [0 1 1];
+            app.NonfiberClassificationChannelColorBox.Box = 'on';
+            app.NonfiberClassificationChannelColorBox.Position = [229 193 30 30];
+
+            % Create PixelSizeumpixelEditField_3Label_2
+            app.PixelSizeumpixelEditField_3Label_2 = uilabel(app.NonfiberClassificationControlPanel);
+            app.PixelSizeumpixelEditField_3Label_2.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditField_3Label_2.FontName = 'Avenir';
+            app.PixelSizeumpixelEditField_3Label_2.Position = [44 232 59 32];
+            app.PixelSizeumpixelEditField_3Label_2.Text = {'Pixel Size'; '(um/pixel)'};
+
+            % Create PixelSizeNonfiberClassification
+            app.PixelSizeNonfiberClassification = uieditfield(app.NonfiberClassificationControlPanel, 'numeric');
+            app.PixelSizeNonfiberClassification.Limits = [0 Inf];
+            app.PixelSizeNonfiberClassification.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberClassificationValueChanged, true);
+            app.PixelSizeNonfiberClassification.FontName = 'Avenir';
+            app.PixelSizeNonfiberClassification.Position = [118 242 100 22];
+
+            % Create DataOutputFolderEditField_3Label_3
+            app.DataOutputFolderEditField_3Label_3 = uilabel(app.NonfiberClassificationControlPanel);
+            app.DataOutputFolderEditField_3Label_3.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_3Label_3.FontName = 'Avenir';
+            app.DataOutputFolderEditField_3Label_3.Position = [16 144 111 22];
+            app.DataOutputFolderEditField_3Label_3.Text = 'Data Output Folder';
+
+            % Create NonfiberClassificationDataOutputFolder
+            app.NonfiberClassificationDataOutputFolder = uieditfield(app.NonfiberClassificationControlPanel, 'text');
+            app.NonfiberClassificationDataOutputFolder.FontName = 'Avenir';
+            app.NonfiberClassificationDataOutputFolder.Position = [142 144 100 22];
+
+            % Create ClassifyNonfiberObjects
+            app.ClassifyNonfiberObjects = uibutton(app.NonfiberClassificationControlPanel, 'push');
+            app.ClassifyNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @ClassifyNonfiberObjectsButtonPushed, true);
+            app.ClassifyNonfiberObjects.FontName = 'Avenir';
+            app.ClassifyNonfiberObjects.Position = [80 88 100 24];
+            app.ClassifyNonfiberObjects.Text = 'Calculate';
+
+            % Create WritetoExcelNonfiberClassification
+            app.WritetoExcelNonfiberClassification = uibutton(app.NonfiberClassificationControlPanel, 'push');
+            app.WritetoExcelNonfiberClassification.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelNonfiberClassificationButtonPushed, true);
+            app.WritetoExcelNonfiberClassification.FontName = 'Avenir';
+            app.WritetoExcelNonfiberClassification.Enable = 'off';
+            app.WritetoExcelNonfiberClassification.Position = [26 43 100 24];
+            app.WritetoExcelNonfiberClassification.Text = 'Write to Excel';
+
+            % Create DoneNonfiberClassification
+            app.DoneNonfiberClassification = uibutton(app.NonfiberClassificationControlPanel, 'push');
+            app.DoneNonfiberClassification.ButtonPushedFcn = createCallbackFcn(app, @DoneNonfiberClassificationButtonPushed, true);
+            app.DoneNonfiberClassification.FontName = 'Avenir';
+            app.DoneNonfiberClassification.Position = [145 43 100 24];
+            app.DoneNonfiberClassification.Text = 'Done';
+
+            % Create ClassificationColorLabel
+            app.ClassificationColorLabel = uilabel(app.NonfiberClassificationControlPanel);
+            app.ClassificationColorLabel.HorizontalAlignment = 'right';
+            app.ClassificationColorLabel.FontName = 'Avenir';
+            app.ClassificationColorLabel.Position = [3 197 108 22];
+            app.ClassificationColorLabel.Text = 'Classification Color';
+
+            % Create NonfiberClassificationColorDropDown
+            app.NonfiberClassificationColorDropDown = uidropdown(app.NonfiberClassificationControlPanel);
+            app.NonfiberClassificationColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.NonfiberClassificationColorDropDown.ItemsData = {'1', '2', '3'};
+            app.NonfiberClassificationColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NonfiberClassificationColorDropDownValueChanged, true);
+            app.NonfiberClassificationColorDropDown.FontName = 'Avenir';
+            app.NonfiberClassificationColorDropDown.Position = [126 197 100 22];
+            app.NonfiberClassificationColorDropDown.Value = '1';
+
+            % Create NonfiberClassificationFileWriteStatusLabel
+            app.NonfiberClassificationFileWriteStatusLabel = uilabel(app.NonfiberClassificationControlPanel);
+            app.NonfiberClassificationFileWriteStatusLabel.Position = [45 4 125 28];
+            app.NonfiberClassificationFileWriteStatusLabel.Text = {'Nonfiber Classification'; ' File Write Status'};
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
