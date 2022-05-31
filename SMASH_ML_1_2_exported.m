@@ -1576,7 +1576,9 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Text = '';
             app.NonfiberPanel.Visible = 'off';
             app.NonfiberObjectsControlPanel.Visible = 'off';
-            SaveNFMaskToMaskFile(app, app.nf_bw_obj);
+            if ~isempty(app.nf_bw_obj)
+                SaveNFMaskToMaskFile(app, app.nf_bw_obj);
+            end
             EnableMenuBarButtons(app);
         end
 
