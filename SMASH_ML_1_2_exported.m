@@ -2948,6 +2948,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CentralNucleiControlPanel);
             app.MinimumNucleusSizeum2EditFieldLabel.HorizontalAlignment = 'right';
             app.MinimumNucleusSizeum2EditFieldLabel.FontName = 'Avenir';
+            app.MinimumNucleusSizeum2EditFieldLabel.Visible = 'off';
             app.MinimumNucleusSizeum2EditFieldLabel.Tooltip = {'Minimum size for a region to be considered a nucleus.'};
             app.MinimumNucleusSizeum2EditFieldLabel.Position = [-1 167 136 32];
             app.MinimumNucleusSizeum2EditFieldLabel.Text = {'Minimum Nucleus Size'; '(um^2)'};
@@ -2956,6 +2957,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.MinimumNucleusSizeum2EditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
             app.MinimumNucleusSizeum2EditField.Limits = [0 Inf];
             app.MinimumNucleusSizeum2EditField.FontName = 'Avenir';
+            app.MinimumNucleusSizeum2EditField.Visible = 'off';
             app.MinimumNucleusSizeum2EditField.Tooltip = {'Save Excel sheet of this step to the folder specified here.'};
             app.MinimumNucleusSizeum2EditField.Position = [150 177 100 22];
 
@@ -3391,6 +3393,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create FiberTypingControlPanel
             app.FiberTypingControlPanel = uipanel(app.UIFigure);
+            app.FiberTypingControlPanel.Visible = 'off';
             app.FiberTypingControlPanel.BackgroundColor = [1 1 1];
             app.FiberTypingControlPanel.FontName = 'Avenir';
             app.FiberTypingControlPanel.Position = [10 176 260 385];
