@@ -3,6 +3,18 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        NonfiberClassificationPanel     matlab.ui.container.Panel
+        Label_3                         matlab.ui.control.Label
+        PositiveNonfiberObjectsLabel    matlab.ui.control.Label
+        OriginalImageLabel              matlab.ui.control.Label
+        PercentPositiveTextArea         matlab.ui.control.TextArea
+        PercentPositiveLabel            matlab.ui.control.Label
+        NonfiberClassificationAccept    matlab.ui.control.Button
+        NonfiberClassificationAdjust    matlab.ui.control.Button
+        NonfiberClassificationThreshold  matlab.ui.control.NumericEditField
+        ThresholdEditField_2Label_3     matlab.ui.control.Label
+        NonfiberClassificationAxes_L    matlab.ui.control.UIAxes
+        NonfiberClassificationAxes_R    matlab.ui.control.UIAxes
         FiberTypingControlPanel         matlab.ui.container.Panel
         FiberTypingFileWriteStatusLabel  matlab.ui.control.Label
         FiberTypingDescription_2        matlab.ui.control.Label
@@ -20,18 +32,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PropertiesPanel                 matlab.ui.container.Panel
         FiberSizeAxes                   matlab.ui.control.UIAxes
         FeretAxes                       matlab.ui.control.UIAxes
-        NonfiberClassificationPanel     matlab.ui.container.Panel
-        Label_3                         matlab.ui.control.Label
-        PositiveNonfiberObjectsLabel    matlab.ui.control.Label
-        OriginalImageLabel              matlab.ui.control.Label
-        PercentPositiveTextArea         matlab.ui.control.TextArea
-        PercentPositiveLabel            matlab.ui.control.Label
-        NonfiberClassificationAccept    matlab.ui.control.Button
-        NonfiberClassificationAdjust    matlab.ui.control.Button
-        NonfiberClassificationThreshold  matlab.ui.control.NumericEditField
-        ThresholdEditField_2Label_3     matlab.ui.control.Label
-        NonfiberClassificationAxes_L    matlab.ui.control.UIAxes
-        NonfiberClassificationAxes_R    matlab.ui.control.UIAxes
         FiberTypingPanel                matlab.ui.container.Panel
         Label_2                         matlab.ui.control.Label
         AcceptButton                    matlab.ui.control.Button
@@ -2370,6 +2370,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.UIAxes.GridColor = 'none';
             app.UIAxes.MinorGridColor = 'none';
             app.UIAxes.Box = 'on';
+            app.UIAxes.Visible = 'off';
             app.UIAxes.Position = [7 -51 897 633];
 
             % Create SelectFileDescription
@@ -3281,98 +3282,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Label_2.Position = [176 50 523 28];
             app.Label_2.Text = {'The value displayed below is the recommended threshold value. To calculate fiber typing'; 'with a different threshold value, select "Adjust". Otherwise, select "Accept".'};
 
-            % Create NonfiberClassificationPanel
-            app.NonfiberClassificationPanel = uipanel(app.UIFigure);
-            app.NonfiberClassificationPanel.BorderType = 'none';
-            app.NonfiberClassificationPanel.Visible = 'off';
-            app.NonfiberClassificationPanel.BackgroundColor = [0.9412 0.9412 0.9412];
-            app.NonfiberClassificationPanel.FontName = 'Avenir';
-            app.NonfiberClassificationPanel.Position = [282 52 876 605];
-
-            % Create NonfiberClassificationAxes_R
-            app.NonfiberClassificationAxes_R = uiaxes(app.NonfiberClassificationPanel);
-            xlabel(app.NonfiberClassificationAxes_R, 'X')
-            ylabel(app.NonfiberClassificationAxes_R, 'Y')
-            app.NonfiberClassificationAxes_R.PlotBoxAspectRatio = [1.35976789168279 1 1];
-            app.NonfiberClassificationAxes_R.FontName = 'Avenir';
-            app.NonfiberClassificationAxes_R.XColor = 'none';
-            app.NonfiberClassificationAxes_R.YColor = 'none';
-            app.NonfiberClassificationAxes_R.Position = [450 90 405 469];
-
-            % Create NonfiberClassificationAxes_L
-            app.NonfiberClassificationAxes_L = uiaxes(app.NonfiberClassificationPanel);
-            xlabel(app.NonfiberClassificationAxes_L, 'X')
-            ylabel(app.NonfiberClassificationAxes_L, 'Y')
-            app.NonfiberClassificationAxes_L.PlotBoxAspectRatio = [1.35976789168279 1 1];
-            app.NonfiberClassificationAxes_L.FontName = 'Avenir';
-            app.NonfiberClassificationAxes_L.XColor = 'none';
-            app.NonfiberClassificationAxes_L.YColor = 'none';
-            app.NonfiberClassificationAxes_L.Position = [2 90 405 469];
-
-            % Create ThresholdEditField_2Label_3
-            app.ThresholdEditField_2Label_3 = uilabel(app.NonfiberClassificationPanel);
-            app.ThresholdEditField_2Label_3.HorizontalAlignment = 'right';
-            app.ThresholdEditField_2Label_3.FontName = 'Avenir';
-            app.ThresholdEditField_2Label_3.Position = [215 16 59 22];
-            app.ThresholdEditField_2Label_3.Text = 'Threshold';
-
-            % Create NonfiberClassificationThreshold
-            app.NonfiberClassificationThreshold = uieditfield(app.NonfiberClassificationPanel, 'numeric');
-            app.NonfiberClassificationThreshold.Limits = [0 Inf];
-            app.NonfiberClassificationThreshold.Editable = 'off';
-            app.NonfiberClassificationThreshold.FontName = 'Avenir';
-            app.NonfiberClassificationThreshold.Enable = 'off';
-            app.NonfiberClassificationThreshold.Position = [289 16 100 22];
-
-            % Create NonfiberClassificationAdjust
-            app.NonfiberClassificationAdjust = uibutton(app.NonfiberClassificationPanel, 'push');
-            app.NonfiberClassificationAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAdjustButtonPushed, true);
-            app.NonfiberClassificationAdjust.FontName = 'Avenir';
-            app.NonfiberClassificationAdjust.Enable = 'off';
-            app.NonfiberClassificationAdjust.Position = [429 15 100 24];
-            app.NonfiberClassificationAdjust.Text = 'Adjust';
-
-            % Create NonfiberClassificationAccept
-            app.NonfiberClassificationAccept = uibutton(app.NonfiberClassificationPanel, 'push');
-            app.NonfiberClassificationAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAcceptButtonPushed, true);
-            app.NonfiberClassificationAccept.FontName = 'Avenir';
-            app.NonfiberClassificationAccept.Enable = 'off';
-            app.NonfiberClassificationAccept.Position = [553 14 100 24];
-            app.NonfiberClassificationAccept.Text = 'Accept';
-
-            % Create PercentPositiveLabel
-            app.PercentPositiveLabel = uilabel(app.NonfiberClassificationPanel);
-            app.PercentPositiveLabel.HorizontalAlignment = 'right';
-            app.PercentPositiveLabel.FontName = 'Avenir';
-            app.PercentPositiveLabel.Position = [323 147 94 22];
-            app.PercentPositiveLabel.Text = 'Percent Positive:';
-
-            % Create PercentPositiveTextArea
-            app.PercentPositiveTextArea = uitextarea(app.NonfiberClassificationPanel);
-            app.PercentPositiveTextArea.Editable = 'off';
-            app.PercentPositiveTextArea.FontName = 'Avenir';
-            app.PercentPositiveTextArea.Position = [431 147 150 24];
-
-            % Create OriginalImageLabel
-            app.OriginalImageLabel = uilabel(app.NonfiberClassificationPanel);
-            app.OriginalImageLabel.FontName = 'Avenir';
-            app.OriginalImageLabel.FontWeight = 'bold';
-            app.OriginalImageLabel.Position = [177 458 89 22];
-            app.OriginalImageLabel.Text = 'Original Image';
-
-            % Create PositiveNonfiberObjectsLabel
-            app.PositiveNonfiberObjectsLabel = uilabel(app.NonfiberClassificationPanel);
-            app.PositiveNonfiberObjectsLabel.FontName = 'Avenir';
-            app.PositiveNonfiberObjectsLabel.FontWeight = 'bold';
-            app.PositiveNonfiberObjectsLabel.Position = [589 462 150 22];
-            app.PositiveNonfiberObjectsLabel.Text = 'Positive Nonfiber Objects';
-
-            % Create Label_3
-            app.Label_3 = uilabel(app.NonfiberClassificationPanel);
-            app.Label_3.FontWeight = 'bold';
-            app.Label_3.Position = [153 53 626 28];
-            app.Label_3.Text = {'The value displayed below is the recommended threshold value. To calculate nonfiber object classification'; 'with a different threshold value, select "Adjust". Otherwise, select "Accept".'};
-
             % Create PropertiesPanel
             app.PropertiesPanel = uipanel(app.UIFigure);
             app.PropertiesPanel.Visible = 'off';
@@ -3495,6 +3404,99 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingFileWriteStatusLabel = uilabel(app.FiberTypingControlPanel);
             app.FiberTypingFileWriteStatusLabel.Position = [34 65 162 22];
             app.FiberTypingFileWriteStatusLabel.Text = 'Fiber Typing File Write Status';
+
+            % Create NonfiberClassificationPanel
+            app.NonfiberClassificationPanel = uipanel(app.UIFigure);
+            app.NonfiberClassificationPanel.BorderType = 'none';
+            app.NonfiberClassificationPanel.Visible = 'off';
+            app.NonfiberClassificationPanel.BackgroundColor = [0.9412 0.9412 0.9412];
+            app.NonfiberClassificationPanel.FontName = 'Avenir';
+            app.NonfiberClassificationPanel.Position = [282 52 876 605];
+
+            % Create NonfiberClassificationAxes_R
+            app.NonfiberClassificationAxes_R = uiaxes(app.NonfiberClassificationPanel);
+            xlabel(app.NonfiberClassificationAxes_R, 'X')
+            ylabel(app.NonfiberClassificationAxes_R, 'Y')
+            app.NonfiberClassificationAxes_R.PlotBoxAspectRatio = [1.35976789168279 1 1];
+            app.NonfiberClassificationAxes_R.FontName = 'Avenir';
+            app.NonfiberClassificationAxes_R.XColor = 'none';
+            app.NonfiberClassificationAxes_R.YColor = 'none';
+            app.NonfiberClassificationAxes_R.Position = [450 90 405 469];
+
+            % Create NonfiberClassificationAxes_L
+            app.NonfiberClassificationAxes_L = uiaxes(app.NonfiberClassificationPanel);
+            xlabel(app.NonfiberClassificationAxes_L, 'X')
+            ylabel(app.NonfiberClassificationAxes_L, 'Y')
+            app.NonfiberClassificationAxes_L.PlotBoxAspectRatio = [1.35976789168279 1 1];
+            app.NonfiberClassificationAxes_L.FontName = 'Avenir';
+            app.NonfiberClassificationAxes_L.XColor = 'none';
+            app.NonfiberClassificationAxes_L.YColor = 'none';
+            app.NonfiberClassificationAxes_L.Position = [2 90 405 469];
+
+            % Create ThresholdEditField_2Label_3
+            app.ThresholdEditField_2Label_3 = uilabel(app.NonfiberClassificationPanel);
+            app.ThresholdEditField_2Label_3.HorizontalAlignment = 'right';
+            app.ThresholdEditField_2Label_3.FontName = 'Avenir';
+            app.ThresholdEditField_2Label_3.Position = [215 16 59 22];
+            app.ThresholdEditField_2Label_3.Text = 'Threshold';
+
+            % Create NonfiberClassificationThreshold
+            app.NonfiberClassificationThreshold = uieditfield(app.NonfiberClassificationPanel, 'numeric');
+            app.NonfiberClassificationThreshold.Limits = [0 Inf];
+            app.NonfiberClassificationThreshold.Editable = 'off';
+            app.NonfiberClassificationThreshold.FontName = 'Avenir';
+            app.NonfiberClassificationThreshold.Enable = 'off';
+            app.NonfiberClassificationThreshold.Position = [289 16 100 22];
+
+            % Create NonfiberClassificationAdjust
+            app.NonfiberClassificationAdjust = uibutton(app.NonfiberClassificationPanel, 'push');
+            app.NonfiberClassificationAdjust.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAdjustButtonPushed, true);
+            app.NonfiberClassificationAdjust.FontName = 'Avenir';
+            app.NonfiberClassificationAdjust.Enable = 'off';
+            app.NonfiberClassificationAdjust.Position = [429 15 100 24];
+            app.NonfiberClassificationAdjust.Text = 'Adjust';
+
+            % Create NonfiberClassificationAccept
+            app.NonfiberClassificationAccept = uibutton(app.NonfiberClassificationPanel, 'push');
+            app.NonfiberClassificationAccept.ButtonPushedFcn = createCallbackFcn(app, @NonfiberClassificationAcceptButtonPushed, true);
+            app.NonfiberClassificationAccept.FontName = 'Avenir';
+            app.NonfiberClassificationAccept.Enable = 'off';
+            app.NonfiberClassificationAccept.Position = [553 14 100 24];
+            app.NonfiberClassificationAccept.Text = 'Accept';
+
+            % Create PercentPositiveLabel
+            app.PercentPositiveLabel = uilabel(app.NonfiberClassificationPanel);
+            app.PercentPositiveLabel.HorizontalAlignment = 'right';
+            app.PercentPositiveLabel.FontName = 'Avenir';
+            app.PercentPositiveLabel.Position = [321 113 94 22];
+            app.PercentPositiveLabel.Text = 'Percent Positive:';
+
+            % Create PercentPositiveTextArea
+            app.PercentPositiveTextArea = uitextarea(app.NonfiberClassificationPanel);
+            app.PercentPositiveTextArea.Editable = 'off';
+            app.PercentPositiveTextArea.FontName = 'Avenir';
+            app.PercentPositiveTextArea.Visible = 'off';
+            app.PercentPositiveTextArea.Position = [429 113 150 24];
+
+            % Create OriginalImageLabel
+            app.OriginalImageLabel = uilabel(app.NonfiberClassificationPanel);
+            app.OriginalImageLabel.FontName = 'Avenir';
+            app.OriginalImageLabel.FontWeight = 'bold';
+            app.OriginalImageLabel.Position = [177 458 89 22];
+            app.OriginalImageLabel.Text = 'Original Image';
+
+            % Create PositiveNonfiberObjectsLabel
+            app.PositiveNonfiberObjectsLabel = uilabel(app.NonfiberClassificationPanel);
+            app.PositiveNonfiberObjectsLabel.FontName = 'Avenir';
+            app.PositiveNonfiberObjectsLabel.FontWeight = 'bold';
+            app.PositiveNonfiberObjectsLabel.Position = [589 462 150 22];
+            app.PositiveNonfiberObjectsLabel.Text = 'Positive Nonfiber Objects';
+
+            % Create Label_3
+            app.Label_3 = uilabel(app.NonfiberClassificationPanel);
+            app.Label_3.FontWeight = 'bold';
+            app.Label_3.Position = [153 53 626 28];
+            app.Label_3.Text = {'The value displayed below is the recommended threshold value. To calculate nonfiber object classification'; 'with a different threshold value, select "Adjust". Otherwise, select "Accept".'};
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
