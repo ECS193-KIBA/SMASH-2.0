@@ -4,8 +4,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
         SegmentationParameters          matlab.ui.container.Panel
+        SegmentationStatusLabel         matlab.ui.control.Label
         CloseInitialSegmentationButton  matlab.ui.control.Button
-        InitialSegmentationDescription_2  matlab.ui.control.Label
         InitialSegmentationDirections   matlab.ui.control.Label
         InitialSegmentationDescription  matlab.ui.control.Label
         DetectValueButton               matlab.ui.control.Button
@@ -16,25 +16,36 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         FiberOutlineColorDropDownLabel  matlab.ui.control.Label
         SegmentButton                   matlab.ui.control.Button
         FiberOutlineChannelColorBox     matlab.ui.control.UIAxes
+        ManualSegmentationControls      matlab.ui.container.Panel
+        ManualSegmentationDescription_4  matlab.ui.control.Label
+        ManualSegmentationDescription_3  matlab.ui.control.Label
+        ManualSegmentationDescription_2  matlab.ui.control.Label
+        ManualSegmentationDescription   matlab.ui.control.Label
+        FinishDrawingButton             matlab.ui.control.Button
+        StartMergingButton              matlab.ui.control.Button
+        MergeObjectsModeLabel           matlab.ui.control.Label
+        DrawingModeLabel                matlab.ui.control.Label
+        CloseManualSegmentationButton   matlab.ui.control.Button
+        AcceptLineButton                matlab.ui.control.Button
+        StartDrawingButton              matlab.ui.control.Button
+        FiberTypingPanel                matlab.ui.container.Panel
+        Label_2                         matlab.ui.control.Label
+        AcceptButton                    matlab.ui.control.Button
+        AdjustButton                    matlab.ui.control.Button
+        ThresholdEditField              matlab.ui.control.NumericEditField
+        ThresholdEditFieldLabel         matlab.ui.control.Label
+        FThistR                         matlab.ui.control.UIAxes
+        FThistL                         matlab.ui.control.UIAxes
+        FiberTypingAxesR                matlab.ui.control.UIAxes
+        FiberTypingAxesL                matlab.ui.control.UIAxes
+        PropertiesPanel                 matlab.ui.container.Panel
+        FiberSizeAxes                   matlab.ui.control.UIAxes
+        FeretAxes                       matlab.ui.control.UIAxes
         ManualFilterControls            matlab.ui.container.Panel
         ManualFilterDescription_2       matlab.ui.control.Label
         ManualFilterDescription         matlab.ui.control.Label
         FinishManualFilteringButton     matlab.ui.control.Button
         RemoveNonfibersButton           matlab.ui.control.Button
-        NonfiberObjectsControlPanel     matlab.ui.container.Panel
-        NonfiberObjectsDescription_2    matlab.ui.control.Label
-        NonfiberObjectsDescription      matlab.ui.control.Label
-        NonfiberObjectsFileWriteStatusLabel  matlab.ui.control.Label
-        PixelSizeNonfiberObjects        matlab.ui.control.NumericEditField
-        PixelSizeumpixelLabel_2         matlab.ui.control.Label
-        DoneNonfiber                    matlab.ui.control.Button
-        WritetoExcelNonfiber            matlab.ui.control.Button
-        CalculateNonfiberObjects        matlab.ui.control.Button
-        NonfiberObjectsDataOutputFolder  matlab.ui.control.EditField
-        DataOutputFolderEditField_3Label_2  matlab.ui.control.Label
-        NonfiberObjectsColorDropDown    matlab.ui.control.DropDown
-        ObjectColorDropDownLabel        matlab.ui.control.Label
-        NonfiberChannelColorBox         matlab.ui.control.UIAxes
         FiberPropertiesControlPanel     matlab.ui.container.Panel
         FiberPropertiesFileWriteStatusLabel  matlab.ui.control.Label
         FiberPropertiesDescription_2    matlab.ui.control.Label
@@ -64,6 +75,20 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         PixelSizeCentralNuclei          matlab.ui.control.NumericEditField
         PixelSizeumpixelLabel           matlab.ui.control.Label
         CentralNucleiChannelColorBox    matlab.ui.control.UIAxes
+        NonfiberObjectsControlPanel     matlab.ui.container.Panel
+        NonfiberObjectsDescription_2    matlab.ui.control.Label
+        NonfiberObjectsDescription      matlab.ui.control.Label
+        NonfiberObjectsFileWriteStatusLabel  matlab.ui.control.Label
+        PixelSizeNonfiberObjects        matlab.ui.control.NumericEditField
+        PixelSizeumpixelLabel_2         matlab.ui.control.Label
+        DoneNonfiber                    matlab.ui.control.Button
+        WritetoExcelNonfiber            matlab.ui.control.Button
+        CalculateNonfiberObjects        matlab.ui.control.Button
+        NonfiberObjectsDataOutputFolder  matlab.ui.control.EditField
+        DataOutputFolderEditField_3Label_2  matlab.ui.control.Label
+        NonfiberObjectsColorDropDown    matlab.ui.control.DropDown
+        ObjectColorDropDownLabel        matlab.ui.control.Label
+        NonfiberChannelColorBox         matlab.ui.control.UIAxes
         NonfiberClassificationControlPanel  matlab.ui.container.Panel
         NonfiberClassificationDescription_2  matlab.ui.control.Label
         NonfiberClassificationDescription  matlab.ui.control.Label
@@ -76,6 +101,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         NonfiberClassificationDataOutputFolder  matlab.ui.control.EditField
         DataOutputFolderEditField_3Label_3  matlab.ui.control.Label
         PixelSizeNonfiberClassification  matlab.ui.control.NumericEditField
+        PixelSizeumpixelEditField_3Label_2  matlab.ui.control.Label
+        NonfiberClassificationChannelColorBox  matlab.ui.control.UIAxes
         FiberPredictionControlPanel     matlab.ui.container.Panel
         FiberPredictionDescription_3    matlab.ui.control.Label
         FiberPredictionDescription_2    matlab.ui.control.Label
@@ -86,8 +113,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         SortingThresholdHigherrequiresmoremanualsortingLabel  matlab.ui.control.Label
         ManualSortingButton             matlab.ui.control.Button
         FilterButton                    matlab.ui.control.Button
-        PixelSizeumpixelEditField_3Label_2  matlab.ui.control.Label
-        NonfiberClassificationChannelColorBox  matlab.ui.control.UIAxes
         FiberTypingControlPanel         matlab.ui.container.Panel
         FiberTypingFileWriteStatusLabel  matlab.ui.control.Label
         FiberTypingDescription_2        matlab.ui.control.Label
@@ -114,19 +139,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         ThresholdEditField_2Label_3     matlab.ui.control.Label
         NonfiberClassificationAxes_L    matlab.ui.control.UIAxes
         NonfiberClassificationAxes_R    matlab.ui.control.UIAxes
-        PropertiesPanel                 matlab.ui.container.Panel
-        FiberSizeAxes                   matlab.ui.control.UIAxes
-        FeretAxes                       matlab.ui.control.UIAxes
-        FiberTypingPanel                matlab.ui.container.Panel
-        Label_2                         matlab.ui.control.Label
-        AcceptButton                    matlab.ui.control.Button
-        AdjustButton                    matlab.ui.control.Button
-        ThresholdEditField              matlab.ui.control.NumericEditField
-        ThresholdEditFieldLabel         matlab.ui.control.Label
-        FThistR                         matlab.ui.control.UIAxes
-        FThistL                         matlab.ui.control.UIAxes
-        FiberTypingAxesR                matlab.ui.control.UIAxes
-        FiberTypingAxesL                matlab.ui.control.UIAxes
         CentralNucleiPanel              matlab.ui.container.Panel
         Label                           matlab.ui.control.Label
         AcceptCentralNuclei             matlab.ui.control.Button
@@ -143,18 +155,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         ThresholdEditField_2Label_2     matlab.ui.control.Label
         NonfiberAxesL                   matlab.ui.control.UIAxes
         NonfiberAxesR                   matlab.ui.control.UIAxes
-        ManualSegmentationControls      matlab.ui.container.Panel
-        ManualSegmentationDescription_4  matlab.ui.control.Label
-        ManualSegmentationDescription_3  matlab.ui.control.Label
-        ManualSegmentationDescription_2  matlab.ui.control.Label
-        ManualSegmentationDescription   matlab.ui.control.Label
-        FinishDrawingButton             matlab.ui.control.Button
-        StartMergingButton              matlab.ui.control.Button
-        MergeObjectsModeLabel           matlab.ui.control.Label
-        DrawingModeLabel                matlab.ui.control.Label
-        CloseManualSegmentationButton   matlab.ui.control.Button
-        AcceptLineButton                matlab.ui.control.Button
-        StartDrawingButton              matlab.ui.control.Button
         SelectFileDescription_2         matlab.ui.control.Label
         SelectFileDescription           matlab.ui.control.Label
         ImageBackground                 matlab.ui.container.Panel
@@ -774,6 +774,8 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                    app.AcceptSegmentationButton.Enable = 'on';
                    
                end
+               app.SegmentationStatusLabel.Text = 'Segmentation complete';
+               app.SegmentationStatusLabel.Visible = 'on'; 
         end
 
         % Button pushed function: StartDrawingButton
@@ -933,11 +935,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                         app.Prompt.FontColor = [1 1 0];
                         promptString = "<Batch Mode - Warning: " + currentFile + " skipped because it is not a valid file type>";
                         app.Prompt.Text = promptString;
+                        drawnow;
                     else
                         % Add the prompt at the top for indication that
                         % batch mode is running on which file
                         promptString = "Batch Mode - In Progress: " + int2str(k-1) + " out of " + int2str(numberOfFilesSelected) + " completed.";
                         app.Prompt.Text = promptString;
+                        drawnow;
                         % Go through file initilization
                         % In file initialization, it enables all the other buttons,
                         % so you need to change this button to the initial page and
@@ -977,11 +981,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                         promptString = "<Batch Mode - Warning: " + currentFile + " skipped because it is not a valid file type>";
                         app.Prompt.FontColor = [1 1 0];
                         app.Prompt.Text = promptString;
+                        drawnow;
                     else
                         % Add the prompt at the top for indication that batch
                         % mode is running on which file
                         promptString = "Batch Mode - In Progress: " + int2str(k-1) + " out of " + int2str(numberOfFilesSelected) + " completed.";
                         app.Prompt.Text = promptString;
+                        drawnow;
                         % Go through file initilization
                         % In file initialization, it enables all the other buttons,
                         % so you need to change this button to the initial page and
@@ -1131,6 +1137,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: WritetoExcelButton
         function WritetoExcelButtonPushed(app, event)
             app.FiberPropertiesFileWriteStatusLabel.Text = 'Writing to Excel...';
+            drawnow;
+
+            % Create folder if directory does not exist for excel input
+            try 
+                CreateFolderIfDirectoryIsNonexistent(app, app.FiberPropertiesDataOutputFolder.Value);
+                cd(app.FiberPropertiesDataOutputFolder.Value)
+            catch E
+                app.FiberPropertiesFileWriteStatusLabel.Text = 'Invalid directory';
+                return;
+            end
+
             cents = cat(1,app.props.Centroid);
             rprop = [cents(:,2) cents(:,1) app.props.MaxFeretDiameter app.props.MaxFeretAngle app.props.MinFeretDiameter app.props.MinFeretAngle app.props.Area];
             propsum(1,:) = mean(rprop,1);
@@ -1160,15 +1177,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             data = [num2cell(fibs') num2cell(rprop)];
             
             out = [header; sums; data];
-            
-            % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.FiberPropertiesDataOutputFolder.Value);
-            cd(app.FiberPropertiesDataOutputFolder.Value)
 
-            writecell(out,[app.Files{4} '_Properties.xlsx'],'Range','A5');
-            app.props = 0;
+            try 
+                writecell(out,[app.Files{4} '_Properties.xlsx'],'Range','A5');
+            catch E
+                app.FiberPropertiesFileWriteStatusLabel.Text = 'Invalid directory';
+                return;
+            end
+            
             cd(app.Files{3})
             app.FiberPropertiesFileWriteStatusLabel.Text = 'Write to Excel done!';
+            
         end
 
         % Value changed function: SortingThresholdSlider
@@ -1243,10 +1262,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: CentralNucleiExcelWrite
         function CentralNucleiExcelWriteButtonPushed(app, event)
             app.CentralNucleiFileWriteStatusLabel.Text = 'Writing to Excel...';
-
-            % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.CentralNucleiDataOutputFolder.Value);
-            cd(app.CentralNucleiDataOutputFolder.Value)
+            drawnow;
+            
+            try
+                % Create folder if directory does not exist for excel input
+                CreateFolderIfDirectoryIsNonexistent(app, app.CentralNucleiDataOutputFolder.Value);
+                cd(app.CentralNucleiDataOutputFolder.Value)
+            catch E
+                app.CentralNucleiFileWriteStatusLabel.Text = 'Invalid directory';
+                return;
+            end
 
             header{1,1} = 'Border (um)';
             header{1,2} = 'Minimum Nuclear Size (um^2)';
@@ -1288,7 +1313,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             farea = farea.*(app.pix_size^2);
             data = cat(2,farea,app.cen_pix.*app.pix_size^2,app.cen_nuc) ;
             out = cat(1,header,num2cell(data));
-            writecell(out,[app.Files{4} '_Properties.xlsx'],'Range','I1');
+            try 
+                writecell(out,[app.Files{4} '_Properties.xlsx'],'Range','I1');
+            catch E
+                app.CentralNucleiFileWriteStatusLabel.Text = 'Invalid directory';
+                return;
+            end
             app.CentralNucleiFileWriteStatusLabel.Text = 'Write to Excel done!';
             cd(app.Files{3})
             app.fprop = 0;
@@ -1392,10 +1422,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: WritetoExcelFT
         function WritetoExcelFTButtonPushed(app, event)
             app.FiberTypingFileWriteStatusLabel.Text = 'Writing to Excel...';
+            drawnow;
 
-            % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.FiberTypingDataOutputFolder.Value);
-            cd(app.FiberTypingDataOutputFolder.Value)
+            try
+                % Create folder if directory does not exist for excel input
+                CreateFolderIfDirectoryIsNonexistent(app, app.FiberTypingDataOutputFolder.Value);
+                cd(app.FiberTypingDataOutputFolder.Value)
+            catch E
+                app.FiberTypingFileWriteStatusLabel.Text = 'Invalid directory';
+                return;
+            end
 
             pix_area = app.pix_size^2;
             header{1,1} = 'Average Fiber Size';
@@ -1432,12 +1468,17 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             out_data(:,3) = app.ponf;
             
             out_file = cat(1,header,num2cell(out_data));
-            if str2double(app.FiberTypeColorDropDown.Value) == 2
-                writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','L1');
-            elseif str2double(app.FiberTypeColorDropDown.Value) == 1
-                writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','O1');
-            elseif str2double(app.FiberTypeColorDropDown.Value) == 3
-                writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','R1');
+            try
+                if str2double(app.FiberTypeColorDropDown.Value) == 2
+                    writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','L1');
+                elseif str2double(app.FiberTypeColorDropDown.Value) == 1
+                    writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','O1');
+                elseif str2double(app.FiberTypeColorDropDown.Value) == 3
+                    writecell(out_file,[app.Files{4} '_Properties.xlsx'],'Range','R1');
+                end
+            catch E
+                app.FiberTypingFileWriteStatusLabel.Text = 'Invalid directory';
+                return;
             end
             app.FiberTypingFileWriteStatusLabel.Text = 'Write to Excel done!';
 
@@ -1546,10 +1587,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: WritetoExcelNonfiber
         function WritetoExcelNonfiberButtonPushed(app, event)
             app.NonfiberObjectsFileWriteStatusLabel.Text = 'Writing to Excel...';
+            drawnow;
 
-            % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.NonfiberObjectsDataOutputFolder.Value);
-            cd(app.NonfiberObjectsDataOutputFolder.Value)
+            try
+                % Create folder if directory does not exist for excel input
+                CreateFolderIfDirectoryIsNonexistent(app, app.NonfiberObjectsDataOutputFolder.Value);
+                cd(app.NonfiberObjectsDataOutputFolder.Value)
+            catch E
+                app.NonfiberObjectsFileWriteStatusLabel.Text = 'Invalid directory';
+                return;
+            end
             
             header{1,1} = 'Threshold';
             header{2,1} = 'Number of Objects';
@@ -1561,8 +1608,12 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             header{4,3} = 'Y centroid';
             
             out = cat(1,header,num2cell(app.nf_data));
-            
-            writecell(out, [app.Files{4} '_Properties.xlsx'], 'Range','P7');
+            try
+                writecell(out, [app.Files{4} '_Properties.xlsx'], 'Range','P7');
+            catch E
+                app.NonfiberObjectWriteStatusLabel.Text = 'Invalid directory';
+                return;
+            end
             app.NonfiberObjectsFileWriteStatusLabel.Text = 'Write to Excel done!';
             cd(app.Files{3})
             
@@ -1694,25 +1745,31 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
         % Button pushed function: DetectValueButton
         function DetectValueButtonPushed(app, event)
-            foc = app.FiberOutlineColorDropDown.Value;
-            foc = str2double(foc);
-            lam = app.orig_img_multispectral(:,:,foc);  % fiber outline color
-            hist = imhist(lam);
-            hist = hist(1:end-1);
-            AverageIntensity = mean2(lam);
-            x = linspace(0,254,255);
-            x = x';
-            y = fit(x,hist,'Gauss1');
-            %peak = y.a1;
-            PeakofGaussian = round(y.b1);
-            stddev = round(y.c1);
-            hist_adj = hist;
-            hist_adj(1:(2*stddev+PeakofGaussian)) = 0;
-            AveragePositiveIntensity = sum(x.*hist_adj)/sum(hist_adj);
-            predictors = table(AverageIntensity, PeakofGaussian, AveragePositiveIntensity);
-            classifier = app.segmodel.segModel.RegressionSVM;
-            value = predict(classifier,predictors);
-            app.SegmentationThresholdSlider.Value = round(value);
+            try
+                foc = app.FiberOutlineColorDropDown.Value;
+                foc = str2double(foc);
+                lam = app.orig_img_multispectral(:,:,foc);  % fiber outline color
+                hist = imhist(lam);
+                hist = hist(1:end-1);
+                AverageIntensity = mean2(lam);
+                x = linspace(0,254,255);
+                x = x';
+                y = fit(x,hist,'Gauss1');
+                %peak = y.a1;
+                PeakofGaussian = round(y.b1);
+                stddev = round(y.c1);
+                hist_adj = hist;
+                hist_adj(1:(2*stddev+PeakofGaussian)) = 0;
+                AveragePositiveIntensity = sum(x.*hist_adj)/sum(hist_adj);
+                predictors = table(AverageIntensity, PeakofGaussian, AveragePositiveIntensity);
+                classifier = app.segmodel.segModel.RegressionSVM;
+                value = predict(classifier,predictors);
+                app.SegmentationThresholdSlider.Value = round(value);
+                app.SegmentationStatusLabel.Text = 'Value detected';
+            catch
+                app.SegmentationStatusLabel.Text = 'Unable to detect value';
+            end
+            app.SegmentationStatusLabel.Visible = 'on';            
         end
 
         % Button pushed function: FinishDrawingButton
@@ -1800,6 +1857,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
                     else
                         %%%% Merging
                         app.Prompt.Text = 'Merging regions...';
+                        drawnow;
                         second_region_to_merge = clicked_region;
                         [app.bw_obj, is_merged_successful] = MergeObjects(app, object_labels, first_region_to_merge, second_region_to_merge);
 
@@ -2008,10 +2066,16 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: WritetoExcelNonfiberClassification
         function WritetoExcelNonfiberClassificationButtonPushed(app, event)
             app.NonfiberClassificationFileWriteStatusLabel.Text = 'Writing to Excel...';
+            drawnow;
 
-            % Create folder if directory does not exist for excel input
-            CreateFolderIfDirectoryIsNonexistent(app, app.NonfiberClassificationDataOutputFolder.Value);
-            cd(app.NonfiberClassificationDataOutputFolder.Value)
+            try
+                % Create folder if directory does not exist for excel input
+                CreateFolderIfDirectoryIsNonexistent(app, app.NonfiberClassificationDataOutputFolder.Value);
+                cd(app.NonfiberClassificationDataOutputFolder.Value)
+            catch E
+                app.NonfiberClassificationFileWriteStatusLabel.Text = 'Invalid directory';
+                return;
+            end
 
             pix_area = app.pix_size^2;
             header{1,1} = 'Average Classified Nonfiber Object Size';
@@ -2048,8 +2112,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             out_data(:,3) = app.classified_nonfiber_ponf;
 
             out_file = cat(1,header,num2cell(out_data));
-            
-            writecell(out_file, [app.Files{4} '_Properties.xlsx'], 'Range','S1');
+
+            try
+                writecell(out_file, [app.Files{4} '_Properties.xlsx'], 'Range','S1');
+            catch E
+                app.NonfiberClassificationFileWriteStatusLabel.Text = 'Invalid directory';
+                return;
+            end
+
             app.NonfiberClassificationFileWriteStatusLabel.Text = 'Write to Excel done!';
             cd(app.Files{3})
             app.classified_nonfiber_ponf = 0;
@@ -2387,96 +2457,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SelectFileDescription_2.Position = [35 624 259 22];
             app.SelectFileDescription_2.Text = '*selecting multiple images enables batch mode';
 
-            % Create ManualSegmentationControls
-            app.ManualSegmentationControls = uipanel(app.UIFigure);
-            app.ManualSegmentationControls.Visible = 'off';
-            app.ManualSegmentationControls.BackgroundColor = [1 1 1];
-            app.ManualSegmentationControls.FontName = 'Avenir';
-            app.ManualSegmentationControls.FontWeight = 'bold';
-            app.ManualSegmentationControls.Position = [19 113 298 459];
-
-            % Create StartDrawingButton
-            app.StartDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
-            app.StartDrawingButton.FontName = 'Avenir';
-            app.StartDrawingButton.Position = [28 281 100 24];
-            app.StartDrawingButton.Text = 'Start Drawing';
-
-            % Create AcceptLineButton
-            app.AcceptLineButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
-            app.AcceptLineButton.BackgroundColor = [0.9608 0.9608 0.9608];
-            app.AcceptLineButton.FontName = 'Avenir';
-            app.AcceptLineButton.Enable = 'off';
-            app.AcceptLineButton.Position = [149 254 100 51];
-            app.AcceptLineButton.Text = 'Accept Line';
-
-            % Create CloseManualSegmentationButton
-            app.CloseManualSegmentationButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.CloseManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseManualSegmentationButtonPushed, true);
-            app.CloseManualSegmentationButton.FontName = 'Avenir';
-            app.CloseManualSegmentationButton.Position = [55 32 182 60];
-            app.CloseManualSegmentationButton.Text = 'Close Manual Segmentation';
-
-            % Create DrawingModeLabel
-            app.DrawingModeLabel = uilabel(app.ManualSegmentationControls);
-            app.DrawingModeLabel.FontName = 'Avenir';
-            app.DrawingModeLabel.FontSize = 14;
-            app.DrawingModeLabel.FontWeight = 'bold';
-            app.DrawingModeLabel.Position = [11 364 103 22];
-            app.DrawingModeLabel.Text = 'Drawing Mode';
-
-            % Create MergeObjectsModeLabel
-            app.MergeObjectsModeLabel = uilabel(app.ManualSegmentationControls);
-            app.MergeObjectsModeLabel.FontName = 'Avenir';
-            app.MergeObjectsModeLabel.FontSize = 14;
-            app.MergeObjectsModeLabel.FontWeight = 'bold';
-            app.MergeObjectsModeLabel.Position = [11 209 146 22];
-            app.MergeObjectsModeLabel.Text = 'Merge Objects Mode';
-
-            % Create StartMergingButton
-            app.StartMergingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.StartMergingButton.ButtonPushedFcn = createCallbackFcn(app, @StartMergingButtonPushed, true);
-            app.StartMergingButton.FontName = 'Avenir';
-            app.StartMergingButton.Position = [28 144 100 24];
-            app.StartMergingButton.Text = 'Start Merging';
-
-            % Create FinishDrawingButton
-            app.FinishDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
-            app.FinishDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishDrawingButtonPushed, true);
-            app.FinishDrawingButton.FontName = 'Avenir';
-            app.FinishDrawingButton.Enable = 'off';
-            app.FinishDrawingButton.Position = [28 252 100 24];
-            app.FinishDrawingButton.Text = 'Finish Drawing';
-
-            % Create ManualSegmentationDescription
-            app.ManualSegmentationDescription = uilabel(app.ManualSegmentationControls);
-            app.ManualSegmentationDescription.FontName = 'Avenir';
-            app.ManualSegmentationDescription.FontWeight = 'bold';
-            app.ManualSegmentationDescription.Position = [9 403 279 48];
-            app.ManualSegmentationDescription.Text = {'This step allows you to manually edit the fiber'; 'outlines generated in the "Initial Segmentation"'; 'stage as needed.'};
-
-            % Create ManualSegmentationDescription_2
-            app.ManualSegmentationDescription_2 = uilabel(app.ManualSegmentationControls);
-            app.ManualSegmentationDescription_2.FontName = 'Avenir';
-            app.ManualSegmentationDescription_2.FontWeight = 'bold';
-            app.ManualSegmentationDescription_2.Position = [6 98 293 22];
-            app.ManualSegmentationDescription_2.Text = 'Once you are done editing the image, click below:';
-
-            % Create ManualSegmentationDescription_3
-            app.ManualSegmentationDescription_3 = uilabel(app.ManualSegmentationControls);
-            app.ManualSegmentationDescription_3.FontName = 'Avenir';
-            app.ManualSegmentationDescription_3.FontWeight = 'bold';
-            app.ManualSegmentationDescription_3.Position = [19 315 277 48];
-            app.ManualSegmentationDescription_3.Text = {'Select "Start Drawing" to begin drawing on the'; 'image. You may adjust the line and click'; '"Accept Line" once you are done.'};
-
-            % Create ManualSegmentationDescription_4
-            app.ManualSegmentationDescription_4 = uilabel(app.ManualSegmentationControls);
-            app.ManualSegmentationDescription_4.FontName = 'Avenir';
-            app.ManualSegmentationDescription_4.FontWeight = 'bold';
-            app.ManualSegmentationDescription_4.Position = [19 178 242 32];
-            app.ManualSegmentationDescription_4.Text = {'Select "Start Merging" to begin merging '; 'over-segmented regions.'};
-
             % Create NonfiberPanel
             app.NonfiberPanel = uipanel(app.UIFigure);
             app.NonfiberPanel.Visible = 'off';
@@ -2594,98 +2574,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Label.Position = [206 72 536 32];
             app.Label.Text = {'The value displayed below is the recommended threshold value. To calculate central nuclei'; 'with a different threshold value, select "Adjust". Otherwise, select "Accept".'};
 
-            % Create FiberTypingPanel
-            app.FiberTypingPanel = uipanel(app.UIFigure);
-            app.FiberTypingPanel.Visible = 'off';
-            app.FiberTypingPanel.FontName = 'Avenir';
-            app.FiberTypingPanel.Position = [285 15 882 650];
-
-            % Create FiberTypingAxesL
-            app.FiberTypingAxesL = uiaxes(app.FiberTypingPanel);
-            app.FiberTypingAxesL.PlotBoxAspectRatio = [1.06832298136646 1 1];
-            app.FiberTypingAxesL.FontName = 'Avenir';
-            app.FiberTypingAxesL.XColor = 'none';
-            app.FiberTypingAxesL.YColor = 'none';
-            app.FiberTypingAxesL.Position = [22 289 414 332];
-
-            % Create FiberTypingAxesR
-            app.FiberTypingAxesR = uiaxes(app.FiberTypingPanel);
-            app.FiberTypingAxesR.PlotBoxAspectRatio = [1.06832298136646 1 1];
-            app.FiberTypingAxesR.FontName = 'Avenir';
-            app.FiberTypingAxesR.XColor = 'none';
-            app.FiberTypingAxesR.YColor = 'none';
-            app.FiberTypingAxesR.Position = [450 289 416 335];
-
-            % Create FThistL
-            app.FThistL = uiaxes(app.FiberTypingPanel);
-            app.FThistL.PlotBoxAspectRatio = [1.83030303030303 1 1];
-            app.FThistL.FontName = 'Avenir';
-            app.FThistL.Position = [22 83 402 207];
-
-            % Create FThistR
-            app.FThistR = uiaxes(app.FiberTypingPanel);
-            app.FThistR.PlotBoxAspectRatio = [1.91358024691358 1 1];
-            app.FThistR.FontName = 'Avenir';
-            app.FThistR.Position = [450 86 402 204];
-
-            % Create ThresholdEditFieldLabel
-            app.ThresholdEditFieldLabel = uilabel(app.FiberTypingPanel);
-            app.ThresholdEditFieldLabel.HorizontalAlignment = 'right';
-            app.ThresholdEditFieldLabel.FontName = 'Avenir';
-            app.ThresholdEditFieldLabel.Enable = 'off';
-            app.ThresholdEditFieldLabel.Position = [210 15 59 22];
-            app.ThresholdEditFieldLabel.Text = 'Threshold';
-
-            % Create ThresholdEditField
-            app.ThresholdEditField = uieditfield(app.FiberTypingPanel, 'numeric');
-            app.ThresholdEditField.Limits = [0 Inf];
-            app.ThresholdEditField.FontName = 'Avenir';
-            app.ThresholdEditField.Enable = 'off';
-            app.ThresholdEditField.Position = [284 14 100 22];
-
-            % Create AdjustButton
-            app.AdjustButton = uibutton(app.FiberTypingPanel, 'push');
-            app.AdjustButton.ButtonPushedFcn = createCallbackFcn(app, @AdjustButtonPushed, true);
-            app.AdjustButton.FontName = 'Avenir';
-            app.AdjustButton.Enable = 'off';
-            app.AdjustButton.Position = [423 12 100 24];
-            app.AdjustButton.Text = 'Adjust';
-
-            % Create AcceptButton
-            app.AcceptButton = uibutton(app.FiberTypingPanel, 'push');
-            app.AcceptButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptButtonPushed, true);
-            app.AcceptButton.FontName = 'Avenir';
-            app.AcceptButton.Enable = 'off';
-            app.AcceptButton.Position = [548 12 100 24];
-            app.AcceptButton.Text = 'Accept';
-
-            % Create Label_2
-            app.Label_2 = uilabel(app.FiberTypingPanel);
-            app.Label_2.FontName = 'Avenir';
-            app.Label_2.FontWeight = 'bold';
-            app.Label_2.Position = [176 46 523 32];
-            app.Label_2.Text = {'The value displayed below is the recommended threshold value. To calculate fiber typing'; 'with a different threshold value, select "Adjust". Otherwise, select "Accept".'};
-
-            % Create PropertiesPanel
-            app.PropertiesPanel = uipanel(app.UIFigure);
-            app.PropertiesPanel.Visible = 'off';
-            app.PropertiesPanel.FontName = 'Avenir';
-            app.PropertiesPanel.Position = [285 28 890 637];
-
-            % Create FeretAxes
-            app.FeretAxes = uiaxes(app.PropertiesPanel);
-            title(app.FeretAxes, 'Minimum Feret Diameter (um)')
-            app.FeretAxes.PlotBoxAspectRatio = [3.2695652173913 1 1];
-            app.FeretAxes.FontName = 'Avenir';
-            app.FeretAxes.Position = [53 323 799 285];
-
-            % Create FiberSizeAxes
-            app.FiberSizeAxes = uiaxes(app.PropertiesPanel);
-            title(app.FiberSizeAxes, 'Fiber Area (um^2)')
-            app.FiberSizeAxes.PlotBoxAspectRatio = [3.29824561403509 1 1];
-            app.FiberSizeAxes.FontName = 'Avenir';
-            app.FiberSizeAxes.Position = [53 25 799 285];
-
             % Create NonfiberClassificationPanel
             app.NonfiberClassificationPanel = uipanel(app.UIFigure);
             app.NonfiberClassificationPanel.BorderType = 'none';
@@ -2782,6 +2670,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
 
             % Create FiberTypingControlPanel
             app.FiberTypingControlPanel = uipanel(app.UIFigure);
+            app.FiberTypingControlPanel.BorderType = 'none';
             app.FiberTypingControlPanel.Visible = 'off';
             app.FiberTypingControlPanel.BackgroundColor = [1 1 1];
             app.FiberTypingControlPanel.FontName = 'Avenir';
@@ -2795,14 +2684,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypingChannelColorBox.YTick = [];
             app.FiberTypingChannelColorBox.Color = [0 1 1];
             app.FiberTypingChannelColorBox.Box = 'on';
-            app.FiberTypingChannelColorBox.Position = [229 171 30 30];
+            app.FiberTypingChannelColorBox.Position = [229 172 30 30];
 
             % Create PixelSizeumpixelEditField_3Label
             app.PixelSizeumpixelEditField_3Label = uilabel(app.FiberTypingControlPanel);
             app.PixelSizeumpixelEditField_3Label.HorizontalAlignment = 'right';
             app.PixelSizeumpixelEditField_3Label.FontName = 'Avenir';
             app.PixelSizeumpixelEditField_3Label.Tooltip = {'Pixel size is default based on microscope, adjust pixel size to your specific microscope.'};
-            app.PixelSizeumpixelEditField_3Label.Position = [44 202 59 32];
+            app.PixelSizeumpixelEditField_3Label.Position = [44 203 59 32];
             app.PixelSizeumpixelEditField_3Label.Text = {'Pixel Size'; '(um/pixel)'};
 
             % Create PixelSizeFiberTyping
@@ -2810,28 +2699,28 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeFiberTyping.Limits = [0 Inf];
             app.PixelSizeFiberTyping.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberTypingValueChanged, true);
             app.PixelSizeFiberTyping.FontName = 'Avenir';
-            app.PixelSizeFiberTyping.Position = [118 212 100 22];
+            app.PixelSizeFiberTyping.Position = [118 213 100 22];
 
             % Create DataOutputFolderEditField_3Label
             app.DataOutputFolderEditField_3Label = uilabel(app.FiberTypingControlPanel);
             app.DataOutputFolderEditField_3Label.HorizontalAlignment = 'right';
             app.DataOutputFolderEditField_3Label.FontName = 'Avenir';
             app.DataOutputFolderEditField_3Label.Tooltip = {'Save Excel sheet of this step to the folder specified here.'};
-            app.DataOutputFolderEditField_3Label.Position = [13 139 114 22];
+            app.DataOutputFolderEditField_3Label.Position = [13 140 114 22];
             app.DataOutputFolderEditField_3Label.Text = 'Data Output Folder';
 
             % Create FiberTypingDataOutputFolder
             app.FiberTypingDataOutputFolder = uieditfield(app.FiberTypingControlPanel, 'text');
             app.FiberTypingDataOutputFolder.FontName = 'Avenir';
             app.FiberTypingDataOutputFolder.Tooltip = {'Save Excel sheet of this step to the folder specified here.'};
-            app.FiberTypingDataOutputFolder.Position = [142 139 100 22];
+            app.FiberTypingDataOutputFolder.Position = [142 140 100 22];
 
             % Create FiberTypeColorDropDownLabel
             app.FiberTypeColorDropDownLabel = uilabel(app.FiberTypingControlPanel);
             app.FiberTypeColorDropDownLabel.HorizontalAlignment = 'right';
             app.FiberTypeColorDropDownLabel.FontName = 'Avenir';
             app.FiberTypeColorDropDownLabel.Tooltip = {'Based on the channel used for imaging.'};
-            app.FiberTypeColorDropDownLabel.Position = [16 174 95 22];
+            app.FiberTypeColorDropDownLabel.Position = [16 175 95 22];
             app.FiberTypeColorDropDownLabel.Text = 'Fiber Type Color';
 
             % Create FiberTypeColorDropDown
@@ -2840,14 +2729,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberTypeColorDropDown.ItemsData = {'1', '2', '3'};
             app.FiberTypeColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberTypeColorValueChanged, true);
             app.FiberTypeColorDropDown.FontName = 'Avenir';
-            app.FiberTypeColorDropDown.Position = [126 174 100 22];
+            app.FiberTypeColorDropDown.Position = [126 175 100 22];
             app.FiberTypeColorDropDown.Value = '1';
 
             % Create CalculateFiberTyping
             app.CalculateFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
             app.CalculateFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberTypingButtonPushed, true);
             app.CalculateFiberTyping.FontName = 'Avenir';
-            app.CalculateFiberTyping.Position = [30 86 100 24];
+            app.CalculateFiberTyping.Position = [30 87 100 24];
             app.CalculateFiberTyping.Text = 'Calculate';
 
             % Create WritetoExcelFT
@@ -2855,38 +2744,39 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.WritetoExcelFT.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelFTButtonPushed, true);
             app.WritetoExcelFT.FontName = 'Avenir';
             app.WritetoExcelFT.Enable = 'off';
-            app.WritetoExcelFT.Position = [138 86 100 24];
+            app.WritetoExcelFT.Position = [138 87 100 24];
             app.WritetoExcelFT.Text = 'Write to Excel';
 
             % Create DoneFiberTyping
             app.DoneFiberTyping = uibutton(app.FiberTypingControlPanel, 'push');
             app.DoneFiberTyping.ButtonPushedFcn = createCallbackFcn(app, @DoneFiberTypingButtonPushed, true);
             app.DoneFiberTyping.FontName = 'Avenir';
-            app.DoneFiberTyping.Position = [87 16 100 24];
+            app.DoneFiberTyping.Position = [87 17 100 24];
             app.DoneFiberTyping.Text = 'Close';
 
             % Create FiberTypingDescription
             app.FiberTypingDescription = uilabel(app.FiberTypingControlPanel);
             app.FiberTypingDescription.FontName = 'Avenir';
             app.FiberTypingDescription.FontWeight = 'bold';
-            app.FiberTypingDescription.Position = [9 310 231 48];
+            app.FiberTypingDescription.Position = [9 311 231 48];
             app.FiberTypingDescription.Text = {'Detect fibers with intensity of a certain '; 'color channel greater than a threshold '; 'value. '};
 
             % Create FiberTypingDescription_2
             app.FiberTypingDescription_2 = uilabel(app.FiberTypingControlPanel);
             app.FiberTypingDescription_2.FontName = 'Avenir';
             app.FiberTypingDescription_2.FontWeight = 'bold';
-            app.FiberTypingDescription_2.Position = [9 244 241 64];
+            app.FiberTypingDescription_2.Position = [9 245 241 64];
             app.FiberTypingDescription_2.Text = {'Set the field values below. Hover over '; 'the field names for more information. '; 'Press "Calculate" and "Write to Excel" to'; 'save the data to Excel.'; ''};
 
             % Create FiberTypingFileWriteStatusLabel
             app.FiberTypingFileWriteStatusLabel = uilabel(app.FiberTypingControlPanel);
             app.FiberTypingFileWriteStatusLabel.FontName = 'Avenir';
-            app.FiberTypingFileWriteStatusLabel.Position = [34 55 162 22];
+            app.FiberTypingFileWriteStatusLabel.Position = [34 56 162 22];
             app.FiberTypingFileWriteStatusLabel.Text = 'Fiber Typing File Write Status';
 
             % Create FiberPredictionControlPanel
             app.FiberPredictionControlPanel = uipanel(app.UIFigure);
+            app.FiberPredictionControlPanel.BorderType = 'none';
             app.FiberPredictionControlPanel.Visible = 'off';
             app.FiberPredictionControlPanel.BackgroundColor = [1 1 1];
             app.FiberPredictionControlPanel.FontName = 'Avenir';
@@ -2896,7 +2786,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FilterButton = uibutton(app.FiberPredictionControlPanel, 'push');
             app.FilterButton.ButtonPushedFcn = createCallbackFcn(app, @FilterButtonPushed, true);
             app.FilterButton.FontName = 'Avenir';
-            app.FilterButton.Position = [74 135 100 24];
+            app.FilterButton.Position = [74 136 100 24];
             app.FilterButton.Text = 'Filter';
 
             % Create ManualSortingButton
@@ -2904,14 +2794,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ManualSortingButton.ButtonPushedFcn = createCallbackFcn(app, @ManualSortingButtonPushed, true);
             app.ManualSortingButton.FontName = 'Avenir';
             app.ManualSortingButton.Enable = 'off';
-            app.ManualSortingButton.Position = [74 39 100 24];
+            app.ManualSortingButton.Position = [74 40 100 24];
             app.ManualSortingButton.Text = 'Manual Sorting';
 
             % Create SortingThresholdHigherrequiresmoremanualsortingLabel
             app.SortingThresholdHigherrequiresmoremanualsortingLabel = uilabel(app.FiberPredictionControlPanel);
             app.SortingThresholdHigherrequiresmoremanualsortingLabel.HorizontalAlignment = 'center';
             app.SortingThresholdHigherrequiresmoremanualsortingLabel.FontName = 'Avenir';
-            app.SortingThresholdHigherrequiresmoremanualsortingLabel.Position = [-41 175 209 48];
+            app.SortingThresholdHigherrequiresmoremanualsortingLabel.Position = [-41 176 209 48];
             app.SortingThresholdHigherrequiresmoremanualsortingLabel.Text = {'Sorting Threshold'; '(Higher requires'; ' more manual sorting)'; ''};
 
             % Create SortingThresholdSlider
@@ -2921,13 +2811,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SortingThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SortingThresholdSliderValueChanged, true);
             app.SortingThresholdSlider.MinorTicks = [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9];
             app.SortingThresholdSlider.FontName = 'Avenir';
-            app.SortingThresholdSlider.Position = [145 209 104 3];
+            app.SortingThresholdSlider.Position = [145 210 104 3];
 
             % Create PizelSizeumpixelLabel
             app.PizelSizeumpixelLabel = uilabel(app.FiberPredictionControlPanel);
             app.PizelSizeumpixelLabel.HorizontalAlignment = 'right';
             app.PizelSizeumpixelLabel.FontName = 'Avenir';
-            app.PizelSizeumpixelLabel.Position = [16 239 114 22];
+            app.PizelSizeumpixelLabel.Position = [16 240 114 22];
             app.PizelSizeumpixelLabel.Text = 'Pixel Size (um/pixel)';
 
             % Create PixelSizeFiberPrediction
@@ -2935,35 +2825,36 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeFiberPrediction.Limits = [0 Inf];
             app.PixelSizeFiberPrediction.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPredictionValueChanged, true);
             app.PixelSizeFiberPrediction.FontName = 'Avenir';
-            app.PixelSizeFiberPrediction.Position = [136 239 100 22];
+            app.PixelSizeFiberPrediction.Position = [136 240 100 22];
 
             % Create FiberPredictionDescription
             app.FiberPredictionDescription = uilabel(app.FiberPredictionControlPanel);
             app.FiberPredictionDescription.FontName = 'Avenir';
             app.FiberPredictionDescription.FontWeight = 'bold';
-            app.FiberPredictionDescription.Position = [9 353 240 32];
+            app.FiberPredictionDescription.Position = [9 354 240 32];
             app.FiberPredictionDescription.Text = {'This stage predicts which regions of the '; 'image are fibers.'};
 
             % Create FiberPredictionDescription_2
             app.FiberPredictionDescription_2 = uilabel(app.FiberPredictionControlPanel);
             app.FiberPredictionDescription_2.FontName = 'Avenir';
             app.FiberPredictionDescription_2.FontWeight = 'bold';
-            app.FiberPredictionDescription_2.Position = [9 279 269 64];
+            app.FiberPredictionDescription_2.Position = [9 280 269 64];
             app.FiberPredictionDescription_2.Text = {'Specify the Pixel Size and Sorting Threshold. '; 'Note that the sorting threshold is the '; 'probability that something is a fiber or'; 'non-fiber.'};
 
             % Create FiberPredictionDescription_3
             app.FiberPredictionDescription_3 = uilabel(app.FiberPredictionControlPanel);
             app.FiberPredictionDescription_3.FontName = 'Avenir';
             app.FiberPredictionDescription_3.FontWeight = 'bold';
-            app.FiberPredictionDescription_3.Position = [9 68 253 32];
+            app.FiberPredictionDescription_3.Position = [9 69 253 32];
             app.FiberPredictionDescription_3.Text = {'Manually sort the regions that could not be'; 'classified:'};
 
             % Create NonfiberClassificationControlPanel
             app.NonfiberClassificationControlPanel = uipanel(app.UIFigure);
+            app.NonfiberClassificationControlPanel.BorderType = 'none';
             app.NonfiberClassificationControlPanel.Visible = 'off';
             app.NonfiberClassificationControlPanel.BackgroundColor = [1 1 1];
             app.NonfiberClassificationControlPanel.FontName = 'Avenir';
-            app.NonfiberClassificationControlPanel.Position = [13 131 260 430];
+            app.NonfiberClassificationControlPanel.Position = [31 131 260 430];
 
             % Create NonfiberClassificationChannelColorBox
             app.NonfiberClassificationChannelColorBox = uiaxes(app.NonfiberClassificationControlPanel);
@@ -2973,14 +2864,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationChannelColorBox.YTick = [];
             app.NonfiberClassificationChannelColorBox.Color = [0 1 1];
             app.NonfiberClassificationChannelColorBox.Box = 'on';
-            app.NonfiberClassificationChannelColorBox.Position = [228 185 30 30];
+            app.NonfiberClassificationChannelColorBox.Position = [228 186 30 30];
 
             % Create PixelSizeumpixelEditField_3Label_2
             app.PixelSizeumpixelEditField_3Label_2 = uilabel(app.NonfiberClassificationControlPanel);
             app.PixelSizeumpixelEditField_3Label_2.HorizontalAlignment = 'right';
             app.PixelSizeumpixelEditField_3Label_2.FontName = 'Avenir';
             app.PixelSizeumpixelEditField_3Label_2.Tooltip = {'Pixel size is default based on microscope, adjust pixel size to your specific microscope.'};
-            app.PixelSizeumpixelEditField_3Label_2.Position = [44 217 59 32];
+            app.PixelSizeumpixelEditField_3Label_2.Position = [44 218 59 32];
             app.PixelSizeumpixelEditField_3Label_2.Text = {'Pixel Size'; '(um/pixel)'};
 
             % Create PixelSizeNonfiberClassification
@@ -2988,26 +2879,26 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeNonfiberClassification.Limits = [0 Inf];
             app.PixelSizeNonfiberClassification.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberClassificationValueChanged, true);
             app.PixelSizeNonfiberClassification.FontName = 'Avenir';
-            app.PixelSizeNonfiberClassification.Position = [118 227 100 22];
+            app.PixelSizeNonfiberClassification.Position = [118 228 100 22];
 
             % Create DataOutputFolderEditField_3Label_3
             app.DataOutputFolderEditField_3Label_3 = uilabel(app.NonfiberClassificationControlPanel);
             app.DataOutputFolderEditField_3Label_3.HorizontalAlignment = 'right';
             app.DataOutputFolderEditField_3Label_3.FontName = 'Avenir';
             app.DataOutputFolderEditField_3Label_3.Tooltip = {'Save Excel sheet of this step to the folder specified here.'};
-            app.DataOutputFolderEditField_3Label_3.Position = [16 155 111 22];
+            app.DataOutputFolderEditField_3Label_3.Position = [16 156 111 22];
             app.DataOutputFolderEditField_3Label_3.Text = 'Data Output Folder';
 
             % Create NonfiberClassificationDataOutputFolder
             app.NonfiberClassificationDataOutputFolder = uieditfield(app.NonfiberClassificationControlPanel, 'text');
             app.NonfiberClassificationDataOutputFolder.FontName = 'Avenir';
-            app.NonfiberClassificationDataOutputFolder.Position = [142 155 100 22];
+            app.NonfiberClassificationDataOutputFolder.Position = [142 156 100 22];
 
             % Create ClassifyNonfiberObjects
             app.ClassifyNonfiberObjects = uibutton(app.NonfiberClassificationControlPanel, 'push');
             app.ClassifyNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @ClassifyNonfiberObjectsButtonPushed, true);
             app.ClassifyNonfiberObjects.FontName = 'Avenir';
-            app.ClassifyNonfiberObjects.Position = [19 113 100 24];
+            app.ClassifyNonfiberObjects.Position = [19 114 100 24];
             app.ClassifyNonfiberObjects.Text = 'Calculate';
 
             % Create WritetoExcelNonfiberClassification
@@ -3015,14 +2906,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.WritetoExcelNonfiberClassification.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelNonfiberClassificationButtonPushed, true);
             app.WritetoExcelNonfiberClassification.FontName = 'Avenir';
             app.WritetoExcelNonfiberClassification.Enable = 'off';
-            app.WritetoExcelNonfiberClassification.Position = [140 112 100 24];
+            app.WritetoExcelNonfiberClassification.Position = [140 113 100 24];
             app.WritetoExcelNonfiberClassification.Text = 'Write to Excel';
 
             % Create DoneNonfiberClassification
             app.DoneNonfiberClassification = uibutton(app.NonfiberClassificationControlPanel, 'push');
             app.DoneNonfiberClassification.ButtonPushedFcn = createCallbackFcn(app, @DoneNonfiberClassificationButtonPushed, true);
             app.DoneNonfiberClassification.FontName = 'Avenir';
-            app.DoneNonfiberClassification.Position = [84 45 100 24];
+            app.DoneNonfiberClassification.Position = [84 46 100 24];
             app.DoneNonfiberClassification.Text = 'Close';
 
             % Create ClassificationColorLabel
@@ -3030,7 +2921,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.ClassificationColorLabel.HorizontalAlignment = 'right';
             app.ClassificationColorLabel.FontName = 'Avenir';
             app.ClassificationColorLabel.Tooltip = {'Based on the channel used for imaging.'};
-            app.ClassificationColorLabel.Position = [2 188 108 22];
+            app.ClassificationColorLabel.Position = [2 189 108 22];
             app.ClassificationColorLabel.Text = 'Classification Color';
 
             % Create NonfiberClassificationColorDropDown
@@ -3039,253 +2930,36 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberClassificationColorDropDown.ItemsData = {'1', '2', '3'};
             app.NonfiberClassificationColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NonfiberClassificationColorDropDownValueChanged, true);
             app.NonfiberClassificationColorDropDown.FontName = 'Avenir';
-            app.NonfiberClassificationColorDropDown.Position = [118 188 100 22];
+            app.NonfiberClassificationColorDropDown.Position = [118 189 100 22];
             app.NonfiberClassificationColorDropDown.Value = '1';
 
             % Create NonfiberClassificationFileWriteStatusLabel
             app.NonfiberClassificationFileWriteStatusLabel = uilabel(app.NonfiberClassificationControlPanel);
             app.NonfiberClassificationFileWriteStatusLabel.FontName = 'Avenir';
-            app.NonfiberClassificationFileWriteStatusLabel.Position = [74 72 126 32];
+            app.NonfiberClassificationFileWriteStatusLabel.Position = [74 73 126 32];
             app.NonfiberClassificationFileWriteStatusLabel.Text = {'Nonfiber Classification'; ' File Write Status'};
 
             % Create NonfiberClassificationDescription
             app.NonfiberClassificationDescription = uilabel(app.NonfiberClassificationControlPanel);
             app.NonfiberClassificationDescription.FontName = 'Avenir';
             app.NonfiberClassificationDescription.FontWeight = 'bold';
-            app.NonfiberClassificationDescription.Position = [12 372 213 48];
+            app.NonfiberClassificationDescription.Position = [12 373 213 48];
             app.NonfiberClassificationDescription.Text = {'Detect non-fibers with intensity of a '; 'certain color channel greater than a'; 'threshold value. '};
 
             % Create NonfiberClassificationDescription_2
             app.NonfiberClassificationDescription_2 = uilabel(app.NonfiberClassificationControlPanel);
             app.NonfiberClassificationDescription_2.FontName = 'Avenir';
             app.NonfiberClassificationDescription_2.FontWeight = 'bold';
-            app.NonfiberClassificationDescription_2.Position = [9 286 250 80];
+            app.NonfiberClassificationDescription_2.Position = [9 287 250 80];
             app.NonfiberClassificationDescription_2.Text = {'Set the field values below. Hover over the '; 'field names for more information. Press '; '"Calculate" to  calculate the nonfiber'; 'classification, and "Write to Excel" to save'; 'the data to Excel.'};
-
-            % Create CentralNucleiControlPanel
-            app.CentralNucleiControlPanel = uipanel(app.UIFigure);
-            app.CentralNucleiControlPanel.Visible = 'off';
-            app.CentralNucleiControlPanel.BackgroundColor = [1 1 1];
-            app.CentralNucleiControlPanel.FontName = 'Avenir';
-            app.CentralNucleiControlPanel.Position = [16 120 264 446];
-
-            % Create CentralNucleiChannelColorBox
-            app.CentralNucleiChannelColorBox = uiaxes(app.CentralNucleiControlPanel);
-            app.CentralNucleiChannelColorBox.Toolbar.Visible = 'off';
-            app.CentralNucleiChannelColorBox.FontName = 'Avenir';
-            app.CentralNucleiChannelColorBox.XTick = [];
-            app.CentralNucleiChannelColorBox.YTick = [];
-            app.CentralNucleiChannelColorBox.Color = [0 1 1];
-            app.CentralNucleiChannelColorBox.Box = 'on';
-            app.CentralNucleiChannelColorBox.Visible = 'off';
-            app.CentralNucleiChannelColorBox.PickableParts = 'none';
-            app.CentralNucleiChannelColorBox.Position = [228 237 30 30];
-
-            % Create PixelSizeumpixelLabel
-            app.PixelSizeumpixelLabel = uilabel(app.CentralNucleiControlPanel);
-            app.PixelSizeumpixelLabel.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelLabel.FontName = 'Avenir';
-            app.PixelSizeumpixelLabel.Tooltip = {'Pixel size is default based on microscope, adjust pixel size to your specific microscope.'};
-            app.PixelSizeumpixelLabel.Position = [48 265 58 32];
-            app.PixelSizeumpixelLabel.Text = {'Pixel Size'; 'um/pixel'};
-
-            % Create PixelSizeCentralNuclei
-            app.PixelSizeCentralNuclei = uieditfield(app.CentralNucleiControlPanel, 'numeric');
-            app.PixelSizeCentralNuclei.Limits = [0 Inf];
-            app.PixelSizeCentralNuclei.ValueChangedFcn = createCallbackFcn(app, @PixelSizeCentralNucleiValueChanged, true);
-            app.PixelSizeCentralNuclei.FontName = 'Avenir';
-            app.PixelSizeCentralNuclei.Tooltip = {'Minimum size for a region to be considered a nucleus.'};
-            app.PixelSizeCentralNuclei.Position = [121 275 100 22];
-
-            % Create NucleiColorDropDownLabel
-            app.NucleiColorDropDownLabel = uilabel(app.CentralNucleiControlPanel);
-            app.NucleiColorDropDownLabel.HorizontalAlignment = 'right';
-            app.NucleiColorDropDownLabel.FontName = 'Avenir';
-            app.NucleiColorDropDownLabel.Tooltip = {'Based on the channel used for imaging'};
-            app.NucleiColorDropDownLabel.Position = [37 240 73 22];
-            app.NucleiColorDropDownLabel.Text = 'Nuclei Color';
-
-            % Create NucleiColorDropDown
-            app.NucleiColorDropDown = uidropdown(app.CentralNucleiControlPanel);
-            app.NucleiColorDropDown.Items = {'Red', 'Green', 'Blue'};
-            app.NucleiColorDropDown.ItemsData = {'1', '2', '3'};
-            app.NucleiColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NucleiColorValueChanged, true);
-            app.NucleiColorDropDown.Tooltip = {'Minimum size for a region to be considered a nucleus.'};
-            app.NucleiColorDropDown.FontName = 'Avenir';
-            app.NucleiColorDropDown.Position = [125 240 100 22];
-            app.NucleiColorDropDown.Value = '1';
-
-            % Create CalculateCentralNuclei
-            app.CalculateCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
-            app.CalculateCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @CalculateCentralNucleiPushed, true);
-            app.CalculateCentralNuclei.FontName = 'Avenir';
-            app.CalculateCentralNuclei.Position = [26 95 100 24];
-            app.CalculateCentralNuclei.Text = 'Calculate';
-
-            % Create CentralNucleiExcelWrite
-            app.CentralNucleiExcelWrite = uibutton(app.CentralNucleiControlPanel, 'push');
-            app.CentralNucleiExcelWrite.ButtonPushedFcn = createCallbackFcn(app, @CentralNucleiExcelWriteButtonPushed, true);
-            app.CentralNucleiExcelWrite.FontName = 'Avenir';
-            app.CentralNucleiExcelWrite.Position = [138 95 100 24];
-            app.CentralNucleiExcelWrite.Text = 'Write To Excel';
-
-            % Create DoneCentralNuclei
-            app.DoneCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
-            app.DoneCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @DoneCentralNucleiPushed, true);
-            app.DoneCentralNuclei.FontName = 'Avenir';
-            app.DoneCentralNuclei.Position = [79 42 100 24];
-            app.DoneCentralNuclei.Text = 'Close';
-
-            % Create DistancefromborderEditFieldLabel
-            app.DistancefromborderEditFieldLabel = uilabel(app.CentralNucleiControlPanel);
-            app.DistancefromborderEditFieldLabel.HorizontalAlignment = 'right';
-            app.DistancefromborderEditFieldLabel.FontName = 'Avenir';
-            app.DistancefromborderEditFieldLabel.Tooltip = {'Distance of the nuclei from the fiber border.'};
-            app.DistancefromborderEditFieldLabel.Position = [14 208 119 22];
-            app.DistancefromborderEditFieldLabel.Text = 'Distance from border';
-
-            % Create DistancefromborderEditField
-            app.DistancefromborderEditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
-            app.DistancefromborderEditField.Limits = [0 Inf];
-            app.DistancefromborderEditField.FontName = 'Avenir';
-            app.DistancefromborderEditField.Position = [149 208 100 22];
-
-            % Create MinimumNucleusSizeum2EditFieldLabel
-            app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CentralNucleiControlPanel);
-            app.MinimumNucleusSizeum2EditFieldLabel.HorizontalAlignment = 'right';
-            app.MinimumNucleusSizeum2EditFieldLabel.FontName = 'Avenir';
-            app.MinimumNucleusSizeum2EditFieldLabel.Visible = 'off';
-            app.MinimumNucleusSizeum2EditFieldLabel.Tooltip = {'Minimum size for a region to be considered a nucleus.'};
-            app.MinimumNucleusSizeum2EditFieldLabel.Position = [-1 167 136 32];
-            app.MinimumNucleusSizeum2EditFieldLabel.Text = {'Minimum Nucleus Size'; '(um^2)'};
-
-            % Create MinimumNucleusSizeum2EditField
-            app.MinimumNucleusSizeum2EditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
-            app.MinimumNucleusSizeum2EditField.Limits = [0 Inf];
-            app.MinimumNucleusSizeum2EditField.FontName = 'Avenir';
-            app.MinimumNucleusSizeum2EditField.Visible = 'off';
-            app.MinimumNucleusSizeum2EditField.Tooltip = {'Save Excel sheet of this step to the folder specified here.'};
-            app.MinimumNucleusSizeum2EditField.Position = [150 177 100 22];
-
-            % Create DataOutputFolderEditField_2Label
-            app.DataOutputFolderEditField_2Label = uilabel(app.CentralNucleiControlPanel);
-            app.DataOutputFolderEditField_2Label.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditField_2Label.FontName = 'Avenir';
-            app.DataOutputFolderEditField_2Label.Tooltip = {'Save Excel sheet of this step to the folder specified here.'};
-            app.DataOutputFolderEditField_2Label.Position = [13 142 111 22];
-            app.DataOutputFolderEditField_2Label.Text = 'Data Output Folder';
-
-            % Create CentralNucleiDataOutputFolder
-            app.CentralNucleiDataOutputFolder = uieditfield(app.CentralNucleiControlPanel, 'text');
-            app.CentralNucleiDataOutputFolder.FontName = 'Avenir';
-            app.CentralNucleiDataOutputFolder.Tooltip = {'Save Excel sheet of this step to the folder specified here.'};
-            app.CentralNucleiDataOutputFolder.Position = [142 142 109 22];
-
-            % Create CentralNucleiDescription
-            app.CentralNucleiDescription = uilabel(app.CentralNucleiControlPanel);
-            app.CentralNucleiDescription.FontName = 'Avenir';
-            app.CentralNucleiDescription.FontWeight = 'bold';
-            app.CentralNucleiDescription.Position = [9 407 238 22];
-            app.CentralNucleiDescription.Text = {'Mark fibers with centrally located nuclei.'; ''};
-
-            % Create CentralNucleiDescription_2
-            app.CentralNucleiDescription_2 = uilabel(app.CentralNucleiControlPanel);
-            app.CentralNucleiDescription_2.FontName = 'Avenir';
-            app.CentralNucleiDescription_2.FontWeight = 'bold';
-            app.CentralNucleiDescription_2.Position = [9 320 248 80];
-            app.CentralNucleiDescription_2.Text = {'Set the field values below. Hover over the '; 'field names for more information. Press '; '"Calculate" to calculate the central nuclei,'; 'and "Write to Excel" to save the '; 'data to Excel.'; ''};
-
-            % Create CentralNucleiFileWriteStatusLabel
-            app.CentralNucleiFileWriteStatusLabel = uilabel(app.CentralNucleiControlPanel);
-            app.CentralNucleiFileWriteStatusLabel.FontName = 'Avenir';
-            app.CentralNucleiFileWriteStatusLabel.Position = [38 70 172 22];
-            app.CentralNucleiFileWriteStatusLabel.Text = 'Central Nuclei File Write Status';
-
-            % Create FiberPropertiesControlPanel
-            app.FiberPropertiesControlPanel = uipanel(app.UIFigure);
-            app.FiberPropertiesControlPanel.Visible = 'off';
-            app.FiberPropertiesControlPanel.BackgroundColor = [1 1 1];
-            app.FiberPropertiesControlPanel.FontName = 'Avenir';
-            app.FiberPropertiesControlPanel.Position = [31 224 250 337];
-
-            % Create WritetoExcelButton
-            app.WritetoExcelButton = uibutton(app.FiberPropertiesControlPanel, 'push');
-            app.WritetoExcelButton.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelButtonPushed, true);
-            app.WritetoExcelButton.FontName = 'Avenir';
-            app.WritetoExcelButton.Enable = 'off';
-            app.WritetoExcelButton.Position = [136 105 100 24];
-            app.WritetoExcelButton.Text = 'Write to Excel';
-
-            % Create DoneFiberProperties
-            app.DoneFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
-            app.DoneFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @DoneFiberPropertiesPushed, true);
-            app.DoneFiberProperties.FontName = 'Avenir';
-            app.DoneFiberProperties.Position = [79 48 100 24];
-            app.DoneFiberProperties.Text = 'Close';
-
-            % Create DataOutputFolderEditFieldLabel
-            app.DataOutputFolderEditFieldLabel = uilabel(app.FiberPropertiesControlPanel);
-            app.DataOutputFolderEditFieldLabel.HorizontalAlignment = 'right';
-            app.DataOutputFolderEditFieldLabel.FontName = 'Avenir';
-            app.DataOutputFolderEditFieldLabel.Position = [13 145 111 22];
-            app.DataOutputFolderEditFieldLabel.Text = 'Data Output Folder';
-
-            % Create FiberPropertiesDataOutputFolder
-            app.FiberPropertiesDataOutputFolder = uieditfield(app.FiberPropertiesControlPanel, 'text');
-            app.FiberPropertiesDataOutputFolder.FontName = 'Avenir';
-            app.FiberPropertiesDataOutputFolder.Position = [139 145 100 22];
-
-            % Create PixelSizeumpixelEditFieldLabel_2
-            app.PixelSizeumpixelEditFieldLabel_2 = uilabel(app.FiberPropertiesControlPanel);
-            app.PixelSizeumpixelEditFieldLabel_2.HorizontalAlignment = 'right';
-            app.PixelSizeumpixelEditFieldLabel_2.FontName = 'Avenir';
-            app.PixelSizeumpixelEditFieldLabel_2.FontWeight = 'bold';
-            app.PixelSizeumpixelEditFieldLabel_2.Visible = 'off';
-            app.PixelSizeumpixelEditFieldLabel_2.Position = [3 177 121 22];
-            app.PixelSizeumpixelEditFieldLabel_2.Text = 'Pixel Size (um/pixel)';
-
-            % Create PixelSizeFiberProperties
-            app.PixelSizeFiberProperties = uieditfield(app.FiberPropertiesControlPanel, 'numeric');
-            app.PixelSizeFiberProperties.Limits = [0 Inf];
-            app.PixelSizeFiberProperties.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPropertiesValueChanged, true);
-            app.PixelSizeFiberProperties.FontName = 'Avenir';
-            app.PixelSizeFiberProperties.FontWeight = 'bold';
-            app.PixelSizeFiberProperties.Visible = 'off';
-            app.PixelSizeFiberProperties.Position = [9 340 35 22];
-
-            % Create CalculateFiberProperties
-            app.CalculateFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
-            app.CalculateFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberPropertiesPushed, true);
-            app.CalculateFiberProperties.FontName = 'Avenir';
-            app.CalculateFiberProperties.Position = [21 105 100 24];
-            app.CalculateFiberProperties.Text = 'Calculate';
-
-            % Create FiberPropertiesDescription
-            app.FiberPropertiesDescription = uilabel(app.FiberPropertiesControlPanel);
-            app.FiberPropertiesDescription.FontName = 'Avenir';
-            app.FiberPropertiesDescription.FontWeight = 'bold';
-            app.FiberPropertiesDescription.Position = [11 294 228 32];
-            app.FiberPropertiesDescription.Text = {'Calculate minimum feret diameter and '; 'fiber area of fibers in the image.'};
-
-            % Create FiberPropertiesDescription_2
-            app.FiberPropertiesDescription_2 = uilabel(app.FiberPropertiesControlPanel);
-            app.FiberPropertiesDescription_2.FontName = 'Avenir';
-            app.FiberPropertiesDescription_2.FontWeight = 'bold';
-            app.FiberPropertiesDescription_2.Position = [11 218 243 64];
-            app.FiberPropertiesDescription_2.Text = {'Input the Pixel Size and Data Output'; 'Folder. Press "Calculate" to run calculate'; 'the fiber properties, and "Write to Excel"'; 'to save the data to Excel.'};
-
-            % Create FiberPropertiesFileWriteStatusLabel
-            app.FiberPropertiesFileWriteStatusLabel = uilabel(app.FiberPropertiesControlPanel);
-            app.FiberPropertiesFileWriteStatusLabel.FontName = 'Avenir';
-            app.FiberPropertiesFileWriteStatusLabel.Position = [26 77 211 22];
-            app.FiberPropertiesFileWriteStatusLabel.Text = 'Fiber Properties File Write Status';
 
             % Create NonfiberObjectsControlPanel
             app.NonfiberObjectsControlPanel = uipanel(app.UIFigure);
+            app.NonfiberObjectsControlPanel.BorderType = 'none';
             app.NonfiberObjectsControlPanel.Visible = 'off';
             app.NonfiberObjectsControlPanel.BackgroundColor = [1 1 1];
             app.NonfiberObjectsControlPanel.FontName = 'Avenir';
-            app.NonfiberObjectsControlPanel.Position = [14 131 260 424];
+            app.NonfiberObjectsControlPanel.Position = [31 131 260 424];
 
             % Create NonfiberChannelColorBox
             app.NonfiberChannelColorBox = uiaxes(app.NonfiberObjectsControlPanel);
@@ -3297,14 +2971,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberChannelColorBox.Box = 'on';
             app.NonfiberChannelColorBox.Visible = 'off';
             app.NonfiberChannelColorBox.PickableParts = 'none';
-            app.NonfiberChannelColorBox.Position = [227 206 30 30];
+            app.NonfiberChannelColorBox.Position = [227 207 30 30];
 
             % Create ObjectColorDropDownLabel
             app.ObjectColorDropDownLabel = uilabel(app.NonfiberObjectsControlPanel);
             app.ObjectColorDropDownLabel.HorizontalAlignment = 'right';
             app.ObjectColorDropDownLabel.FontName = 'Avenir';
             app.ObjectColorDropDownLabel.Tooltip = {'Based on the channel used for imaging'};
-            app.ObjectColorDropDownLabel.Position = [33 210 75 22];
+            app.ObjectColorDropDownLabel.Position = [33 211 75 22];
             app.ObjectColorDropDownLabel.Text = 'Object Color';
 
             % Create NonfiberObjectsColorDropDown
@@ -3313,7 +2987,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.NonfiberObjectsColorDropDown.ItemsData = {'1', '2', '3'};
             app.NonfiberObjectsColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NonfiberObjectsColorDropDownValueChanged, true);
             app.NonfiberObjectsColorDropDown.FontName = 'Avenir';
-            app.NonfiberObjectsColorDropDown.Position = [123 210 100 22];
+            app.NonfiberObjectsColorDropDown.Position = [123 211 100 22];
             app.NonfiberObjectsColorDropDown.Value = '1';
 
             % Create DataOutputFolderEditField_3Label_2
@@ -3321,33 +2995,33 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.DataOutputFolderEditField_3Label_2.HorizontalAlignment = 'right';
             app.DataOutputFolderEditField_3Label_2.FontName = 'Avenir';
             app.DataOutputFolderEditField_3Label_2.Tooltip = {'Save Excel sheet of this step to the folder specified here.'};
-            app.DataOutputFolderEditField_3Label_2.Position = [2 172 111 22];
+            app.DataOutputFolderEditField_3Label_2.Position = [2 173 111 22];
             app.DataOutputFolderEditField_3Label_2.Text = 'Data Output Folder';
 
             % Create NonfiberObjectsDataOutputFolder
             app.NonfiberObjectsDataOutputFolder = uieditfield(app.NonfiberObjectsControlPanel, 'text');
             app.NonfiberObjectsDataOutputFolder.FontName = 'Avenir';
-            app.NonfiberObjectsDataOutputFolder.Position = [128 172 100 22];
+            app.NonfiberObjectsDataOutputFolder.Position = [128 173 100 22];
 
             % Create CalculateNonfiberObjects
             app.CalculateNonfiberObjects = uibutton(app.NonfiberObjectsControlPanel, 'push');
             app.CalculateNonfiberObjects.ButtonPushedFcn = createCallbackFcn(app, @CalculateNonfiberObjectsButtonPushed, true);
             app.CalculateNonfiberObjects.FontName = 'Avenir';
-            app.CalculateNonfiberObjects.Position = [22 120 100 24];
+            app.CalculateNonfiberObjects.Position = [22 121 100 24];
             app.CalculateNonfiberObjects.Text = 'Calculate';
 
             % Create WritetoExcelNonfiber
             app.WritetoExcelNonfiber = uibutton(app.NonfiberObjectsControlPanel, 'push');
             app.WritetoExcelNonfiber.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelNonfiberButtonPushed, true);
             app.WritetoExcelNonfiber.FontName = 'Avenir';
-            app.WritetoExcelNonfiber.Position = [137 120 100 24];
+            app.WritetoExcelNonfiber.Position = [137 121 100 24];
             app.WritetoExcelNonfiber.Text = 'Write to Excel';
 
             % Create DoneNonfiber
             app.DoneNonfiber = uibutton(app.NonfiberObjectsControlPanel, 'push');
             app.DoneNonfiber.ButtonPushedFcn = createCallbackFcn(app, @DoneNonfiberButtonPushed, true);
             app.DoneNonfiber.FontName = 'Avenir';
-            app.DoneNonfiber.Position = [83 56 100 24];
+            app.DoneNonfiber.Position = [83 57 100 24];
             app.DoneNonfiber.Text = 'Close';
 
             % Create PixelSizeumpixelLabel_2
@@ -3355,7 +3029,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeumpixelLabel_2.HorizontalAlignment = 'right';
             app.PixelSizeumpixelLabel_2.FontName = 'Avenir';
             app.PixelSizeumpixelLabel_2.Tooltip = {'Pixel size is default based on microscope, adjust pixel size to your specific microscope.'};
-            app.PixelSizeumpixelLabel_2.Position = [51 245 59 32];
+            app.PixelSizeumpixelLabel_2.Position = [51 246 59 32];
             app.PixelSizeumpixelLabel_2.Text = {'Pixel Size'; '(um/pixel)'};
 
             % Create PixelSizeNonfiberObjects
@@ -3363,29 +3037,244 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.PixelSizeNonfiberObjects.Limits = [0 Inf];
             app.PixelSizeNonfiberObjects.ValueChangedFcn = createCallbackFcn(app, @PixelSizeNonfiberObjectsValueChanged, true);
             app.PixelSizeNonfiberObjects.FontName = 'Avenir';
-            app.PixelSizeNonfiberObjects.Position = [125 255 100 22];
+            app.PixelSizeNonfiberObjects.Position = [125 256 100 22];
 
             % Create NonfiberObjectsFileWriteStatusLabel
             app.NonfiberObjectsFileWriteStatusLabel = uilabel(app.NonfiberObjectsControlPanel);
             app.NonfiberObjectsFileWriteStatusLabel.FontName = 'Avenir';
-            app.NonfiberObjectsFileWriteStatusLabel.Position = [36 92 190 22];
+            app.NonfiberObjectsFileWriteStatusLabel.Position = [36 93 190 22];
             app.NonfiberObjectsFileWriteStatusLabel.Text = 'Nonfiber Objects File Write Status';
 
             % Create NonfiberObjectsDescription
             app.NonfiberObjectsDescription = uilabel(app.NonfiberObjectsControlPanel);
             app.NonfiberObjectsDescription.FontWeight = 'bold';
-            app.NonfiberObjectsDescription.Position = [8 385 226 28];
+            app.NonfiberObjectsDescription.Position = [8 386 226 28];
             app.NonfiberObjectsDescription.Text = {'Calculate and display objects that are '; 'not fibers. '};
 
             % Create NonfiberObjectsDescription_2
             app.NonfiberObjectsDescription_2 = uilabel(app.NonfiberObjectsControlPanel);
             app.NonfiberObjectsDescription_2.FontName = 'Avenir';
             app.NonfiberObjectsDescription_2.FontWeight = 'bold';
-            app.NonfiberObjectsDescription_2.Position = [8 294 248 80];
+            app.NonfiberObjectsDescription_2.Position = [8 295 248 80];
             app.NonfiberObjectsDescription_2.Text = {'Set the field values below. Hover over the '; 'field names for more information. Press '; '"Calculate" to calculate nonfiber objects,'; 'and "Write to Excel" to save the '; 'data to Excel.'};
+
+            % Create CentralNucleiControlPanel
+            app.CentralNucleiControlPanel = uipanel(app.UIFigure);
+            app.CentralNucleiControlPanel.BorderType = 'none';
+            app.CentralNucleiControlPanel.Visible = 'off';
+            app.CentralNucleiControlPanel.BackgroundColor = [1 1 1];
+            app.CentralNucleiControlPanel.FontName = 'Avenir';
+            app.CentralNucleiControlPanel.Position = [30 120 264 446];
+
+            % Create CentralNucleiChannelColorBox
+            app.CentralNucleiChannelColorBox = uiaxes(app.CentralNucleiControlPanel);
+            app.CentralNucleiChannelColorBox.Toolbar.Visible = 'off';
+            app.CentralNucleiChannelColorBox.FontName = 'Avenir';
+            app.CentralNucleiChannelColorBox.XTick = [];
+            app.CentralNucleiChannelColorBox.YTick = [];
+            app.CentralNucleiChannelColorBox.Color = [0 1 1];
+            app.CentralNucleiChannelColorBox.Box = 'on';
+            app.CentralNucleiChannelColorBox.Visible = 'off';
+            app.CentralNucleiChannelColorBox.PickableParts = 'none';
+            app.CentralNucleiChannelColorBox.Position = [228 238 30 30];
+
+            % Create PixelSizeumpixelLabel
+            app.PixelSizeumpixelLabel = uilabel(app.CentralNucleiControlPanel);
+            app.PixelSizeumpixelLabel.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelLabel.FontName = 'Avenir';
+            app.PixelSizeumpixelLabel.Tooltip = {'Pixel size is default based on microscope, adjust pixel size to your specific microscope.'};
+            app.PixelSizeumpixelLabel.Position = [48 266 58 32];
+            app.PixelSizeumpixelLabel.Text = {'Pixel Size'; 'um/pixel'};
+
+            % Create PixelSizeCentralNuclei
+            app.PixelSizeCentralNuclei = uieditfield(app.CentralNucleiControlPanel, 'numeric');
+            app.PixelSizeCentralNuclei.Limits = [0 Inf];
+            app.PixelSizeCentralNuclei.ValueChangedFcn = createCallbackFcn(app, @PixelSizeCentralNucleiValueChanged, true);
+            app.PixelSizeCentralNuclei.FontName = 'Avenir';
+            app.PixelSizeCentralNuclei.Tooltip = {'Minimum size for a region to be considered a nucleus.'};
+            app.PixelSizeCentralNuclei.Position = [121 276 100 22];
+
+            % Create NucleiColorDropDownLabel
+            app.NucleiColorDropDownLabel = uilabel(app.CentralNucleiControlPanel);
+            app.NucleiColorDropDownLabel.HorizontalAlignment = 'right';
+            app.NucleiColorDropDownLabel.FontName = 'Avenir';
+            app.NucleiColorDropDownLabel.Tooltip = {'Based on the channel used for imaging'};
+            app.NucleiColorDropDownLabel.Position = [37 241 73 22];
+            app.NucleiColorDropDownLabel.Text = 'Nuclei Color';
+
+            % Create NucleiColorDropDown
+            app.NucleiColorDropDown = uidropdown(app.CentralNucleiControlPanel);
+            app.NucleiColorDropDown.Items = {'Red', 'Green', 'Blue'};
+            app.NucleiColorDropDown.ItemsData = {'1', '2', '3'};
+            app.NucleiColorDropDown.ValueChangedFcn = createCallbackFcn(app, @NucleiColorValueChanged, true);
+            app.NucleiColorDropDown.Tooltip = {'Minimum size for a region to be considered a nucleus.'};
+            app.NucleiColorDropDown.FontName = 'Avenir';
+            app.NucleiColorDropDown.Position = [125 241 100 22];
+            app.NucleiColorDropDown.Value = '1';
+
+            % Create CalculateCentralNuclei
+            app.CalculateCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
+            app.CalculateCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @CalculateCentralNucleiPushed, true);
+            app.CalculateCentralNuclei.FontName = 'Avenir';
+            app.CalculateCentralNuclei.Position = [26 96 100 24];
+            app.CalculateCentralNuclei.Text = 'Calculate';
+
+            % Create CentralNucleiExcelWrite
+            app.CentralNucleiExcelWrite = uibutton(app.CentralNucleiControlPanel, 'push');
+            app.CentralNucleiExcelWrite.ButtonPushedFcn = createCallbackFcn(app, @CentralNucleiExcelWriteButtonPushed, true);
+            app.CentralNucleiExcelWrite.FontName = 'Avenir';
+            app.CentralNucleiExcelWrite.Position = [138 96 100 24];
+            app.CentralNucleiExcelWrite.Text = 'Write To Excel';
+
+            % Create DoneCentralNuclei
+            app.DoneCentralNuclei = uibutton(app.CentralNucleiControlPanel, 'push');
+            app.DoneCentralNuclei.ButtonPushedFcn = createCallbackFcn(app, @DoneCentralNucleiPushed, true);
+            app.DoneCentralNuclei.FontName = 'Avenir';
+            app.DoneCentralNuclei.Position = [79 43 100 24];
+            app.DoneCentralNuclei.Text = 'Close';
+
+            % Create DistancefromborderEditFieldLabel
+            app.DistancefromborderEditFieldLabel = uilabel(app.CentralNucleiControlPanel);
+            app.DistancefromborderEditFieldLabel.HorizontalAlignment = 'right';
+            app.DistancefromborderEditFieldLabel.FontName = 'Avenir';
+            app.DistancefromborderEditFieldLabel.Tooltip = {'Distance of the nuclei from the fiber border.'};
+            app.DistancefromborderEditFieldLabel.Position = [14 209 119 22];
+            app.DistancefromborderEditFieldLabel.Text = 'Distance from border';
+
+            % Create DistancefromborderEditField
+            app.DistancefromborderEditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
+            app.DistancefromborderEditField.Limits = [0 Inf];
+            app.DistancefromborderEditField.FontName = 'Avenir';
+            app.DistancefromborderEditField.Position = [149 209 100 22];
+
+            % Create MinimumNucleusSizeum2EditFieldLabel
+            app.MinimumNucleusSizeum2EditFieldLabel = uilabel(app.CentralNucleiControlPanel);
+            app.MinimumNucleusSizeum2EditFieldLabel.HorizontalAlignment = 'right';
+            app.MinimumNucleusSizeum2EditFieldLabel.FontName = 'Avenir';
+            app.MinimumNucleusSizeum2EditFieldLabel.Tooltip = {'Minimum size for a region to be considered a nucleus.'};
+            app.MinimumNucleusSizeum2EditFieldLabel.Position = [-1 168 136 32];
+            app.MinimumNucleusSizeum2EditFieldLabel.Text = {'Minimum Nucleus Size'; '(um^2)'};
+
+            % Create MinimumNucleusSizeum2EditField
+            app.MinimumNucleusSizeum2EditField = uieditfield(app.CentralNucleiControlPanel, 'numeric');
+            app.MinimumNucleusSizeum2EditField.Limits = [0 Inf];
+            app.MinimumNucleusSizeum2EditField.FontName = 'Avenir';
+            app.MinimumNucleusSizeum2EditField.Tooltip = {'Save Excel sheet of this step to the folder specified here.'};
+            app.MinimumNucleusSizeum2EditField.Position = [150 178 100 22];
+
+            % Create DataOutputFolderEditField_2Label
+            app.DataOutputFolderEditField_2Label = uilabel(app.CentralNucleiControlPanel);
+            app.DataOutputFolderEditField_2Label.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditField_2Label.FontName = 'Avenir';
+            app.DataOutputFolderEditField_2Label.Tooltip = {'Save Excel sheet of this step to the folder specified here.'};
+            app.DataOutputFolderEditField_2Label.Position = [13 143 111 22];
+            app.DataOutputFolderEditField_2Label.Text = 'Data Output Folder';
+
+            % Create CentralNucleiDataOutputFolder
+            app.CentralNucleiDataOutputFolder = uieditfield(app.CentralNucleiControlPanel, 'text');
+            app.CentralNucleiDataOutputFolder.FontName = 'Avenir';
+            app.CentralNucleiDataOutputFolder.Tooltip = {'Save Excel sheet of this step to the folder specified here.'};
+            app.CentralNucleiDataOutputFolder.Position = [142 143 109 22];
+
+            % Create CentralNucleiDescription
+            app.CentralNucleiDescription = uilabel(app.CentralNucleiControlPanel);
+            app.CentralNucleiDescription.FontName = 'Avenir';
+            app.CentralNucleiDescription.FontWeight = 'bold';
+            app.CentralNucleiDescription.Position = [9 408 238 22];
+            app.CentralNucleiDescription.Text = {'Mark fibers with centrally located nuclei.'; ''};
+
+            % Create CentralNucleiDescription_2
+            app.CentralNucleiDescription_2 = uilabel(app.CentralNucleiControlPanel);
+            app.CentralNucleiDescription_2.FontName = 'Avenir';
+            app.CentralNucleiDescription_2.FontWeight = 'bold';
+            app.CentralNucleiDescription_2.Position = [9 321 248 80];
+            app.CentralNucleiDescription_2.Text = {'Set the field values below. Hover over the '; 'field names for more information. Press '; '"Calculate" to calculate the central nuclei,'; 'and "Write to Excel" to save the '; 'data to Excel.'; ''};
+
+            % Create CentralNucleiFileWriteStatusLabel
+            app.CentralNucleiFileWriteStatusLabel = uilabel(app.CentralNucleiControlPanel);
+            app.CentralNucleiFileWriteStatusLabel.FontName = 'Avenir';
+            app.CentralNucleiFileWriteStatusLabel.Position = [38 71 172 22];
+            app.CentralNucleiFileWriteStatusLabel.Text = 'Central Nuclei File Write Status';
+
+            % Create FiberPropertiesControlPanel
+            app.FiberPropertiesControlPanel = uipanel(app.UIFigure);
+            app.FiberPropertiesControlPanel.BorderType = 'none';
+            app.FiberPropertiesControlPanel.Visible = 'off';
+            app.FiberPropertiesControlPanel.BackgroundColor = [1 1 1];
+            app.FiberPropertiesControlPanel.FontName = 'Avenir';
+            app.FiberPropertiesControlPanel.Position = [31 224 250 337];
+
+            % Create WritetoExcelButton
+            app.WritetoExcelButton = uibutton(app.FiberPropertiesControlPanel, 'push');
+            app.WritetoExcelButton.ButtonPushedFcn = createCallbackFcn(app, @WritetoExcelButtonPushed, true);
+            app.WritetoExcelButton.FontName = 'Avenir';
+            app.WritetoExcelButton.Enable = 'off';
+            app.WritetoExcelButton.Position = [136 106 100 24];
+            app.WritetoExcelButton.Text = 'Write to Excel';
+
+            % Create DoneFiberProperties
+            app.DoneFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
+            app.DoneFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @DoneFiberPropertiesPushed, true);
+            app.DoneFiberProperties.FontName = 'Avenir';
+            app.DoneFiberProperties.Position = [79 49 100 24];
+            app.DoneFiberProperties.Text = 'Close';
+
+            % Create DataOutputFolderEditFieldLabel
+            app.DataOutputFolderEditFieldLabel = uilabel(app.FiberPropertiesControlPanel);
+            app.DataOutputFolderEditFieldLabel.HorizontalAlignment = 'right';
+            app.DataOutputFolderEditFieldLabel.FontName = 'Avenir';
+            app.DataOutputFolderEditFieldLabel.Position = [13 146 111 22];
+            app.DataOutputFolderEditFieldLabel.Text = 'Data Output Folder';
+
+            % Create FiberPropertiesDataOutputFolder
+            app.FiberPropertiesDataOutputFolder = uieditfield(app.FiberPropertiesControlPanel, 'text');
+            app.FiberPropertiesDataOutputFolder.FontName = 'Avenir';
+            app.FiberPropertiesDataOutputFolder.Position = [139 146 100 22];
+
+            % Create PixelSizeumpixelEditFieldLabel_2
+            app.PixelSizeumpixelEditFieldLabel_2 = uilabel(app.FiberPropertiesControlPanel);
+            app.PixelSizeumpixelEditFieldLabel_2.HorizontalAlignment = 'right';
+            app.PixelSizeumpixelEditFieldLabel_2.FontName = 'Avenir';
+            app.PixelSizeumpixelEditFieldLabel_2.Position = [5 178 121 22];
+            app.PixelSizeumpixelEditFieldLabel_2.Text = 'Pixel Size (um/pixel)';
+
+            % Create PixelSizeFiberProperties
+            app.PixelSizeFiberProperties = uieditfield(app.FiberPropertiesControlPanel, 'numeric');
+            app.PixelSizeFiberProperties.Limits = [0 Inf];
+            app.PixelSizeFiberProperties.ValueChangedFcn = createCallbackFcn(app, @PixelSizeFiberPropertiesValueChanged, true);
+            app.PixelSizeFiberProperties.FontName = 'Avenir';
+            app.PixelSizeFiberProperties.Position = [139 181 97 22];
+
+            % Create CalculateFiberProperties
+            app.CalculateFiberProperties = uibutton(app.FiberPropertiesControlPanel, 'push');
+            app.CalculateFiberProperties.ButtonPushedFcn = createCallbackFcn(app, @CalculateFiberPropertiesPushed, true);
+            app.CalculateFiberProperties.FontName = 'Avenir';
+            app.CalculateFiberProperties.Position = [21 106 100 24];
+            app.CalculateFiberProperties.Text = 'Calculate';
+
+            % Create FiberPropertiesDescription
+            app.FiberPropertiesDescription = uilabel(app.FiberPropertiesControlPanel);
+            app.FiberPropertiesDescription.FontName = 'Avenir';
+            app.FiberPropertiesDescription.FontWeight = 'bold';
+            app.FiberPropertiesDescription.Position = [11 295 228 32];
+            app.FiberPropertiesDescription.Text = {'Calculate minimum feret diameter and '; 'fiber area of fibers in the image.'};
+
+            % Create FiberPropertiesDescription_2
+            app.FiberPropertiesDescription_2 = uilabel(app.FiberPropertiesControlPanel);
+            app.FiberPropertiesDescription_2.FontName = 'Avenir';
+            app.FiberPropertiesDescription_2.FontWeight = 'bold';
+            app.FiberPropertiesDescription_2.Position = [11 219 243 64];
+            app.FiberPropertiesDescription_2.Text = {'Input the Pixel Size and Data Output'; 'Folder. Press "Calculate" to run calculate'; 'the fiber properties, and "Write to Excel"'; 'to save the data to Excel.'};
+
+            % Create FiberPropertiesFileWriteStatusLabel
+            app.FiberPropertiesFileWriteStatusLabel = uilabel(app.FiberPropertiesControlPanel);
+            app.FiberPropertiesFileWriteStatusLabel.FontName = 'Avenir';
+            app.FiberPropertiesFileWriteStatusLabel.Position = [26 78 211 22];
+            app.FiberPropertiesFileWriteStatusLabel.Text = 'Fiber Properties File Write Status';
 
             % Create ManualFilterControls
             app.ManualFilterControls = uipanel(app.UIFigure);
+            app.ManualFilterControls.BorderType = 'none';
             app.ManualFilterControls.Visible = 'off';
             app.ManualFilterControls.BackgroundColor = [1 1 1];
             app.ManualFilterControls.FontName = 'Avenir';
@@ -3395,7 +3284,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.RemoveNonfibersButton = uibutton(app.ManualFilterControls, 'push');
             app.RemoveNonfibersButton.ButtonPushedFcn = createCallbackFcn(app, @RemoveNonfibersButtonPushed, true);
             app.RemoveNonfibersButton.FontName = 'Avenir';
-            app.RemoveNonfibersButton.Position = [68 94 115 24];
+            app.RemoveNonfibersButton.Position = [68 95 115 24];
             app.RemoveNonfibersButton.Text = 'Remove Nonfibers';
 
             % Create FinishManualFilteringButton
@@ -3403,25 +3292,219 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FinishManualFilteringButton.ButtonPushedFcn = createCallbackFcn(app, @FinishManualFilteringButtonPushed, true);
             app.FinishManualFilteringButton.FontName = 'Avenir';
             app.FinishManualFilteringButton.Enable = 'off';
-            app.FinishManualFilteringButton.Position = [58 53 136 24];
+            app.FinishManualFilteringButton.Position = [58 54 136 24];
             app.FinishManualFilteringButton.Text = 'Finish Manual Filtering';
 
             % Create ManualFilterDescription
             app.ManualFilterDescription = uilabel(app.ManualFilterControls);
             app.ManualFilterDescription.FontName = 'Avenir';
             app.ManualFilterDescription.FontWeight = 'bold';
-            app.ManualFilterDescription.Position = [9 216 221 32];
+            app.ManualFilterDescription.Position = [9 217 221 32];
             app.ManualFilterDescription.Text = {'Remove any image regions that were '; 'misclassified as fibers.'};
 
             % Create ManualFilterDescription_2
             app.ManualFilterDescription_2 = uilabel(app.ManualFilterControls);
             app.ManualFilterDescription_2.FontName = 'Avenir';
             app.ManualFilterDescription_2.FontWeight = 'bold';
-            app.ManualFilterDescription_2.Position = [9 145 259 64];
+            app.ManualFilterDescription_2.Position = [9 146 259 64];
             app.ManualFilterDescription_2.Text = {'Click “Remove Nonfibers” and click on any '; 'misclassified fibers to remove them. If you '; 'accidentally remove a correctly classified'; 'fiber, click again to undo. '};
+
+            % Create PropertiesPanel
+            app.PropertiesPanel = uipanel(app.UIFigure);
+            app.PropertiesPanel.Visible = 'off';
+            app.PropertiesPanel.FontName = 'Avenir';
+            app.PropertiesPanel.Position = [285 28 890 637];
+
+            % Create FeretAxes
+            app.FeretAxes = uiaxes(app.PropertiesPanel);
+            title(app.FeretAxes, 'Distribution of Minimum Feret Diameter')
+            xlabel(app.FeretAxes, 'Diameter (um)')
+            ylabel(app.FeretAxes, 'Frequency')
+            app.FeretAxes.PlotBoxAspectRatio = [3.2695652173913 1 1];
+            app.FeretAxes.FontName = 'Avenir';
+            app.FeretAxes.Position = [53 323 799 285];
+
+            % Create FiberSizeAxes
+            app.FiberSizeAxes = uiaxes(app.PropertiesPanel);
+            title(app.FiberSizeAxes, 'Distribution of Fiber Area')
+            xlabel(app.FiberSizeAxes, 'Area (um^2)')
+            ylabel(app.FiberSizeAxes, 'Frequency')
+            app.FiberSizeAxes.PlotBoxAspectRatio = [3.29824561403509 1 1];
+            app.FiberSizeAxes.FontName = 'Avenir';
+            app.FiberSizeAxes.Position = [53 25 799 285];
+
+            % Create FiberTypingPanel
+            app.FiberTypingPanel = uipanel(app.UIFigure);
+            app.FiberTypingPanel.Visible = 'off';
+            app.FiberTypingPanel.FontName = 'Avenir';
+            app.FiberTypingPanel.Position = [285 15 882 650];
+
+            % Create FiberTypingAxesL
+            app.FiberTypingAxesL = uiaxes(app.FiberTypingPanel);
+            app.FiberTypingAxesL.PlotBoxAspectRatio = [1.06832298136646 1 1];
+            app.FiberTypingAxesL.FontName = 'Avenir';
+            app.FiberTypingAxesL.XColor = 'none';
+            app.FiberTypingAxesL.YColor = 'none';
+            app.FiberTypingAxesL.Position = [22 289 414 332];
+
+            % Create FiberTypingAxesR
+            app.FiberTypingAxesR = uiaxes(app.FiberTypingPanel);
+            app.FiberTypingAxesR.PlotBoxAspectRatio = [1.06832298136646 1 1];
+            app.FiberTypingAxesR.FontName = 'Avenir';
+            app.FiberTypingAxesR.XColor = 'none';
+            app.FiberTypingAxesR.YColor = 'none';
+            app.FiberTypingAxesR.Position = [450 289 416 335];
+
+            % Create FThistL
+            app.FThistL = uiaxes(app.FiberTypingPanel);
+            title(app.FThistL, 'Distribution of Average Fiber Pixel Intensity')
+            xlabel(app.FThistL, 'Intensity')
+            ylabel(app.FThistL, 'Frequency')
+            app.FThistL.PlotBoxAspectRatio = [1.83030303030303 1 1];
+            app.FThistL.FontName = 'Avenir';
+            app.FThistL.Position = [22 83 402 207];
+
+            % Create FThistR
+            app.FThistR = uiaxes(app.FiberTypingPanel);
+            title(app.FThistR, 'Distribution of Fiber Size')
+            xlabel(app.FThistR, 'Area (um^2)')
+            ylabel(app.FThistR, 'Frequency')
+            app.FThistR.PlotBoxAspectRatio = [1.91358024691358 1 1];
+            app.FThistR.FontName = 'Avenir';
+            app.FThistR.Position = [450 86 402 204];
+
+            % Create ThresholdEditFieldLabel
+            app.ThresholdEditFieldLabel = uilabel(app.FiberTypingPanel);
+            app.ThresholdEditFieldLabel.HorizontalAlignment = 'right';
+            app.ThresholdEditFieldLabel.FontName = 'Avenir';
+            app.ThresholdEditFieldLabel.Enable = 'off';
+            app.ThresholdEditFieldLabel.Position = [210 15 59 22];
+            app.ThresholdEditFieldLabel.Text = 'Threshold';
+
+            % Create ThresholdEditField
+            app.ThresholdEditField = uieditfield(app.FiberTypingPanel, 'numeric');
+            app.ThresholdEditField.Limits = [0 Inf];
+            app.ThresholdEditField.FontName = 'Avenir';
+            app.ThresholdEditField.Enable = 'off';
+            app.ThresholdEditField.Position = [284 14 100 22];
+
+            % Create AdjustButton
+            app.AdjustButton = uibutton(app.FiberTypingPanel, 'push');
+            app.AdjustButton.ButtonPushedFcn = createCallbackFcn(app, @AdjustButtonPushed, true);
+            app.AdjustButton.FontName = 'Avenir';
+            app.AdjustButton.Enable = 'off';
+            app.AdjustButton.Position = [423 12 100 24];
+            app.AdjustButton.Text = 'Adjust';
+
+            % Create AcceptButton
+            app.AcceptButton = uibutton(app.FiberTypingPanel, 'push');
+            app.AcceptButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptButtonPushed, true);
+            app.AcceptButton.FontName = 'Avenir';
+            app.AcceptButton.Enable = 'off';
+            app.AcceptButton.Position = [548 12 100 24];
+            app.AcceptButton.Text = 'Accept';
+
+            % Create Label_2
+            app.Label_2 = uilabel(app.FiberTypingPanel);
+            app.Label_2.FontName = 'Avenir';
+            app.Label_2.FontWeight = 'bold';
+            app.Label_2.Position = [176 46 523 32];
+            app.Label_2.Text = {'The value displayed below is the recommended threshold value. To calculate fiber typing'; 'with a different threshold value, select "Adjust". Otherwise, select "Accept".'};
+
+            % Create ManualSegmentationControls
+            app.ManualSegmentationControls = uipanel(app.UIFigure);
+            app.ManualSegmentationControls.BorderType = 'none';
+            app.ManualSegmentationControls.Visible = 'off';
+            app.ManualSegmentationControls.BackgroundColor = [1 1 1];
+            app.ManualSegmentationControls.FontName = 'Avenir';
+            app.ManualSegmentationControls.FontWeight = 'bold';
+            app.ManualSegmentationControls.Position = [19 113 298 459];
+
+            % Create StartDrawingButton
+            app.StartDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.StartDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @StartDrawingButtonPushed, true);
+            app.StartDrawingButton.FontName = 'Avenir';
+            app.StartDrawingButton.Position = [28 282 100 24];
+            app.StartDrawingButton.Text = 'Start Drawing';
+
+            % Create AcceptLineButton
+            app.AcceptLineButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.AcceptLineButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptLineButtonPushed, true);
+            app.AcceptLineButton.BackgroundColor = [0.9608 0.9608 0.9608];
+            app.AcceptLineButton.FontName = 'Avenir';
+            app.AcceptLineButton.Enable = 'off';
+            app.AcceptLineButton.Position = [149 255 100 51];
+            app.AcceptLineButton.Text = 'Accept Line';
+
+            % Create CloseManualSegmentationButton
+            app.CloseManualSegmentationButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.CloseManualSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseManualSegmentationButtonPushed, true);
+            app.CloseManualSegmentationButton.FontName = 'Avenir';
+            app.CloseManualSegmentationButton.Position = [55 33 182 60];
+            app.CloseManualSegmentationButton.Text = 'Close Manual Segmentation';
+
+            % Create DrawingModeLabel
+            app.DrawingModeLabel = uilabel(app.ManualSegmentationControls);
+            app.DrawingModeLabel.FontName = 'Avenir';
+            app.DrawingModeLabel.FontSize = 14;
+            app.DrawingModeLabel.FontWeight = 'bold';
+            app.DrawingModeLabel.Position = [11 365 103 22];
+            app.DrawingModeLabel.Text = 'Drawing Mode';
+
+            % Create MergeObjectsModeLabel
+            app.MergeObjectsModeLabel = uilabel(app.ManualSegmentationControls);
+            app.MergeObjectsModeLabel.FontName = 'Avenir';
+            app.MergeObjectsModeLabel.FontSize = 14;
+            app.MergeObjectsModeLabel.FontWeight = 'bold';
+            app.MergeObjectsModeLabel.Position = [11 210 146 22];
+            app.MergeObjectsModeLabel.Text = 'Merge Objects Mode';
+
+            % Create StartMergingButton
+            app.StartMergingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.StartMergingButton.ButtonPushedFcn = createCallbackFcn(app, @StartMergingButtonPushed, true);
+            app.StartMergingButton.FontName = 'Avenir';
+            app.StartMergingButton.Position = [28 145 100 24];
+            app.StartMergingButton.Text = 'Start Merging';
+
+            % Create FinishDrawingButton
+            app.FinishDrawingButton = uibutton(app.ManualSegmentationControls, 'push');
+            app.FinishDrawingButton.ButtonPushedFcn = createCallbackFcn(app, @FinishDrawingButtonPushed, true);
+            app.FinishDrawingButton.FontName = 'Avenir';
+            app.FinishDrawingButton.Enable = 'off';
+            app.FinishDrawingButton.Position = [28 253 100 24];
+            app.FinishDrawingButton.Text = 'Finish Drawing';
+
+            % Create ManualSegmentationDescription
+            app.ManualSegmentationDescription = uilabel(app.ManualSegmentationControls);
+            app.ManualSegmentationDescription.FontName = 'Avenir';
+            app.ManualSegmentationDescription.FontWeight = 'bold';
+            app.ManualSegmentationDescription.Position = [9 404 279 48];
+            app.ManualSegmentationDescription.Text = {'This step allows you to manually edit the fiber'; 'outlines generated in the "Initial Segmentation"'; 'stage as needed.'};
+
+            % Create ManualSegmentationDescription_2
+            app.ManualSegmentationDescription_2 = uilabel(app.ManualSegmentationControls);
+            app.ManualSegmentationDescription_2.FontName = 'Avenir';
+            app.ManualSegmentationDescription_2.FontWeight = 'bold';
+            app.ManualSegmentationDescription_2.Position = [6 99 293 22];
+            app.ManualSegmentationDescription_2.Text = 'Once you are done editing the image, click below:';
+
+            % Create ManualSegmentationDescription_3
+            app.ManualSegmentationDescription_3 = uilabel(app.ManualSegmentationControls);
+            app.ManualSegmentationDescription_3.FontName = 'Avenir';
+            app.ManualSegmentationDescription_3.FontWeight = 'bold';
+            app.ManualSegmentationDescription_3.Position = [19 316 277 48];
+            app.ManualSegmentationDescription_3.Text = {'Select "Start Drawing" to begin drawing on the'; 'image. You may adjust the line and click'; '"Accept Line" once you are done.'};
+
+            % Create ManualSegmentationDescription_4
+            app.ManualSegmentationDescription_4 = uilabel(app.ManualSegmentationControls);
+            app.ManualSegmentationDescription_4.FontName = 'Avenir';
+            app.ManualSegmentationDescription_4.FontWeight = 'bold';
+            app.ManualSegmentationDescription_4.Position = [19 179 242 32];
+            app.ManualSegmentationDescription_4.Text = {'Select "Start Merging" to begin merging '; 'over-segmented regions.'};
 
             % Create SegmentationParameters
             app.SegmentationParameters = uipanel(app.UIFigure);
+            app.SegmentationParameters.BorderType = 'none';
             app.SegmentationParameters.Visible = 'off';
             app.SegmentationParameters.BackgroundColor = [1 1 1];
             app.SegmentationParameters.FontName = 'Avenir';
@@ -3437,20 +3520,20 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberOutlineChannelColorBox.Color = [0 1 1];
             app.FiberOutlineChannelColorBox.Box = 'on';
             app.FiberOutlineChannelColorBox.PickableParts = 'none';
-            app.FiberOutlineChannelColorBox.Position = [238 224 30 30];
+            app.FiberOutlineChannelColorBox.Position = [238 225 30 30];
 
             % Create SegmentButton
             app.SegmentButton = uibutton(app.SegmentationParameters, 'push');
             app.SegmentButton.ButtonPushedFcn = createCallbackFcn(app, @SegmentButtonPushed, true);
             app.SegmentButton.FontName = 'Avenir';
-            app.SegmentButton.Position = [152 122 100 24];
+            app.SegmentButton.Position = [152 123 100 24];
             app.SegmentButton.Text = 'Segment';
 
             % Create FiberOutlineColorDropDownLabel
             app.FiberOutlineColorDropDownLabel = uilabel(app.SegmentationParameters);
             app.FiberOutlineColorDropDownLabel.HorizontalAlignment = 'right';
             app.FiberOutlineColorDropDownLabel.FontName = 'Avenir';
-            app.FiberOutlineColorDropDownLabel.Position = [6 228 109 22];
+            app.FiberOutlineColorDropDownLabel.Position = [6 229 109 22];
             app.FiberOutlineColorDropDownLabel.Text = 'Fiber Outline Color';
 
             % Create FiberOutlineColorDropDown
@@ -3459,7 +3542,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.FiberOutlineColorDropDown.ItemsData = {'1', '2', '3'};
             app.FiberOutlineColorDropDown.ValueChangedFcn = createCallbackFcn(app, @FiberOutlineColorValueChanged, true);
             app.FiberOutlineColorDropDown.FontName = 'Avenir';
-            app.FiberOutlineColorDropDown.Position = [126 228 106 22];
+            app.FiberOutlineColorDropDown.Position = [126 229 106 22];
             app.FiberOutlineColorDropDown.Value = '1';
 
             % Create AcceptSegmentationButton
@@ -3467,14 +3550,14 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.AcceptSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @AcceptSegmentationButtonPushed, true);
             app.AcceptSegmentationButton.FontName = 'Avenir';
             app.AcceptSegmentationButton.Enable = 'off';
-            app.AcceptSegmentationButton.Position = [89 75 100 24];
+            app.AcceptSegmentationButton.Position = [89 64 100 24];
             app.AcceptSegmentationButton.Text = 'Accept';
 
             % Create SegmentationThresholdSliderLabel
             app.SegmentationThresholdSliderLabel = uilabel(app.SegmentationParameters);
             app.SegmentationThresholdSliderLabel.HorizontalAlignment = 'center';
             app.SegmentationThresholdSliderLabel.FontName = 'Avenir';
-            app.SegmentationThresholdSliderLabel.Position = [10 168 80 43];
+            app.SegmentationThresholdSliderLabel.Position = [10 169 80 43];
             app.SegmentationThresholdSliderLabel.Text = {'Segmentation'; 'Threshold'};
 
             % Create SegmentationThresholdSlider
@@ -3482,45 +3565,43 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SegmentationThresholdSlider.Limits = [0 50];
             app.SegmentationThresholdSlider.ValueChangedFcn = createCallbackFcn(app, @SegmentationThresholdSliderValueChanged, true);
             app.SegmentationThresholdSlider.FontName = 'Avenir';
-            app.SegmentationThresholdSlider.Position = [104 194 153 3];
+            app.SegmentationThresholdSlider.Position = [104 195 153 3];
 
             % Create DetectValueButton
             app.DetectValueButton = uibutton(app.SegmentationParameters, 'push');
             app.DetectValueButton.ButtonPushedFcn = createCallbackFcn(app, @DetectValueButtonPushed, true);
             app.DetectValueButton.BackgroundColor = [0.902 0.902 0.902];
             app.DetectValueButton.FontName = 'Avenir';
-            app.DetectValueButton.Position = [27 122 100 24];
+            app.DetectValueButton.Position = [27 123 100 24];
             app.DetectValueButton.Text = 'Detect Value';
 
             % Create InitialSegmentationDescription
             app.InitialSegmentationDescription = uilabel(app.SegmentationParameters);
             app.InitialSegmentationDescription.FontName = 'Avenir';
             app.InitialSegmentationDescription.FontWeight = 'bold';
-            app.InitialSegmentationDescription.Position = [15 354 237 39];
+            app.InitialSegmentationDescription.Position = [15 355 237 39];
             app.InitialSegmentationDescription.Text = {'This step segments the image to extract'; 'muscle fiber features from the image.'};
 
             % Create InitialSegmentationDirections
             app.InitialSegmentationDirections = uilabel(app.SegmentationParameters);
             app.InitialSegmentationDirections.FontName = 'Avenir';
             app.InitialSegmentationDirections.FontWeight = 'bold';
-            app.InitialSegmentationDirections.Position = [15 253 267 102];
+            app.InitialSegmentationDirections.Position = [15 254 267 102];
             app.InitialSegmentationDirections.Text = {'Adjust the Fiber Outline Color, Pixel Size, '; 'and Segmentation Threshold to the desired '; 'values. Optionally, “Detect Value” can be'; 'used to predict a segmentation value. Select'; '“Segment” once the desired values are '; 'chosen, and click "Accept" to save changes.'};
-
-            % Create InitialSegmentationDescription_2
-            app.InitialSegmentationDescription_2 = uilabel(app.SegmentationParameters);
-            app.InitialSegmentationDescription_2.FontName = 'Avenir';
-            app.InitialSegmentationDescription_2.FontSize = 14;
-            app.InitialSegmentationDescription_2.FontWeight = 'bold';
-            app.InitialSegmentationDescription_2.Visible = 'off';
-            app.InitialSegmentationDescription_2.Position = [17 67 287 39];
-            app.InitialSegmentationDescription_2.Text = {'Select "Start Merging" to begin merging '; 'over-segmented regions.'};
 
             % Create CloseInitialSegmentationButton
             app.CloseInitialSegmentationButton = uibutton(app.SegmentationParameters, 'push');
             app.CloseInitialSegmentationButton.ButtonPushedFcn = createCallbackFcn(app, @CloseInitialSegmentationButtonPushed, true);
             app.CloseInitialSegmentationButton.FontName = 'Avenir';
-            app.CloseInitialSegmentationButton.Position = [89 38 100 24];
+            app.CloseInitialSegmentationButton.Position = [89 27 100 24];
             app.CloseInitialSegmentationButton.Text = 'Close';
+
+            % Create SegmentationStatusLabel
+            app.SegmentationStatusLabel = uilabel(app.SegmentationParameters);
+            app.SegmentationStatusLabel.FontName = 'Avenir';
+            app.SegmentationStatusLabel.Visible = 'off';
+            app.SegmentationStatusLabel.Position = [53 95 180 22];
+            app.SegmentationStatusLabel.Text = 'Segmentation Status Label';
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
