@@ -1637,6 +1637,7 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         % Button pushed function: InitialSegmentationButton
         function InitialSegmentationButtonPushed(app, event)
             DisableMenuBarButtonsAndClearFileLabels(app);
+            app.SegmentationStatusLabel.Text = '';
             app.ImageBackground.Visible = 'on';
             app.AcceptSegmentationButton.Enable = 'off';
 
