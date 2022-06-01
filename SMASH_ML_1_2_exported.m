@@ -3,6 +3,13 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
+        SortingAxesPanel                matlab.ui.container.Panel
+        Label_4                         matlab.ui.control.Label
+        MarkasfiberLabel                matlab.ui.control.Label
+        NoButton                        matlab.ui.control.Button
+        YesButton                       matlab.ui.control.Button
+        SortingAxesR                    matlab.ui.control.UIAxes
+        SortingAxesL                    matlab.ui.control.UIAxes
         SegmentationParameters          matlab.ui.container.Panel
         SegmentationStatusLabel         matlab.ui.control.Label
         CloseInitialSegmentationButton  matlab.ui.control.Button
@@ -177,12 +184,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
         ManualFiberFilterButton         matlab.ui.control.Button
         FiberPredictionButton           matlab.ui.control.Button
         ManualSegmentationButton        matlab.ui.control.Button
-        SortingAxesPanel                matlab.ui.container.Panel
-        MarkasfiberLabel                matlab.ui.control.Label
-        NoButton                        matlab.ui.control.Button
-        YesButton                       matlab.ui.control.Button
-        SortingAxesR                    matlab.ui.control.UIAxes
-        SortingAxesL                    matlab.ui.control.UIAxes
         Prompt                          matlab.ui.control.Label
         FilenameLabel                   matlab.ui.control.Label
         SelectFilesButton               matlab.ui.control.Button
@@ -2221,54 +2222,6 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.Prompt.Position = [289 650 824 22];
             app.Prompt.Text = '';
 
-            % Create SortingAxesPanel
-            app.SortingAxesPanel = uipanel(app.UIFigure);
-            app.SortingAxesPanel.Title = 'Panel4';
-            app.SortingAxesPanel.Visible = 'off';
-            app.SortingAxesPanel.FontName = 'Avenir';
-            app.SortingAxesPanel.Position = [285 28 890 633];
-
-            % Create SortingAxesL
-            app.SortingAxesL = uiaxes(app.SortingAxesPanel);
-            xlabel(app.SortingAxesL, 'X')
-            ylabel(app.SortingAxesL, 'Y')
-            app.SortingAxesL.PlotBoxAspectRatio = [1 1.04306220095694 1];
-            app.SortingAxesL.FontName = 'Avenir';
-            app.SortingAxesL.XColor = 'none';
-            app.SortingAxesL.YColor = 'none';
-            app.SortingAxesL.Position = [12 140 412 438];
-
-            % Create SortingAxesR
-            app.SortingAxesR = uiaxes(app.SortingAxesPanel);
-            xlabel(app.SortingAxesR, 'X')
-            ylabel(app.SortingAxesR, 'Y')
-            app.SortingAxesR.PlotBoxAspectRatio = [1 1.12082262210797 1];
-            app.SortingAxesR.FontName = 'Avenir';
-            app.SortingAxesR.XColor = 'none';
-            app.SortingAxesR.YColor = 'none';
-            app.SortingAxesR.Position = [467 140 412 438];
-
-            % Create YesButton
-            app.YesButton = uibutton(app.SortingAxesPanel, 'push');
-            app.YesButton.ButtonPushedFcn = createCallbackFcn(app, @YesButtonPushed, true);
-            app.YesButton.FontName = 'Avenir';
-            app.YesButton.Position = [178 58 100 24];
-            app.YesButton.Text = 'Yes';
-
-            % Create NoButton
-            app.NoButton = uibutton(app.SortingAxesPanel, 'push');
-            app.NoButton.ButtonPushedFcn = createCallbackFcn(app, @NoButtonPushed, true);
-            app.NoButton.FontName = 'Avenir';
-            app.NoButton.Position = [378 58 100 24];
-            app.NoButton.Text = 'No';
-
-            % Create MarkasfiberLabel
-            app.MarkasfiberLabel = uilabel(app.SortingAxesPanel);
-            app.MarkasfiberLabel.HorizontalAlignment = 'center';
-            app.MarkasfiberLabel.FontName = 'Avenir';
-            app.MarkasfiberLabel.Position = [188 95 290 22];
-            app.MarkasfiberLabel.Text = 'Mark as fiber?';
-
             % Create Toolbar
             app.Toolbar = uipanel(app.UIFigure);
             app.Toolbar.ForegroundColor = [1 1 1];
@@ -3602,6 +3555,61 @@ classdef SMASH_ML_1_2_exported < matlab.apps.AppBase
             app.SegmentationStatusLabel.Visible = 'off';
             app.SegmentationStatusLabel.Position = [53 95 180 22];
             app.SegmentationStatusLabel.Text = 'Segmentation Status Label';
+
+            % Create SortingAxesPanel
+            app.SortingAxesPanel = uipanel(app.UIFigure);
+            app.SortingAxesPanel.Title = 'Panel4';
+            app.SortingAxesPanel.Visible = 'off';
+            app.SortingAxesPanel.FontName = 'Avenir';
+            app.SortingAxesPanel.Position = [285 28 890 633];
+
+            % Create SortingAxesL
+            app.SortingAxesL = uiaxes(app.SortingAxesPanel);
+            xlabel(app.SortingAxesL, 'X')
+            ylabel(app.SortingAxesL, 'Y')
+            app.SortingAxesL.PlotBoxAspectRatio = [1 1.04306220095694 1];
+            app.SortingAxesL.FontName = 'Avenir';
+            app.SortingAxesL.XColor = 'none';
+            app.SortingAxesL.YColor = 'none';
+            app.SortingAxesL.Position = [12 140 412 438];
+
+            % Create SortingAxesR
+            app.SortingAxesR = uiaxes(app.SortingAxesPanel);
+            xlabel(app.SortingAxesR, 'X')
+            ylabel(app.SortingAxesR, 'Y')
+            app.SortingAxesR.PlotBoxAspectRatio = [1 1.12082262210797 1];
+            app.SortingAxesR.FontName = 'Avenir';
+            app.SortingAxesR.XColor = 'none';
+            app.SortingAxesR.YColor = 'none';
+            app.SortingAxesR.Position = [467 140 412 438];
+
+            % Create YesButton
+            app.YesButton = uibutton(app.SortingAxesPanel, 'push');
+            app.YesButton.ButtonPushedFcn = createCallbackFcn(app, @YesButtonPushed, true);
+            app.YesButton.FontName = 'Avenir';
+            app.YesButton.Position = [178 58 100 24];
+            app.YesButton.Text = 'Yes';
+
+            % Create NoButton
+            app.NoButton = uibutton(app.SortingAxesPanel, 'push');
+            app.NoButton.ButtonPushedFcn = createCallbackFcn(app, @NoButtonPushed, true);
+            app.NoButton.FontName = 'Avenir';
+            app.NoButton.Position = [378 58 100 24];
+            app.NoButton.Text = 'No';
+
+            % Create MarkasfiberLabel
+            app.MarkasfiberLabel = uilabel(app.SortingAxesPanel);
+            app.MarkasfiberLabel.HorizontalAlignment = 'center';
+            app.MarkasfiberLabel.FontName = 'Avenir';
+            app.MarkasfiberLabel.FontWeight = 'bold';
+            app.MarkasfiberLabel.Position = [188 95 290 22];
+            app.MarkasfiberLabel.Text = 'Mark as fiber?';
+
+            % Create Label_4
+            app.Label_4 = uilabel(app.SortingAxesPanel);
+            app.Label_4.FontWeight = 'bold';
+            app.Label_4.Position = [555 61 165 56];
+            app.Label_4.Text = {'Green: Classified as Fiber '; 'Red: Classified as Nonfiber '; 'Blue: Maybe Fiber '; 'Magenta: Maybe Nonfiber '; ''};
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
